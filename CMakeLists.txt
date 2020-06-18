@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.13)
 project(pipert CXX)
 # enable_testing()
 
-set(SOURCES src/ChannelBase.cpp src/Scheduler.cpp src/SchedulerImp.cpp src/Timer.cpp)
+set(SOURCES ChannelBase.cpp Scheduler.cpp SchedulerImp.cpp Timer.cpp)
 
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Using default build type Release as none was specified with -DCMAKE_BUILD_TYPE=<mode>")
@@ -41,10 +41,15 @@ endfunction(SetupTarget)
 find_package(Threads)
 # find_package(PkgConfig)
 
-add_library(${PROJECT_NAME}_static STATIC ${SOURCES})
+unset(REAL_SOURCES)
+foreach(CPPFILE ${SOURCES})
+  set(REAL_SOURCES ${REAL_SOURCES} src/${CPPFILE})
+endforeach(CPPFILE)
+
+add_library(${PROJECT_NAME}_static STATIC ${REAL_SOURCES})
 SetupTarget(${PROJECT_NAME}_static)
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
+add_library(${PROJECT_NAME} SHARED ${REAL_SOURCES})
 SetupTarget(${PROJECT_NAME})
 if(Threads_FOUND)
   target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
