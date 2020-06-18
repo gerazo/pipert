@@ -3,24 +3,12 @@
 
 namespace pipert {
 
-Scheduler::Scheduler(int workers) : imp_(new SchedulerImp(workers)) 
-{
+Scheduler::Scheduler(int workers) : imp_(new SchedulerImp(workers)) {}
 
-}
+Scheduler::~Scheduler() { delete imp_; }
 
-Scheduler::~Scheduler() 
-{ 
-  delete imp_; 
-}
+void Scheduler::Start() { imp_->Start(); }
 
-void Scheduler::Start() 
-{
-  imp_->Start();
-}
+void Scheduler::Stop() { imp_->Stop(); }
 
-void Scheduler::Stop() 
-{
-  imp_->Stop();
-}
-
-}
+}  // namespace pipert

@@ -6,18 +6,19 @@
 namespace pipert {
 
 class ChannelBase {
-public:
+ public:
   ChannelBase(const std::string& name, size_t buffer_size);
   virtual ~ChannelBase();
-	virtual void Execute() = 0;
+  virtual void Execute() = 0;
 
   const std::string& GetName() const { return name_; }
   int GetSize() const { return buffer_size_; }
-protected:
+
+ protected:
   std::string name_;
   size_t buffer_size_;
 };
 
-}
+}  // namespace pipert
 
-#endif //_CHANNEL_BASE_H_
+#endif  //_CHANNEL_BASE_H_

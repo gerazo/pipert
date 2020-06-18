@@ -2,27 +2,25 @@
 #define _STATELESS_CHANNEL_IMP_HPP_
 
 //#include "ChannelImp.h"
-#include <queue>
 #include <mutex>
+#include <queue>
 
 namespace pipert {
 
-template<class T>
+template <class T>
 class ChannelImp;
 
 class SchedulerImp;
 
-template<class T>
+template <class T>
 class Packet;
 
-template<class T>
+template <class T>
 class StatelessChannelImp : public ChannelImp<T> {
-public:
-  StatelessChannelImp(
-        const std::string& name,
-        SchedulerImp* scheduler,
-        const std::function<void(Packet<T>)>& callback,
-        int buffer_size);
+ public:
+  StatelessChannelImp(const std::string& name, SchedulerImp* scheduler,
+                      const std::function<void(Packet<T>)>& callback,
+                      int buffer_size);
 
   ~StatelessChannelImp();
 
@@ -30,43 +28,35 @@ public:
   // with the freshest element from the buffer
   void Execute() override;
 
-  // Write writes packet into the channel buffer 
+  // Write writes packet into the channel buffer
   // if number of packets less than
-  // the buffer_size_, otherwise drop the packet 
+  // the buffer_size_, otherwise drop the packet
   // and notify the scheduler that channel is ready for execution
   void Write(const Packet<T>& packet) override;
 
-private:
+ private:
   std::queue<Packet<T> > packets_;
   std::mutex m_;
   int dropped_packets_;
-
 };
 
-template<class T>
+template <class T>
 StatelessChannelImp<T>::StatelessChannelImp(
-        const std::string& name,
-        SchedulerImp* scheduler,
-        const std::function<void(Packet<T>)>& callback,
-        int buffer_size) :
-    ChannelImp<T>(name, scheduler, callback, buffer_size),
-    dropped_packets_(0)
-{
+    const std::string& name, SchedulerImp* scheduler,
+    const std::function<void(Packet<T>)>& callback, int buffer_size)
+    : ChannelImp<T>(name, scheduler, callback, buffer_size),
+      dropped_packets_(0) {}
 
-}
-
-template<class T>
-StatelessChannelImp<T>::~StatelessChannelImp()
-{
+template <class T>
+StatelessChannelImp<T>::~StatelessChannelImp() {
   std::cout << this->name_ << " -> ";
   std::cout << "dropped packets: " << dropped_packets_;
   std::cout << " remained packets is channel: " << packets_.size();
   std::cout << std::endl;
 }
 
-template<class T>
-void StatelessChannelImp<T>::Execute()
-{
+template <class T>
+void StatelessChannelImp<T>::Execute() {
   m_.lock();
   if (!packets_.empty()) {
     auto packet = packets_.front();
@@ -78,9 +68,8 @@ void StatelessChannelImp<T>::Execute()
   }
 }
 
-template<class T>
-void StatelessChannelImp<T>::Write(const Packet<T>& packet)
-{
+template <class T>
+void StatelessChannelImp<T>::Write(const Packet<T>& packet) {
   m_.lock();
   if (packets_.size() < this->buffer_size_) {
     packets_.push(packet);
@@ -94,6 +83,6 @@ void StatelessChannelImp<T>::Write(const Packet<T>& packet)
   }
 }
 
-}
+}  // namespace pipert
 
-#endif //_STATELESS_CHANNEL_IMP_HPP_
+#endif  //_STATELESS_CHANNEL_IMP_HPP_
