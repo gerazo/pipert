@@ -1,9 +1,14 @@
 cmake_minimum_required(VERSION 3.13)
 project(pipert CXX)
-# enable_testing()
+enable_testing()
 
+
+# Configuration
 set(SOURCES ChannelBase.cpp Scheduler.cpp SchedulerImp.cpp Timer.cpp)
+set(TEST_SOURCES PacketImp_test.cpp)
 
+
+# General settings
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Using default build type Release as none was specified with -DCMAKE_BUILD_TYPE=<mode>")
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Type of build." FORCE)
@@ -35,17 +40,27 @@ function(SetupTarget target_name)
   target_compile_options(${target_name} PRIVATE $<$<CONFIG:RelWithDebInfo>:-flto>)
   set_target_properties(${target_name} PROPERTIES LINK_FLAGS_RELEASE "-flto")
   set_target_properties(${target_name} PROPERTIES LINK_FLAGS_RELWITHDEBINFO "-flto")
-  target_include_directories(${target_name} SYSTEM PRIVATE "include")
+  target_include_directories(${target_name} PRIVATE "include")
 endfunction(SetupTarget)
-
-find_package(Threads)
-# find_package(PkgConfig)
 
 unset(REAL_SOURCES)
 foreach(CPPFILE ${SOURCES})
   set(REAL_SOURCES ${REAL_SOURCES} src/${CPPFILE})
 endforeach(CPPFILE)
 
+unset(REAL_TEST_SOURCES)
+foreach(CPPFILE ${TEST_SOURCES})
+  set(REAL_TEST_SOURCES ${REAL_TEST_SOURCES} test/${CPPFILE})
+endforeach(CPPFILE)
+
+
+# Libraries
+find_package(Threads)
+# find_package(PkgConfig)
+include(googletest.cmake)
+
+
+# Targets
 add_library(${PROJECT_NAME}_static STATIC ${REAL_SOURCES})
 SetupTarget(${PROJECT_NAME}_static)
 
@@ -54,3 +69,7 @@ SetupTarget(${PROJECT_NAME})
 if(Threads_FOUND)
   target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 endif()
+
+add_executable(${PROJECT_NAME}_test ${REAL_TEST_SOURCES})
+target_link_libraries(${PROJECT_NAME}_test gtest_main)
+add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
