@@ -17,6 +17,7 @@
 #include "StatefulJoinChannelImp.h"
 #include "StatelessChannelImp.h"
 #include "StatelessJoinChannelImp.h"
+#include "pipert/src/IScheduler.h"
 
 namespace pipert {
 
@@ -44,7 +45,7 @@ class StatefulJoinChannelImp;
 using StateAndQueue = std::pair<bool, std::queue<ChannelBase*>>;
 using StatefulHashtable = std::unordered_map<const void*, StateAndQueue>;
 
-class SchedulerImp {
+class SchedulerImp : public IScheduler {
  public:
   SchedulerImp(int workers_number);
 
@@ -79,9 +80,9 @@ class SchedulerImp {
 
   void MoveStatefulChannel(const void* mem_address);
 
-  void Start();
+  void Start() override;
 
-  void Stop();
+  void Stop() override;
 
  private:
   std::deque<ChannelBase*> channels_;

@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 #include "ChannelBase.h"
+#include "pipert/src/IChannel.h"
 
 namespace pipert {
 
@@ -15,12 +16,10 @@ class Packet;
 class SchedulerImp;
 
 template <class T>
-class ChannelImp : public ChannelBase {
+class ChannelImp : public ChannelBase, public IChannel<T> {
  public:
   ChannelImp(const std::string& name, SchedulerImp* scheduler,
              const std::function<void(Packet<T>)>& callback, int buffer_size);
-
-  virtual void Write(const Packet<T>& packet) = 0;
 
  protected:
   SchedulerImp* scheduler_;

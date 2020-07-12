@@ -2,7 +2,7 @@
 #define _CHANNEL_HPP_
 
 #include <memory>
-#include "ChannelImp.h"
+#include "src/IChannel.h"
 
 namespace pipert {
 
@@ -17,9 +17,9 @@ class Channel {
   {
   }*/
 
-  Channel(ChannelImp<T>* imp);
+  Channel(IChannel<T>* imp);
 
-  ChannelImp<T>* GetChannelImp();
+  //ChannelImp<T>* GetChannelImp();
 
   void Write(Packet<T> packet);
 
@@ -30,16 +30,16 @@ class Channel {
   int GetSize() const;
 
  protected:
-  std::shared_ptr<ChannelImp<T>> imp_;
+  std::shared_ptr<IChannel<T>> imp_;
 };
 
 template <class T>
-Channel<T>::Channel(ChannelImp<T>* imp) : imp_(imp) {}
+Channel<T>::Channel(IChannel<T>* imp) : imp_(imp) {}
 
-template <class T>
+/*template <class T>
 ChannelImp<T>* Channel<T>::GetChannelImp() {
   return imp_.get();
-}
+}*/
 
 template <class T>
 void Channel<T>::Write(Packet<T> packet) {

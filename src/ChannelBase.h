@@ -2,17 +2,17 @@
 #define _CHANNEL_BASE_H_
 
 #include <string>
+#include "pipert/src/IChannel.h"
 
 namespace pipert {
 
-class ChannelBase {
+class ChannelBase : public IChannelBase {
  public:
   ChannelBase(const std::string& name, size_t buffer_size);
   virtual ~ChannelBase();
-  virtual void Execute() = 0;
 
-  const std::string& GetName() const { return name_; }
-  int GetSize() const { return buffer_size_; }
+  const std::string& GetName() const override { return name_; }
+  int GetSize() const override { return buffer_size_; }
 
  protected:
   std::string name_;
