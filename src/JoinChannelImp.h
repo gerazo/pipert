@@ -2,6 +2,7 @@
 #define _JOIN_CHANNEL_IMP_HPP_
 
 //#include "ChannelBase.h"
+#include "pipert/src/IJoinChannel.h"
 
 namespace pipert {
 
@@ -13,15 +14,11 @@ class Packet;
 class SchedulerImp;
 
 template <class T1, class T2>
-class JoinChannelImp : public ChannelBase {
+class JoinChannelImp : public ChannelBase, public IJoinChannel<T1, T2> {
  public:
   JoinChannelImp(const std::string& name, SchedulerImp* scheduler,
                  const std::function<void(Packet<T1>, Packet<T2>)>& callback,
                  int buffer_size);
-
-  virtual void WriteFst(const Packet<T1>& packet) = 0;
-
-  virtual void WriteSnd(const Packet<T2>& packet) = 0;
 
  protected:
   SchedulerImp* scheduler_;
