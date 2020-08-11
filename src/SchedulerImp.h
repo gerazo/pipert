@@ -14,9 +14,7 @@
 
 #include "ChannelBase.h"
 #include "StatefulChannelImp.h"
-#include "StatefulJoinChannelImp.h"
 #include "StatelessChannelImp.h"
-#include "StatelessJoinChannelImp.h"
 #include "pipert/src/IScheduler.h"
 
 namespace pipert {
@@ -32,15 +30,6 @@ class StatelessChannelImp;
 
 template <class T>
 class StatefulChannelImp;
-
-template <class T1, class T2>
-class JoinChannel;
-
-template <class T1, class T2>
-class StatelessJoinChannelImp;
-
-template <class T1, class T2>
-class StatefulJoinChannelImp;
 
 using StateAndQueue = std::pair<bool, std::queue<ChannelBase*>>;
 using StatefulHashtable = std::unordered_map<const void*, StateAndQueue>;
@@ -60,18 +49,6 @@ class SchedulerImp : public IScheduler {
   Channel<T> MakeChannel(const void* mem_address, const std::string& name,
                          const std::function<void(Packet<T>)>& callback,
                          int buffer_size);
-
-  template <class T1, class T2>
-  JoinChannel<T1, T2> MakeJoinChannel(
-      const std::string& name,
-      const std::function<void(Packet<T1>, Packet<T2>)>& callback,
-      int buffer_size);
-
-  template <class T1, class T2>
-  JoinChannel<T1, T2> MakeJoinChannel(
-      const void* mem_address, const std::string& name,
-      const std::function<void(Packet<T1>, Packet<T2>)>& callback,
-      int buffer_size);
 
   void AddChannel(ChannelBase* channel);
 
@@ -110,26 +87,6 @@ Channel<T> SchedulerImp::MakeChannel(
     const std::function<void(Packet<T>)>& callback, int buffer_size) {
   Channel<T> ch(new StatefulChannelImp<T>(mem_address, name, this, callback,
                                           buffer_size));
-  return ch;
-}
-
-template <class T1, class T2>
-JoinChannel<T1, T2> SchedulerImp::MakeJoinChannel(
-    const std::string& name,
-    const std::function<void(Packet<T1>, Packet<T2>)>& callback,
-    int buffer_size) {
-  JoinChannel<T1, T2> ch(
-      new StatelessJoinChannelImp<T1, T2>(name, this, callback, buffer_size));
-  return ch;
-}
-
-template <class T1, class T2>
-JoinChannel<T1, T2> SchedulerImp::MakeJoinChannel(
-    const void* mem_address, const std::string& name,
-    const std::function<void(Packet<T1>, Packet<T2>)>& callback,
-    int buffer_size) {
-  JoinChannel<T1, T2> ch(new StatefulJoinChannelImp<T1, T2>(
-      mem_address, name, this, callback, buffer_size));
   return ch;
 }
 

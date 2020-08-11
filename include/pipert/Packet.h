@@ -22,8 +22,8 @@ class Packet {
 };
 
 template <class T>
-Packet<T>::Packet(const T& data) : 
-    imp_(new PacketImp(reinterpret_cast<const Byte*>(std::addressof(data))), sizeof(T)) {}
+Packet<T>::Packet(const T& data) 
+  : imp_(new PacketImp(reinterpret_cast<const Byte*>(std::addressof(data)), sizeof(T))) {}
 
 template <class T>
 T Packet<T>::GetData() const {

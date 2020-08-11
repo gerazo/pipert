@@ -7,9 +7,9 @@
 #include <functional>
 #include <iostream>
 #include <string>
-#include "Channel.h"
-#include "Packet.h"
-#include "Scheduler.h"
+#include "pipert/Channel.h"
+#include "pipert/Packet.h"
+#include "pipert/Scheduler.h"
 
 template <class T>
 void printPacketTimes(pipert::Packet<T> packet) {
@@ -48,7 +48,7 @@ class HumanPrinter {
     // std::endl; std::cout << h.GetDataConstPtr()->getId() << " : " <<
     // h.GetDataConstPtr()->getFirstName() << " " <<
     // h.GetDataConstPtr()->getLastName() << std::endl;
-    pipert::Packet<Human> newPacket(h.GetData(), h);
+    pipert::Packet<Human> newPacket(h.GetData());
     usleep(116);
     reverseChannel.Write(newPacket);
   }
@@ -71,7 +71,7 @@ class HumanReverse {
     std::reverse(fstn.begin(), fstn.end());
     std::reverse(sndn.begin(), sndn.end());
     Human newH(fstn, sndn, h.GetData().getId());
-    pipert::Packet<Human> hr(newH, h);
+    pipert::Packet<Human> hr(newH);
     ch.Write(hr);
     // std::cout << h.GetDataConstPtr()->getId() << " : " << fstn << " " << sndn
     // << std::endl;

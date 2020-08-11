@@ -1,10 +1,10 @@
-cmake_minimum_required(VERSION 3.13)
+cmake_minimum_required(VERSION 3.10)
 project(pipert CXX)
 enable_testing()
 
 
 # Configuration
-set(SOURCES ChannelBase.cpp Scheduler.cpp SchedulerImp.cpp Timer.cpp)
+set(SOURCES ChannelBase.cpp Scheduler.cpp SchedulerImp.cpp Timer.cpp PacketImp.cpp)
 set(TEST_SOURCES PacketImp_test.cpp)
 
 
