@@ -2,6 +2,7 @@
 #define _PACKET_HPP_
 
 #include <memory>
+#include "pipert/Timer.h"
 #include "src/PacketImp.h"
 
 namespace pipert {
@@ -9,13 +10,12 @@ namespace pipert {
 template <class T>
 class Packet {
  public:
-  using Time = uint64_t;
   Packet(const T& data);
   ~Packet() { }
 
   T GetData() const;
   T* GetDataPtr();
-  Time GetCreatedTime() const;
+  Timer::Time GetCreatedTime() const;
 
  private:
   std::shared_ptr<PacketImp> imp_;
@@ -36,7 +36,7 @@ T* Packet<T>::GetDataPtr() {
 }
 
 template <class T>
-typename Packet<T>::Time Packet<T>::GetCreatedTime() const {
+Timer::Time Packet<T>::GetCreatedTime() const {
   return imp_->GetCreatedTime();
 }
 

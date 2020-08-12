@@ -18,7 +18,7 @@ Byte* PacketImp::GetData() {
   return &raw_data_[0];
 }
 
-Time PacketImp::GetCreatedTime() const {
+Timer::Time PacketImp::GetCreatedTime() const {
   return created_at_;
 }
  
