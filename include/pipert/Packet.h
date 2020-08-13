@@ -1,45 +1,47 @@
-#ifndef _PACKET_HPP_
-#define _PACKET_HPP_
+#ifndef _PACKET_H_
+#define _PACKET_H_
 
-#include <memory>
+#include <utility>
 #include "pipert/Timer.h"
-#include "src/PacketImp.h"
 
 namespace pipert {
 
 template <class T>
 class Packet {
  public:
-  Packet(const T& data);
+  template <class... Args>
+  Packet(Timer::Time created_at, Args&&... args);
   ~Packet() { }
 
-  T GetData() const;
-  T* GetDataPtr();
   Timer::Time GetCreatedTime() const;
+  const T& data() const;
+  T& data();
 
  private:
-  std::shared_ptr<PacketImp> imp_;
+
+  Timer::Time created_at_;  // timestamp when package was first created
+  T data_;  // the data stored in the package
 };
 
-template <class T>
-Packet<T>::Packet(const T& data) 
-  : imp_(new PacketImp(reinterpret_cast<const Byte*>(std::addressof(data)), sizeof(T))) {}
-
-template <class T>
-T Packet<T>::GetData() const {
-  return *(reinterpret_cast<T*>(imp_->GetData()));
-}
-
-template <class T>
-T* Packet<T>::GetDataPtr() {
-  return reinterpret_cast<T*>(imp_->GetData());
-}
+template <class T> template <class... Args>
+Packet<T>::Packet(Timer::Time created_at, Args&&... args)
+  : created_at_(created_at), data_(std::forward<Args>(args)...) {}
 
 template <class T>
 Timer::Time Packet<T>::GetCreatedTime() const {
-  return imp_->GetCreatedTime();
+  return created_at_;
+}
+
+template <class T>
+const T& Packet<T>::data() const {
+  return data_;
+}
+
+template <class T>
+T& Packet<T>::data() {
+  return data_;
 }
 
 }  // namespace pipert
 
-#endif  //_PACKET_HPP_
+#endif  //_PACKET_H_

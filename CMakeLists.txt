@@ -4,8 +4,8 @@ enable_testing()
 
 
 # Configuration
-set(SOURCES ChannelBase.cpp Scheduler.cpp SchedulerImp.cpp Timer.cpp PacketImp.cpp)
-set(TEST_SOURCES PacketImp_test.cpp)
+set(SOURCES ChannelBase.cpp Scheduler.cpp SchedulerImp.cpp Timer.cpp)
+set(TEST_SOURCES PacketTest.cpp)
 
 
 # General settings
@@ -71,5 +71,10 @@ if(Threads_FOUND)
 endif()
 
 add_executable(${PROJECT_NAME}_test ${REAL_TEST_SOURCES})
-target_link_libraries(${PROJECT_NAME}_test gtest_main)
+SetupTarget(${PROJECT_NAME}_test)
+if(Threads_FOUND)
+  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME}_static gtest_main ${CMAKE_THREAD_LIBS_INIT})
+else()
+  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME}_static gtest_main)
+endif()
 add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
