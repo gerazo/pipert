@@ -11,14 +11,15 @@ class Packet {
  public:
   template <class... Args>
   Packet(Timer::Time created_at, Args&&... args);
-  ~Packet() { }
+  Packet(const Packet&) = delete;
+  Packet& operator=(const Packet&) = delete;
+  ~Packet() {}
 
   Timer::Time GetCreatedTime() const;
   const T& data() const;
   T& data();
 
  private:
-
   Timer::Time created_at_;  // timestamp when package was first created
   T data_;  // the data stored in the package
 };
