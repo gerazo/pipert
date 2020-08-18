@@ -12,7 +12,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ChannelBase.h"
+#include "pipert/ChannelBase.h"
 #include "StatefulChannelImp.h"
 #include "StatelessChannelImp.h"
 #include "pipert/src/IScheduler.h"

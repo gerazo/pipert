@@ -38,7 +38,6 @@ class StatefulChannelImp : public ChannelImp<T> {
 
  private:
   const void* mem_address_;
-  std::queue<Packet<T> > packets_;
   std::mutex m_;
   int dropped_packets_;
 };
@@ -57,16 +56,16 @@ template <class T>
 StatefulChannelImp<T>::~StatefulChannelImp() {
   std::cout << this->name_ << " -> ";
   std::cout << "dropped packets: " << dropped_packets_;
-  std::cout << " remained packets is channel: " << packets_.size();
+  std::cout << " remained packets is channel: " << this->packets_.size();
   std::cout << std::endl;
 }
 
 template <class T>
 void StatefulChannelImp<T>::Execute() {
   m_.lock();
-  if (!packets_.empty()) {
-    auto packet = packets_.front();
-    packets_.pop();
+  if (!this->packets_.empty()) {
+    auto packet = this->packets_.front();
+    this->packets_.pop();
     m_.unlock();
     this->callback_(packet);
   } else {
@@ -78,13 +77,13 @@ void StatefulChannelImp<T>::Execute() {
 template <class T>
 void StatefulChannelImp<T>::Write(const Packet<T>& packet) {
   m_.lock();
-  if (packets_.size() < this->buffer_size_) {
-    packets_.push(packet);
+  if (this->packets_.size() < this->buffer_size_) {
+    this->packets_.push(packet);
     m_.unlock();
     this->scheduler_->AddStatefulChannel(mem_address_, this);
   } else {
-    packets_.pop();
-    packets_.push(packet);
+    this->packets_.pop();
+    this->packets_.push(packet);
     ++dropped_packets_;
     m_.unlock();
   }

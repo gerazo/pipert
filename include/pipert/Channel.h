@@ -1,25 +1,20 @@
-#ifndef _CHANNEL_HPP_
-#define _CHANNEL_HPP_
+#ifndef _CHANNEL_H_
+#define _CHANNEL_H_
 
 #include <memory>
-#include "src/IChannel.h"
+#include "ChannelImp.h"
 
 namespace pipert {
 
 template <class T>
 class Packet;
 
+//Channel should be created by just Scheduler (friend?)
+
 template <class T>
 class Channel {
  public:
-  /*Channel(const std::function<void(Packet<T>)>& callback, int bufferSize)
-          :	imp_(new ChannelImp<T>(callback, bufferSize))
-  {
-  }*/
-
-  Channel(IChannel<T>* imp);
-
-  //ChannelImp<T>* GetChannelImp();
+  Channel(Channel<T>* imp);
 
   void Write(Packet<T> packet);
 
@@ -30,16 +25,11 @@ class Channel {
   int GetSize() const;
 
  protected:
-  std::shared_ptr<IChannel<T>> imp_;
+  std::shared_ptr<ChannelImp<T>> imp_;
 };
 
 template <class T>
-Channel<T>::Channel(IChannel<T>* imp) : imp_(imp) {}
-
-/*template <class T>
-ChannelImp<T>* Channel<T>::GetChannelImp() {
-  return imp_.get();
-}*/
+Channel<T>::Channel(Channel<T>* imp) : imp_(imp) {}
 
 template <class T>
 void Channel<T>::Write(Packet<T> packet) {
@@ -63,4 +53,4 @@ int Channel<T>::GetSize() const {
 
 }  // namespace pipert
 
-#endif  //_CHANNEL_HPP_
+#endif  //_CHANNEL_H_
