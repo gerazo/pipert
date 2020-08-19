@@ -4,7 +4,7 @@ enable_testing()
 
 
 # Configuration
-set(SOURCES ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp SchedulerImp.cpp Timer.cpp)
+set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp SchedulerImp.cpp Timer.cpp)
 set(TEST_SOURCES PacketTest.cpp)
 
 
