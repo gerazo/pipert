@@ -19,8 +19,13 @@ class ChannelBase {
   const char* GetName() const;
 
  protected:
-  ChannelBase(char* name, int capacity, int packet_size, void* this_mutex, InternalCallback callback);
+  ChannelBase(char* name, int capacity, int packet_size, void* mutex_state, InternalCallback callback);
   ~ChannelBase();
+
+  PacketBase* Acquire(const char* client_name);
+  void Push(PacketBase* packet);
+  PacketBase* GetNext();
+  void Release(PacketBase* packet);
 
  private:
   ChannelImpl* impl_;

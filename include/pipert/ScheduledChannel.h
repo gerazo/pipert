@@ -11,7 +11,7 @@ class ScheduledChannel : public Channel<T> {
  public:
   using Callback = std::function<void(PacketToProcess<T>)>;
 
-  ScheduledChannel(char* name, int capacity, void* this_mutex, Callback processing_fun);
+  ScheduledChannel(char* name, int capacity, void* mutex_state, Callback processing_fun);
 
  private:
   static void CallbackTranslator(ChannelBase* this_channel, PacketBase* packet);
@@ -20,8 +20,8 @@ class ScheduledChannel : public Channel<T> {
 };
 
 template <class T>
-ScheduledChannel<T>::ScheduledChannel(char* name, int capacity, void* this_mutex, Callback processing_fun)
-  : Channel(name, capacity, this_mutex, &CallbackTranslator), processing_fun_(processing_fun) {}
+ScheduledChannel<T>::ScheduledChannel(char* name, int capacity, void* mutex_state, Callback processing_fun)
+  : Channel(name, capacity, mutex_state, &CallbackTranslator), processing_fun_(processing_fun) {}
 
 template <class T>
 void ScheduledChannel<T>::CallbackTranslator(ChannelBase* this_channel, PacketBase* packet) {

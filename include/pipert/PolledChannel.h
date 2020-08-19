@@ -17,6 +17,12 @@ template <class T>
 PolledChannel<T>::PolledChannel(char* name, int capacity)
   : Channel(name, capacity, nullptr, nullptr) {}
 
+template <class T>
+PolledChannel<T>::PacketToProcess<T> Poll() {
+  Packet<T>* new_packet = reinterpret_cast<Packet<T>*>(GetNext());
+  return PacketToProcess<T>(new_packet, this);
+}
+
 }  // namespace pipert
 
 #endif  //_POLLEDCHANNEL_H_

@@ -20,14 +20,30 @@ const char* ChannelBase::GetName() const {
   return impl_->GetName();
 }
 
-ChannelBase::ChannelBase(char* name, int capacity, int packet_size, void* this_mutex, InternalCallback callback) {
-  impl_ = new ChannelImpl(name, capacity, packet_size, this_mutex, callback);
+ChannelBase::ChannelBase(char* name, int capacity, int packet_size, void* mutex_state, InternalCallback callback) {
+  impl_ = new ChannelImpl(name, capacity, packet_size, mutex_state, callback);
 }
 
 ChannelBase::~ChannelBase() {
   assert(impl_);
   delete impl_;
   impl_ = nullptr;
+}
+
+PacketBase* ChannelBase::Acquire(const char* client_name) {
+  return impl_->Acquire(client_name);
+}
+
+void ChannelBase::Push(PacketBase* packet) {
+  impl_->Push(packet);
+}
+
+PacketBase* ChannelBase::GetNext() {
+  return impl_->GetNext();
+}
+
+void ChannelBase::Release(PacketBase* packet) {
+  impl_->Release(packet);
 }
 
 }  // namespace pipert
