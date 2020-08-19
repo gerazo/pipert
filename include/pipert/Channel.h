@@ -17,12 +17,12 @@ class Channel : public ChannelBase {
   void Release(PacketToProcess<T>* processed_packet);
 
  protected:
-  Channel(char* name, int capacity, void* this_mutex);
+  Channel(char* name, int capacity, void* this_mutex, InternalCallback callback);
 };
 
 template <class T>
-Channel<T>::Channel(char* name, int capacity, void* this_mutex)
-  : ChannelBase(name, capacity, sizeof(Packet<T>), this_mutex) {}
+Channel<T>::Channel(char* name, int capacity, void* this_mutex, InternalCallback callback)
+  : ChannelBase(name, capacity, sizeof(Packet<T>), this_mutex, callback) {}
 
 }  // namespace pipert
 

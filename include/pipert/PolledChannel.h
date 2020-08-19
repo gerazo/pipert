@@ -9,12 +9,13 @@ template <class T>
 class PolledChannel : public Channel<T> {
  public:
   PolledChannel(char* name, int capacity);
+
   PacketToProcess<T> Poll();  ///< Returns empty object if there is no packet available
 };
 
 template <class T>
 PolledChannel<T>::PolledChannel(char* name, int capacity)
-  : Channel(name, capacity, nullptr) {}
+  : Channel(name, capacity, nullptr, nullptr) {}
 
 }  // namespace pipert
 

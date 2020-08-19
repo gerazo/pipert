@@ -13,7 +13,7 @@ TEST(PacketTest, InitializationWithData) {
   pipert::Packet<Human> packet_(now, "Jimi Hendrix", 28);
   EXPECT_EQ(packet_.data().name_, "Jimi Hendrix");
   EXPECT_EQ(packet_.data().age_, 28);
-  EXPECT_EQ(packet_.GetCreatedTime(), now);
+  EXPECT_EQ(packet_.timestamp(), now);
 }
 
 TEST(PacketTest, InitilaizationWithDifferentTime) {
@@ -24,7 +24,7 @@ TEST(PacketTest, InitilaizationWithDifferentTime) {
   EXPECT_EQ(packet_.data().age_, 28);
   EXPECT_EQ(packet2_.data().name_, "Kurt Cobain");
   EXPECT_EQ(packet2_.data().age_, 27);
-  EXPECT_NE(packet_.GetCreatedTime(), packet2_.GetCreatedTime());
+  EXPECT_NE(packet_.timestamp(), packet2_.timestamp());
 }
 
 TEST(PacketTest, ChangeDataInPacket) {
