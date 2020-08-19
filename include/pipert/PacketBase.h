@@ -10,13 +10,13 @@ class PacketBase {
   PacketBase(const PacketBase&) = delete;
   PacketBase& operator=(const PacketBase&) = delete;
 
-  Timer::Time GetCreatedTime() const { return created_at_; }
+  Timer::Time timestamp() const { return timestamp_; }
 
  protected:
-  PacketBase(Timer::Time created_at) : created_at_(created_at) {};
+  PacketBase(Timer::Time timestamp) : timestamp_(timestamp) {};
 
  private:
-  Timer::Time created_at_;  // timestamp when package was first created
+  Timer::Time timestamp_;  ///< time when data came into the system
 };
 
 }  // namespace pipert

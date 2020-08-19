@@ -10,7 +10,7 @@ template <class T>
 class Packet : public PacketBase {
  public:
   template <class... Args>
-  Packet(Timer::Time created_at, Args&&... args);
+  Packet(Timer::Time timestamp, Args&&... args);
   ~Packet() {}
 
   const T& data() const;
@@ -21,8 +21,8 @@ class Packet : public PacketBase {
 };
 
 template <class T> template <class... Args>
-Packet<T>::Packet(Timer::Time created_at, Args&&... args)
-  : PacketBase(created_at), data_(std::forward<Args>(args)...) {}
+Packet<T>::Packet(Timer::Time timestamp, Args&&... args)
+  : PacketBase(timestamp), data_(std::forward<Args>(args)...) {}
 
 template <class T>
 const T& Packet<T>::data() const {

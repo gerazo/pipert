@@ -3,7 +3,7 @@
 namespace pipert {
 
 int64_t Timer::time() {
-  return (int64_t)std::chrono::duration_cast<std::chrono::microseconds>(
+  return (Time)std::chrono::duration_cast<std::chrono::microseconds>(
              std::chrono::high_resolution_clock::now().time_since_epoch())
       .count();
 }

@@ -8,9 +8,9 @@ namespace pipert {
 
 class Timer {
  public:
-  using Time = uint64_t;
+  using Time = int64_t;
 
-  static int64_t time();  // return time since epoch in microseconds
+  static Time time();  // return time since epoch in microseconds
 
   void tic();
   double toc() const;         // return time passed in milliseconds

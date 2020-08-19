@@ -1,55 +1,28 @@
 #ifndef _CHANNEL_H_
 #define _CHANNEL_H_
 
-#include <memory>
-#include "ChannelImp.h"
+#include "pipert/ChannelBase.h"
+#include "pipert/Packet.h"
+#include "pipert/PacketToFill.h"
+#include "pipert/PacketToProcess.h"
 
 namespace pipert {
 
 template <class T>
-class Packet;
-
-//Channel should be created by just Scheduler (friend?)
-
-template <class T>
-class Channel {
+class Channel : public ChannelBase {
  public:
-  Channel(Channel<T>* imp);
-
-  void Write(Packet<T> packet);
-
-  void Execute();
-
-  const std::string& GetName() const;
-
-  int GetSize() const;
+  template <class... Args>
+  PacketToFill<T> Acquire(const char* client_name, Timer::Time timestamp, Args&&... args);  ///< Always returns, but sometimes old packets are dropped
+  void Push(PacketToFill<T>* filled_packet);
+  void Release(PacketToProcess<T>* processed_packet);
 
  protected:
-  std::shared_ptr<ChannelImp<T>> imp_;
+  Channel(char* name, int capacity, void* this_mutex);
 };
 
 template <class T>
-Channel<T>::Channel(Channel<T>* imp) : imp_(imp) {}
-
-template <class T>
-void Channel<T>::Write(Packet<T> packet) {
-  imp_->Write(packet);
-}
-
-template <class T>
-void Channel<T>::Execute() {
-  imp_->Execute;
-}
-
-template <class T>
-const std::string& Channel<T>::GetName() const {
-  return imp_->GetName();
-}
-
-template <class T>
-int Channel<T>::GetSize() const {
-  return imp_->GetSize();
-}
+Channel<T>::Channel(char* name, int capacity, void* this_mutex)
+  : ChannelBase(name, capacity, sizeof(Packet<T>), this_mutex) {}
 
 }  // namespace pipert
 

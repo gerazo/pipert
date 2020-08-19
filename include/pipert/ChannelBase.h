@@ -1,25 +1,27 @@
-#ifndef _CHANNEL_BASE_H_
-#define _CHANNEL_BASE_H_
-
-#include <string>
+#ifndef _CHANNELBASE_H_
+#define _CHANNELBASE_H_
 
 namespace pipert {
 
+class ChannelImpl;
+
 class ChannelBase {
  public:
-  virtual ~ChannelBase();
+  ChannelBase(const ChannelBase&) = delete;
+  ChannelBase& operator=(const ChannelBase&) = delete;
 
-  virtual void Execute() = 0;
-  const std::string& GetName() const { return name_; }
-  int GetSize() const { return buffer_size_; }
- protected:
-  ChannelBase(const std::string& name, size_t buffer_size);
+  int GetCapacity() const;  ///< Number of packets the channel buffer has space for
+  int GetPacketSize() const;
+  const char* GetName() const;
 
  protected:
-  std::string name_;
-  size_t buffer_size_;
+  ChannelBase(char* name, int capacity, int packet_size, void* this_mutex);
+  ~ChannelBase();
+
+ private:
+  ChannelImpl* impl_;
 };
 
 }  // namespace pipert
 
-#endif  //_CHANNEL_BASE_H_
+#endif  //_CHANNELBASE_H_
