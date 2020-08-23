@@ -3,8 +3,12 @@
 
 #include <cassert>
 #include "pipert/Packet.h"
+#include "pipert/Channel.h"
 
 namespace pipert {
+
+template <class T>
+class Channel;
 
 template <class T>
 class PacketStub {
@@ -13,6 +17,7 @@ class PacketStub {
   PacketStub& operator=(const PacketStub&) = delete;
   PacketStub(PacketStub&&);
   PacketStub& operator=(PacketStub&&);
+  void move(PacketStub&& o);
 
   bool IsEmpty() const;
   Timer::Time timestamp() const;

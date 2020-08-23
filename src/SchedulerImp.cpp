@@ -1,4 +1,4 @@
-#include "SchedulerImp.h"
+#include "pipert/SchedulerImp.h"
 
 namespace pipert {
 
@@ -70,10 +70,10 @@ void SchedulerImp::RunTasks() {
   while (keep_running_.load(std::memory_order_acquire)) {
     m_.lock();
     if (!channels_.empty()) {
-      ChannelBase* ch = channels_.front();
+      //ChannelBase* ch = channels_.front();
       channels_.pop_front();
       m_.unlock();
-      ch->Execute();
+      //ch->Execute();
     } else {
       m_.unlock();
     }

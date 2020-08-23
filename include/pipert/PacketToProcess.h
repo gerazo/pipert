@@ -15,21 +15,21 @@ class PacketToProcess : public PacketStub<T> {
 
 template <class T>
 PacketToProcess<T>::PacketToProcess(Packet<T>* packet, Channel<T>* channel)
-  : PacketStub(packet, channel) {
-  assert(channel_);
+  : PacketStub<T>(packet, channel) {
+  assert(this->channel_);
   // can be created empty
 }
 
 template <class T>
 PacketToProcess<T>::~PacketToProcess() {
-  if (!IsEmpty()) channel_->Release(this);
+  if (!this->IsEmpty()) this->channel_->Release(this);
 }
 
 template <class T>
 void PacketToProcess<T>::Release() {
-  assert(!IsEmpty());
-  channel_->Release(this);
-  packet_ = nullptr;
+  assert(!this->IsEmpty());
+  this->channel_->Release(this);
+  this->packet_ = nullptr;
 }
 
 }  // namespace pipert

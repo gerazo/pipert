@@ -15,21 +15,21 @@ class PacketToFill : public PacketStub<T> {
 
 template <class T>
 PacketToFill<T>::PacketToFill(Packet<T>* packet, Channel<T>* channel)
-  : PacketStub(packet, channel) {
-  assert(channel_);
-  assert(packet_);  // always created initialized
+  : PacketStub<T>(packet, channel) {
+  assert(this->channel_);
+  assert(this->packet_);  // always created initialized
 }
 
 template <class T>
 PacketToFill<T>::~PacketToFill() {
-  if (!IsEmpty()) channel_->Push(this);
+  if (!this->IsEmpty()) this->channel_->Push(this);
 }
 
 template <class T>
 void PacketToFill<T>::Push() {
-  assert(!IsEmpty());
-  channel_->Push(this);
-  packet_ = nullptr;
+  assert(!this->IsEmpty());
+  this->channel_->Push(this);
+  this->packet_ = nullptr;
 }
 
 }  // namespace pipert

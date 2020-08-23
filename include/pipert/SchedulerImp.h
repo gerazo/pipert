@@ -13,9 +13,7 @@
 #include <vector>
 
 #include "pipert/ChannelBase.h"
-#include "StatefulChannelImp.h"
-#include "StatelessChannelImp.h"
-#include "pipert/src/IScheduler.h"
+#include "pipert/PolledChannel.h"
 
 namespace pipert {
 
@@ -25,16 +23,10 @@ class Packet;
 template <class T>
 class Channel;
 
-template <class T>
-class StatelessChannelImp;
-
-template <class T>
-class StatefulChannelImp;
-
 using StateAndQueue = std::pair<bool, std::queue<ChannelBase*>>;
 using StatefulHashtable = std::unordered_map<const void*, StateAndQueue>;
 
-class SchedulerImp : public IScheduler {
+class SchedulerImp {
  public:
   SchedulerImp(int workers_number);
 
@@ -57,9 +49,9 @@ class SchedulerImp : public IScheduler {
 
   void MoveStatefulChannel(const void* mem_address);
 
-  void Start() override;
+  void Start();
 
-  void Stop() override;
+  void Stop();
 
  private:
   std::deque<ChannelBase*> channels_;
@@ -77,7 +69,7 @@ template <class T>
 Channel<T> SchedulerImp::MakeChannel(
     const std::string& name, const std::function<void(Packet<T>)>& callback,
     int buffer_size) {
-  Channel<T> ch(new StatelessChannelImp<T>(name, this, callback, buffer_size));
+  PolledChannel<T> ch(name, buffer_size);
   return ch;
 }
 
@@ -85,8 +77,7 @@ template <class T>
 Channel<T> SchedulerImp::MakeChannel(
     const void* mem_address, const std::string& name,
     const std::function<void(Packet<T>)>& callback, int buffer_size) {
-  Channel<T> ch(new StatefulChannelImp<T>(mem_address, name, this, callback,
-                                          buffer_size));
+  PolledChannel<T> ch(name, buffer_size);
   return ch;
 }
 

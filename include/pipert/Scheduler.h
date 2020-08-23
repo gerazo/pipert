@@ -2,7 +2,7 @@
 #define _SCHEDULER_H_
 
 #include <functional>
-#include "src/IScheduler.h"
+#include "pipert/SchedulerImp.h"
 
 namespace pipert {
 
@@ -25,7 +25,7 @@ class Scheduler {
   void Stop();
 
  private:
-  IScheduler* imp_;
+  SchedulerImp* imp_;
 };
 
 template <class T>

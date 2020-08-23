@@ -1,5 +1,6 @@
 #include "pipert/Scheduler.h"
-#include "SchedulerImp.h"
+#include "pipert/SchedulerImp.h"
+#include "pipert/PacketStub.h"
 
 namespace pipert {
 

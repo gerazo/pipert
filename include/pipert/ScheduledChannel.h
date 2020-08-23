@@ -21,7 +21,7 @@ class ScheduledChannel : public Channel<T> {
 
 template <class T>
 ScheduledChannel<T>::ScheduledChannel(char* name, int capacity, void* mutex_state, Callback processing_fun)
-  : Channel(name, capacity, mutex_state, &CallbackTranslator), processing_fun_(processing_fun) {}
+  : Channel<T>(name, capacity, mutex_state, &CallbackTranslator), processing_fun_(processing_fun) {}
 
 template <class T>
 void ScheduledChannel<T>::CallbackTranslator(ChannelBase* this_channel, PacketBase* packet) {
