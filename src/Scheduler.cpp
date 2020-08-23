@@ -1,15 +1,15 @@
 #include "pipert/Scheduler.h"
-#include "pipert/SchedulerImp.h"
+#include "pipert/SchedulerImpl.h"
 #include "pipert/PacketStub.h"
 
 namespace pipert {
 
-Scheduler::Scheduler(int workers) : imp_(new SchedulerImp(workers)) {}
+Scheduler::Scheduler(int workers) : impl_(new SchedulerImpl(workers)) {}
 
-Scheduler::~Scheduler() { delete imp_; }
+Scheduler::~Scheduler() { delete impl_; }
 
-void Scheduler::Start() { imp_->Start(); }
+void Scheduler::Start() { impl_->Start(); }
 
-void Scheduler::Stop() { imp_->Stop(); }
+void Scheduler::Stop() { impl_->Stop(); }
 
 }  // namespace pipert

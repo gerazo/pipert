@@ -1,25 +1,41 @@
-#include "pipert/SchedulerImp.h"
+#include "pipert/SchedulerImpl.h"
+#include "ChannelImpl.h"
 
 namespace pipert {
 
-SchedulerImp::SchedulerImp(int workers_number)
+SchedulerImpl::SchedulerImpl(int workers_number)
     : workers_number_(workers_number) {
   workers_.reserve(workers_number_);
 }
 
-SchedulerImp::~SchedulerImp() { Stop(); }
+SchedulerImpl::~SchedulerImpl() { Stop(); }
 
-void SchedulerImp::AddChannel(ChannelBase* channel) {
+ChannelImpl* SchedulerImpl::MakePolledChannel(char* name,
+                        int capacity,
+                        int packet_size
+                        ) {
+  return new ChannelImpl(name, capacity, packet_size, nullptr, nullptr, this);
+}
+
+ChannelImpl* SchedulerImpl::MakeScheduledChannel(char* name,
+                          int capacity,
+                          int packet_size,
+                          void* mutex_state,
+                          InternalCallback callback) {
+  return new ChannelImpl(name, capacity, packet_size, mutex_state, callback, this);
+}
+
+void SchedulerImpl::AddChannel(ChannelBase* channel) {
   std::lock_guard<std::mutex> guard(m_);
   channels_.push_back(channel);
 }
 
-void SchedulerImp::InitStatefulChannel(const void* mem_address) {
+void SchedulerImpl::InitStatefulChannel(const void* mem_address) {
   std::lock_guard<std::mutex> guard(m_);
   stateful_channels_hash_.insert({mem_address, {true, {}}});
 }
 
-void SchedulerImp::AddStatefulChannel(const void* mem_address,
+void SchedulerImpl::AddStatefulChannel(const void* mem_address,
                                       ChannelBase* channel) {
   m_.lock();
   StateAndQueue& state_and_queue =
@@ -38,7 +54,7 @@ void SchedulerImp::AddStatefulChannel(const void* mem_address,
   }
 }
 
-void SchedulerImp::MoveStatefulChannel(const void* mem_address) {
+void SchedulerImpl::MoveStatefulChannel(const void* mem_address) {
   std::lock_guard<std::mutex> guard(m_);
   StateAndQueue& state_and_queue =
       stateful_channels_hash_.find(mem_address)->second;
@@ -50,30 +66,31 @@ void SchedulerImp::MoveStatefulChannel(const void* mem_address) {
   }
 }
 
-void SchedulerImp::Start() {
+void SchedulerImpl::Start() {
   // worker = std::thread([](){ std::cout << "Thread started" << std::endl; });
   keep_running_.store(true, std::memory_order_release);
   while (workers_number_-- > 0) {
-    std::thread t = std::thread(&SchedulerImp::RunTasks, this);
+    std::thread t = std::thread(&SchedulerImpl::RunTasks, this);
     t.detach();
     workers_.push_back(&t);
   }
 }
 
-void SchedulerImp::Stop() {
+void SchedulerImpl::Stop() {
   // std::lock_guard<std::mutex> guard(m);
   std::cout << "Stop was called" << std::endl;
   keep_running_.store(false, std::memory_order_release);
 }
 
-void SchedulerImp::RunTasks() {
+void SchedulerImpl::RunTasks() {
   while (keep_running_.load(std::memory_order_acquire)) {
     m_.lock();
     if (!channels_.empty()) {
       //ChannelBase* ch = channels_.front();
       channels_.pop_front();
       m_.unlock();
-      //ch->Execute();
+      // ch->GetCallBack(ch, ch->GetNext()); ?? or
+      // ch->Execute(); and hiding behind all the implementation details, GetNext and calling the callback function
     } else {
       m_.unlock();
     }

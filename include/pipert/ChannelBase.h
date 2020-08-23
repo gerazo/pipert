@@ -20,12 +20,15 @@ class ChannelBase {
 
  protected:
   ChannelBase(char* name, int capacity, int packet_size, void* mutex_state, InternalCallback callback);
+  ChannelBase(ChannelImpl* impl);
   ~ChannelBase();
 
   PacketBase* Acquire(const char* client_name);
   void Push(PacketBase* packet);
   PacketBase* GetNext();
   void Release(PacketBase* packet);
+ private:
+  void Execute();
 
  private:
   ChannelImpl* impl_;

@@ -11,13 +11,16 @@ class ScheduledChannel : public Channel<T> {
  public:
   using Callback = std::function<void(PacketToProcess<T>)>;
 
-  ScheduledChannel(char* name, int capacity, void* mutex_state, Callback processing_fun);
-
- private:
+  ScheduledChannel(char* name, int capacity, void* mutex_state, Callback processing_fun); // Or plus parameter for Scheduler for the communication
+  ScheduledChannel(ChannelImpl* impl);
   static void CallbackTranslator(ChannelBase* this_channel, PacketBase* packet);
-
+ private:
   Callback processing_fun_;
 };
+
+template <class T>
+ScheduledChannel<T>::ScheduledChannel(ChannelImpl* impl) 
+  : Channel<T>(impl) {}
 
 template <class T>
 ScheduledChannel<T>::ScheduledChannel(char* name, int capacity, void* mutex_state, Callback processing_fun)
@@ -26,7 +29,7 @@ ScheduledChannel<T>::ScheduledChannel(char* name, int capacity, void* mutex_stat
 template <class T>
 void ScheduledChannel<T>::CallbackTranslator(ChannelBase* this_channel, PacketBase* packet) {
   ScheduledChannel<T>* my_this = reinterpret_cast<ScheduledChannel<T>*>(this_channel);
-  my_this->processing_fun_(PacketToProcess(reinterpret_cast<Packet<T>*>(packet), my_this));
+  my_this->processing_fun_(PacketToProcess<T>(reinterpret_cast<Packet<T>*>(packet), my_this));
 }
 
 }  // namespace pipert

@@ -21,8 +21,11 @@ const char* ChannelBase::GetName() const {
 }
 
 ChannelBase::ChannelBase(char* name, int capacity, int packet_size, void* mutex_state, InternalCallback callback) {
-  impl_ = new ChannelImpl(name, capacity, packet_size, mutex_state, callback);
+  impl_ = new ChannelImpl(name, capacity, packet_size, mutex_state, callback, nullptr);
 }
+
+ChannelBase::ChannelBase(ChannelImpl* impl)
+  : impl_(impl) {}
 
 ChannelBase::~ChannelBase() {
   assert(impl_);
@@ -35,7 +38,7 @@ PacketBase* ChannelBase::Acquire(const char* client_name) {
 }
 
 void ChannelBase::Push(PacketBase* packet) {
-  impl_->Push(packet);
+  impl_->Push(packet, this);
 }
 
 PacketBase* ChannelBase::GetNext() {

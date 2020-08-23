@@ -6,8 +6,8 @@
 
 namespace pipert {
 
-ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size, void* mutex_state, ChannelBase::InternalCallback callback)
-  : mutex_state_(mutex_state), callback_(callback), name_(name), capacity_(capacity), packet_size_(packet_size) {
+ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size, void* mutex_state, ChannelBase::InternalCallback callback, SchedulerImpl* scheduler)
+  : mutex_state_(mutex_state), callback_(callback), name_(name), capacity_(capacity), packet_size_(packet_size), scheduler_(scheduler) {
   pool_ = new int8_t[capacity_ * packet_size_];
   free_packets_.reserve(capacity_);
   for (int i = capacity_ - 1; i >= 0; i--) free_packets_.push_back(i);
@@ -48,8 +48,9 @@ PacketBase* ChannelImpl::Acquire(const char* client_name) {
   return reinterpret_cast<PacketBase*>(pool_ + packet_size_ * free_idx);
 }
 
-void ChannelImpl::Push(PacketBase* packet) {
+void ChannelImpl::Push(PacketBase* packet, ChannelBase* base) {
   // TODO: Record time in packet
+  scheduler_->AddChannel(base);
   std::lock_guard<AdaptiveSpinLock> lock(queued_mutex_);
   assert((int)queued_packets_.size() < capacity_);
   queued_packets_.push_back(packet);

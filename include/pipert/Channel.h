@@ -10,6 +10,8 @@
 
 namespace pipert {
 
+class ChannelImpl;
+
 template <class T>
 class Channel : public ChannelBase {
  public:
@@ -20,11 +22,16 @@ class Channel : public ChannelBase {
 
  protected:
   Channel(char* name, int capacity, void* mutex_state, InternalCallback callback);
+  Channel(ChannelImpl* impl);
 };
 
 template <class T>
 Channel<T>::Channel(char* name, int capacity, void* mutex_state, InternalCallback callback)
   : ChannelBase(name, capacity, sizeof(Packet<T>), mutex_state, callback) {}
+
+template <class T>
+Channel<T>::Channel(ChannelImpl* impl)
+  : ChannelBase(impl) {}
 
 template <class T> template <class... Args>
 PacketToFill<T> Channel<T>::Acquire(const char* client_name, Timer::Time timestamp, Args&&... args) {
