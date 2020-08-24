@@ -4,10 +4,16 @@
 #include <cassert>
 #include <mutex>
 
+#include "SchedulerImpl.h"
+
+
 namespace pipert {
 
-ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size, void* mutex_state, ChannelBase::InternalCallback callback, SchedulerImpl* scheduler)
-  : mutex_state_(mutex_state), callback_(callback), name_(name), capacity_(capacity), packet_size_(packet_size), scheduler_(scheduler) {
+ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size,
+                         void* mutex_state, ChannelBase::InternalCallback callback,
+                         SchedulerImpl* scheduler)
+  : mutex_state_(mutex_state), callback_(callback), name_(name),
+    capacity_(capacity), packet_size_(packet_size), scheduler_(scheduler) {
   pool_ = new int8_t[capacity_ * packet_size_];
   free_packets_.reserve(capacity_);
   for (int i = capacity_ - 1; i >= 0; i--) free_packets_.push_back(i);

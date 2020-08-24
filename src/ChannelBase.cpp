@@ -20,10 +20,6 @@ const char* ChannelBase::GetName() const {
   return impl_->GetName();
 }
 
-ChannelBase::ChannelBase(char* name, int capacity, int packet_size, void* mutex_state, InternalCallback callback) {
-  impl_ = new ChannelImpl(name, capacity, packet_size, mutex_state, callback, nullptr);
-}
-
 ChannelBase::ChannelBase(ChannelImpl* impl)
   : impl_(impl) {}
 

@@ -33,16 +33,6 @@ class SchedulerImpl {
 
   ~SchedulerImpl();
 
-  ChannelImpl* MakePolledChannel(char* name,
-                          int capacity,
-                          int packet_size);
-
-  ChannelImpl* MakeScheduledChannel(char* name,
-                          int capacity,
-                          int packet_size,
-                          void* mutex_state,
-                          InternalCallback callback);
-
   void AddChannel(ChannelBase* channel);
 
   void InitStatefulChannel(const void* mem_address);

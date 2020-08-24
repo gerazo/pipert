@@ -5,13 +5,15 @@
 #include <vector>
 #include "pipert/ChannelBase.h"
 #include "AdaptiveSpinLock.h"
-#include "pipert/SchedulerImpl.h"
 
 namespace pipert {
 
+class SchedulerImpl;
+
 class ChannelImpl {
  public:
-  ChannelImpl(char* name, int capacity, int packet_size, void* mutex_state, ChannelBase::InternalCallback callback, SchedulerImpl* scheduler);
+  ChannelImpl(char* name, int capacity, int packet_size, void* mutex_state,
+      ChannelBase::InternalCallback callback, SchedulerImpl* scheduler);
   ~ChannelImpl();
   ChannelImpl(const ChannelImpl&) = delete;
   ChannelImpl& operator=(const ChannelImpl&) = delete;

@@ -10,31 +10,26 @@
 
 namespace pipert {
 
-class ChannelImpl;
-
 template <class T>
 class Channel : public ChannelBase {
  public:
   template <class... Args>
-  PacketToFill<T> Acquire(const char* client_name, Timer::Time timestamp, Args&&... args);  ///< Always returns, but sometimes old packets are dropped
+  PacketToFill<T> Acquire(const char* client_name, Timer::Time timestamp,
+                          Args&&... args);  ///< Always returns, but sometimes old packets are dropped
   void Push(PacketToFill<T>* filled_packet);
   void Release(PacketToProcess<T>* processed_packet);
 
  protected:
-  Channel(char* name, int capacity, void* mutex_state, InternalCallback callback);
   Channel(ChannelImpl* impl);
 };
-
-template <class T>
-Channel<T>::Channel(char* name, int capacity, void* mutex_state, InternalCallback callback)
-  : ChannelBase(name, capacity, sizeof(Packet<T>), mutex_state, callback) {}
 
 template <class T>
 Channel<T>::Channel(ChannelImpl* impl)
   : ChannelBase(impl) {}
 
 template <class T> template <class... Args>
-PacketToFill<T> Channel<T>::Acquire(const char* client_name, Timer::Time timestamp, Args&&... args) {
+PacketToFill<T> Channel<T>::Acquire(const char* client_name, Timer::Time timestamp,
+                                    Args&&... args) {
   Packet<T>* new_packet = reinterpret_cast<Packet<T>*>(Acquire(client_name));
   assert(new_packet);
   new(new_packet) Packet<T>(timestamp, std::forward<Args>(args)...);

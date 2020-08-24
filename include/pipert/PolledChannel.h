@@ -5,20 +5,13 @@
 
 namespace pipert {
 
-class ChannelImpl;
-
 template <class T>
 class PolledChannel : public Channel<T> {
  public:
-  PolledChannel(char* name, int capacity); // Or plus parameter for Scheduler for the communication
   PolledChannel(ChannelImpl* impl);
 
   PacketToProcess<T> Poll();  ///< Returns empty object if there is no packet available
 };
-
-template <class T>
-PolledChannel<T>::PolledChannel(char* name, int capacity)
-  : Channel<T>(name, capacity, nullptr, nullptr) {}
 
 template<class T>
 PolledChannel<T>::PolledChannel(ChannelImpl* imp)

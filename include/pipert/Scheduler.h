@@ -2,11 +2,12 @@
 #define _SCHEDULER_H_
 
 #include <functional>
-#include "pipert/SchedulerImpl.h"
 #include "pipert/PolledChannel.h"
 #include "pipert/ScheduledChannel.h"
 
 namespace pipert {
+
+class SchedulerImpl;
 
 class Scheduler {
  public:
@@ -14,34 +15,35 @@ class Scheduler {
   ~Scheduler();
 
   template <class T>
-  PolledChannel<T> MakePolledChannel(char* name,
-                                  int capacity);
+  PolledChannel<T> CreatePolledChannel(char* name, int capacity);
 
   template <class T>
-  ScheduledChannel<T> MakeScheduledChannel(char* name,
-                          int capacity,
-                          void* mutex_state,
-                          const std::function<void(PacketToProcess<T>)>& callback);
+  ScheduledChannel<T> CreateScheduledChannel(char* name, int capacity,
+      void* mutex_state, typename ScheduledChannel<T>::Callback callback);
 
   void Start();
   void Stop();
 
  private:
   SchedulerImpl* impl_;
+
+  ChannelImpl* CreateChannelImpl(char* name, int capacity, int packet_size,
+    void* mutex_state, ChannelBase::InternalCallback callback);
 };
 
 template <class T>
-PolledChannel<T> Scheduler::MakePolledChannel(char* name,
-                                int capacity) {
-  return  PolledChannel<T>(impl_->MakePolledChannel(name, capacity, sizeof(Packet<T>)));
+PolledChannel<T> Scheduler::CreatePolledChannel(char* name, int capacity) {
+  ChannelImpl* chimpl = CreateChannelImpl(name, capacity, sizeof(Packet<T>),
+                                          nullptr, nullptr);
+  return PolledChannel<T>(chimpl);
 }
 
 template <class T>
-ScheduledChannel<T> Scheduler::MakeScheduledChannel(char* name,
-                          int capacity,
-                          void* mutex_state,
-                          const std::function<void(PacketToProcess<T>)>& callback) {
-  return ScheduledChannel<T>(impl_->MakeScheduledChannel(name, capacity, sizeof(Packet<T>), mutex_state, &ScheduledChannel<T>::CallbackTranslator));
+ScheduledChannel<T> Scheduler::CreateScheduledChannel(char* name, int capacity,
+    void* mutex_state, typename ScheduledChannel<T>::Callback callback) {
+  ChannelImpl* chimpl = CreateChannelImpl(name, capacity, sizeof(Packet<T>),
+    mutex_state, &ScheduledChannel<T>::CallbackTranslator);
+  return ScheduledChannel<T>(chimpl, callback);
 }
 
 }  // namespace pipert

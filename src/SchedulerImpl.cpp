@@ -1,4 +1,4 @@
-#include "pipert/SchedulerImpl.h"
+#include "SchedulerImpl.h"
 #include "ChannelImpl.h"
 
 namespace pipert {
@@ -9,21 +9,6 @@ SchedulerImpl::SchedulerImpl(int workers_number)
 }
 
 SchedulerImpl::~SchedulerImpl() { Stop(); }
-
-ChannelImpl* SchedulerImpl::MakePolledChannel(char* name,
-                        int capacity,
-                        int packet_size
-                        ) {
-  return new ChannelImpl(name, capacity, packet_size, nullptr, nullptr, this);
-}
-
-ChannelImpl* SchedulerImpl::MakeScheduledChannel(char* name,
-                          int capacity,
-                          int packet_size,
-                          void* mutex_state,
-                          InternalCallback callback) {
-  return new ChannelImpl(name, capacity, packet_size, mutex_state, callback, this);
-}
 
 void SchedulerImpl::AddChannel(ChannelBase* channel) {
   std::lock_guard<std::mutex> guard(m_);
