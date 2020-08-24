@@ -17,7 +17,6 @@ class PacketStub {
   PacketStub& operator=(const PacketStub&) = delete;
   PacketStub(PacketStub&&);
   PacketStub& operator=(PacketStub&&);
-  void move(PacketStub&& o);
 
   bool IsEmpty() const;
   Timer::Time timestamp() const;
@@ -27,10 +26,12 @@ class PacketStub {
 
 protected:
   PacketStub(Packet<T>* packet, Channel<T>* channel);
-  void move(PacketStub& o);
 
   Channel<T>* channel_;
   Packet<T>* packet_;
+
+ private:
+  void move(PacketStub&& o);
 };
 
 template <class T>
