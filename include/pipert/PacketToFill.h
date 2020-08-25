@@ -17,7 +17,7 @@ template <class T>
 PacketToFill<T>::PacketToFill(Packet<T>* packet, Channel<T>* channel)
   : PacketStub<T>(packet, channel) {
   assert(this->channel_);
-  assert(this->packet_);  // always created initialized
+  // can be created empty
 }
 
 template <class T>

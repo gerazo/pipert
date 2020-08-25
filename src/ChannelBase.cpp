@@ -21,7 +21,9 @@ const char* ChannelBase::GetName() const {
 }
 
 ChannelBase::ChannelBase(ChannelImpl* impl)
-  : impl_(impl) {}
+  : impl_(impl) {
+  assert(impl);
+}
 
 ChannelBase::~ChannelBase() {
   assert(impl_);

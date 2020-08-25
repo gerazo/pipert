@@ -15,8 +15,10 @@ ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size,
   : mutex_state_(mutex_state), callback_(callback), name_(name),
     capacity_(capacity), packet_size_(packet_size), scheduler_(scheduler) {
   pool_ = new int8_t[capacity_ * packet_size_];
+  assert(pool_);
   free_packets_.reserve(capacity_);
-  for (int i = capacity_ - 1; i >= 0; i--) free_packets_.push_back(i);
+  for (int i = capacity_ - 1; i >= 0; i--)
+    free_packets_.push_back(reinterpret_cast<PacketBase*>(pool_ + packet_size_ * i));
   assert((int)free_packets_.size() == capacity_);
   assert((int)free_packets_.capacity() >= capacity_);
   queued_packets_.reserve(capacity_);
@@ -26,32 +28,25 @@ ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size,
 
 ChannelImpl::~ChannelImpl() {
   assert(pool_);
-  delete[] reinterpret_cast<int8_t*>(pool_);
+  delete[] pool_;
   pool_ = nullptr;
 }
 
 PacketBase* ChannelImpl::Acquire(const char* client_name) {
   (void)client_name;
   // TODO: Record acquirer and time in packet
-  int free_idx = -1;
-  {
+  PacketBase* packet = nullptr;
+  for (int i = 0; !packet && i < 2 && (i == 0 || TryDroppingPacket()); i++) {
     std::lock_guard<AdaptiveSpinLock> lock(free_mutex_);
     if (!free_packets_.empty()) {
-      free_idx = free_packets_.back();
+      packet = free_packets_.back();
       free_packets_.pop_back();
     }
   }
-  if (free_idx == -1) {
-    // TODO: Implement packet drop policy, now, the earliest will be dropped
-    // TODO: Signal dropped packet correctly with times
-    Release(GetNext());
-    std::lock_guard<AdaptiveSpinLock> lock(free_mutex_);
-    assert(!free_packets_.empty());
-    free_idx = free_packets_.back();
-    free_packets_.pop_back();
-  }
-  assert(free_idx >= 0 && free_idx < capacity_);
-  return reinterpret_cast<PacketBase*>(pool_ + packet_size_ * free_idx);
+  assert(reinterpret_cast<int8_t*>(packet) >= pool_);
+  assert(reinterpret_cast<int8_t*>(packet) < pool_ + packet_size_ * capacity_);
+  assert((reinterpret_cast<int8_t*>(packet) - pool_) % packet_size_ == 0);
+  return packet;
 }
 
 void ChannelImpl::Push(PacketBase* packet, ChannelBase* base) {
@@ -65,24 +60,34 @@ void ChannelImpl::Push(PacketBase* packet, ChannelBase* base) {
 
 PacketBase* ChannelImpl::GetNext() {
   // TODO: Record time in packet
+  PacketBase* top = nullptr;
   std::lock_guard<AdaptiveSpinLock> lock(queued_mutex_);
-  assert(!queued_packets_.empty());
   assert((int)queued_packets_.size() <= capacity_);
-  PacketBase* top = queued_packets_.front();
-  std::pop_heap(queued_packets_.begin(), queued_packets_.end(), PacketOrdering());
-  queued_packets_.pop_back();
+  if (!queued_packets_.empty()) {
+    top = queued_packets_.front();
+    std::pop_heap(queued_packets_.begin(), queued_packets_.end(), PacketOrdering());
+    queued_packets_.pop_back();
+  }
   return top;
 }
 
 void ChannelImpl::Release(PacketBase* packet) {
   // TODO: Record this time and all data from packet
-  int8_t* address = reinterpret_cast<int8_t*>(packet);
-  assert(address >= pool_ && address < pool_ + packet_size_ * capacity_);
-  assert((address - pool_) % packet_size_ == 0);
-  int idx = (address - pool_) / packet_size_;
+  assert(reinterpret_cast<int8_t*>(packet) >= pool_);
+  assert(reinterpret_cast<int8_t*>(packet) < pool_ + packet_size_ * capacity_);
+  assert((reinterpret_cast<int8_t*>(packet) - pool_) % packet_size_ == 0);
   std::lock_guard<AdaptiveSpinLock> lock(free_mutex_);
   assert((int)free_packets_.size() < capacity_);
-  free_packets_.push_back(idx);
+  free_packets_.push_back(packet);
+}
+
+bool ChannelImpl::TryDroppingPacket() {
+  // TODO: Tell Scheduler about the dropped packet
+  // TODO: Implement packet drop policy, now, the earliest will be dropped
+  // TODO: Signal dropped packet correctly with times
+  PacketBase* packet = GetNext();
+  if (packet) Release(packet);
+  return packet;
 }
 
 }  // namespace pipert

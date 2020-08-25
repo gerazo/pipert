@@ -15,7 +15,7 @@ class Channel : public ChannelBase {
  public:
   template <class... Args>
   PacketToFill<T> Acquire(const char* client_name, Timer::Time timestamp,
-                          Args&&... args);  ///< Always returns, but sometimes old packets are dropped
+                          Args&&... args);  ///< Returns empty object when all packets are used
   void Push(PacketToFill<T>* filled_packet);
   void Release(PacketToProcess<T>* processed_packet);
 

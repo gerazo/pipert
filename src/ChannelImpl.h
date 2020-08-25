@@ -38,13 +38,15 @@ class ChannelImpl {
   ChannelBase::InternalCallback callback_;
   int8_t* pool_;
   AdaptiveSpinLock free_mutex_;
-  std::vector<int> free_packets_;  // already released packets (not in transit as in PacketTo***)
+  std::vector<PacketBase*> free_packets_;  // already released packets (not in transit as in PacketTo***)
   AdaptiveSpinLock queued_mutex_;
   std::vector<PacketBase*> queued_packets_;  // heap having the oldest timestamp on top
   char* name_;
   int capacity_;
   int packet_size_;
   SchedulerImpl* scheduler_;
+
+  bool TryDroppingPacket();  ///< Return true if a packet was dropped
 };
 
 }  // namespace pipert
