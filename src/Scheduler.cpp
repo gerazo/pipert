@@ -1,4 +1,6 @@
 #include "pipert/Scheduler.h"
+
+#include <cassert>
 #include "pipert/PacketStub.h"
 #include "ChannelImpl.h"
 #include "SchedulerImpl.h"
@@ -7,7 +9,11 @@ namespace pipert {
 
 Scheduler::Scheduler(int workers) : impl_(new SchedulerImpl(workers)) {}
 
-Scheduler::~Scheduler() { delete impl_; }
+Scheduler::~Scheduler() {
+  assert(impl_);
+  delete impl_;
+  impl_ = nullptr;
+}
 
 void Scheduler::Start() { impl_->Start(); }
 

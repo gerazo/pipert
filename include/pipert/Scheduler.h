@@ -11,8 +11,11 @@ class SchedulerImpl;
 
 class Scheduler {
  public:
-  Scheduler(int workers);
+  Scheduler(int workers);  ///< Entering preparation state
   ~Scheduler();
+
+  Scheduler(const Scheduler&) = delete;
+  Scheduler& operator=(const Scheduler&) = delete;
 
   template <class T>
   PolledChannel<T> CreatePolledChannel(char* name, int capacity);
@@ -21,7 +24,7 @@ class Scheduler {
   ScheduledChannel<T> CreateScheduledChannel(char* name, int capacity,
       void* mutex_state, typename ScheduledChannel<T>::Callback callback);
 
-  void Start();
+  void Start();  ///< Entering running state
   void Stop();
 
  private:
