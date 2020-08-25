@@ -26,8 +26,6 @@ class ChannelBase {
   void Push(PacketBase* packet);
   PacketBase* GetNext();
   void Release(PacketBase* packet);
- private:
-  void Execute();
 
  private:
   ChannelImpl* impl_;
