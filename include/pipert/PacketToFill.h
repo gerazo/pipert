@@ -10,6 +10,8 @@ class PacketToFill : public PacketStub<T> {
  public:
   PacketToFill(Packet<T>* packet, Channel<T>* channel);
   ~PacketToFill();
+  PacketToFill(PacketToFill&&) = default;
+  PacketToFill& operator=(PacketToFill&&) = default;
   void Push();  ///< Force submitting packet before the destruction of this stub
 };
 

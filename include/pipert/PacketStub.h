@@ -2,6 +2,7 @@
 #define _PACKETSTUB_H_
 
 #include <cassert>
+#include <utility>
 #include "pipert/Packet.h"
 #include "pipert/Channel.h"
 
@@ -31,17 +32,18 @@ protected:
   Packet<T>* packet_;
 
  private:
-  void move(PacketStub&& o);
+  void move(PacketStub&&);
 };
 
 template <class T>
 PacketStub<T>::PacketStub(PacketStub&& o) {
-  move(o);
+  move(std::move(o));
 }
 
 template <class T>
 PacketStub<T>& PacketStub<T>::operator=(PacketStub&& o) {
-  move(o);
+  move(std::move(o));
+  return *this;
 }
 
 template <class T>

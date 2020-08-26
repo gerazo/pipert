@@ -13,6 +13,8 @@ class ChannelBase {
 
   ChannelBase(const ChannelBase&) = delete;
   ChannelBase& operator=(const ChannelBase&) = delete;
+  ChannelBase(ChannelBase&&);
+  ChannelBase& operator=(ChannelBase&&);
 
   int GetCapacity() const;  ///< Number of packets the channel buffer has space for
   int GetPacketSize() const;
@@ -29,6 +31,8 @@ class ChannelBase {
 
  private:
   ChannelImpl* impl_;
+
+  void move(ChannelBase&&);
 };
 
 }  // namespace pipert

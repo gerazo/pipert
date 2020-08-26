@@ -10,6 +10,8 @@ class PacketToProcess : public PacketStub<T> {
  public:
   PacketToProcess(Packet<T>* packet, Channel<T>* channel);
   ~PacketToProcess();
+  PacketToProcess(PacketToProcess&&) = default;
+  PacketToProcess& operator=(PacketToProcess&&) = default;
   void Release();  ///< Force releasing the packet before the destruction of this stub
 };
 
