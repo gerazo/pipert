@@ -6,19 +6,24 @@
 
 #include "SchedulerImpl.h"
 
-
 namespace pipert {
 
 ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size,
-                         void* mutex_state, ChannelBase::InternalCallback callback,
+                         void* single_thread_object,
+                         ChannelBase::InternalCallback callback,
                          SchedulerImpl* scheduler)
-  : mutex_state_(mutex_state), callback_(callback), name_(name),
-    capacity_(capacity), packet_size_(packet_size), scheduler_(scheduler) {
+    : single_thread_object_(single_thread_object),
+      callback_(callback),
+      name_(name),
+      capacity_(capacity),
+      packet_size_(packet_size),
+      scheduler_(scheduler) {
   pool_ = new int8_t[capacity_ * packet_size_];
   assert(pool_);
   free_packets_.reserve(capacity_);
   for (int i = capacity_ - 1; i >= 0; i--)
-    free_packets_.push_back(reinterpret_cast<PacketBase*>(pool_ + packet_size_ * i));
+    free_packets_.push_back(
+        reinterpret_cast<PacketBase*>(pool_ + packet_size_ * i));
   assert((int)free_packets_.size() == capacity_);
   assert((int)free_packets_.capacity() >= capacity_);
   queued_packets_.reserve(capacity_);
@@ -55,7 +60,8 @@ void ChannelImpl::Push(PacketBase* packet, ChannelBase* base) {
   std::lock_guard<AdaptiveSpinLock> lock(queued_mutex_);
   assert((int)queued_packets_.size() < capacity_);
   queued_packets_.push_back(packet);
-  std::push_heap(queued_packets_.begin(), queued_packets_.end(), PacketOrdering());
+  std::push_heap(queued_packets_.begin(), queued_packets_.end(),
+                 PacketOrdering());
 }
 
 PacketBase* ChannelImpl::GetNext() {
@@ -65,7 +71,8 @@ PacketBase* ChannelImpl::GetNext() {
   assert((int)queued_packets_.size() <= capacity_);
   if (!queued_packets_.empty()) {
     top = queued_packets_.front();
-    std::pop_heap(queued_packets_.begin(), queued_packets_.end(), PacketOrdering());
+    std::pop_heap(queued_packets_.begin(), queued_packets_.end(),
+                  PacketOrdering());
     queued_packets_.pop_back();
   }
   return top;

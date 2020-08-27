@@ -3,8 +3,8 @@
 
 #include <cstdint>
 #include <vector>
-#include "pipert/ChannelBase.h"
 #include "AdaptiveSpinLock.h"
+#include "pipert/ChannelBase.h"
 
 namespace pipert {
 
@@ -12,8 +12,9 @@ class SchedulerImpl;
 
 class ChannelImpl {
  public:
-  ChannelImpl(char* name, int capacity, int packet_size, void* mutex_state,
-      ChannelBase::InternalCallback callback, SchedulerImpl* scheduler);
+  ChannelImpl(char* name, int capacity, int packet_size,
+              void* single_thread_object,
+              ChannelBase::InternalCallback callback, SchedulerImpl* scheduler);
   ~ChannelImpl();
   ChannelImpl(const ChannelImpl&) = delete;
   ChannelImpl& operator=(const ChannelImpl&) = delete;
@@ -34,13 +35,15 @@ class ChannelImpl {
     }
   };
 
-  void* mutex_state_;
+  void* single_thread_object_;
   ChannelBase::InternalCallback callback_;
   int8_t* pool_;
   AdaptiveSpinLock free_mutex_;
-  std::vector<PacketBase*> free_packets_;  // already released packets (not in transit as in PacketTo***)
+  std::vector<PacketBase*> free_packets_;  // already released packets (not in
+                                           // transit as in PacketTo***)
   AdaptiveSpinLock queued_mutex_;
-  std::vector<PacketBase*> queued_packets_;  // heap having the oldest timestamp on top
+  std::vector<PacketBase*>
+      queued_packets_;  // heap having the oldest timestamp on top
   char* name_;
   int capacity_;
   int packet_size_;

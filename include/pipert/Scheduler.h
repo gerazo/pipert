@@ -21,8 +21,9 @@ class Scheduler {
   PolledChannel<T> CreatePolledChannel(char* name, int capacity);
 
   template <class T>
-  ScheduledChannel<T> CreateScheduledChannel(char* name, int capacity,
-      void* mutex_state, typename ScheduledChannel<T>::Callback callback);
+  ScheduledChannel<T> CreateScheduledChannel(
+      char* name, int capacity, void* single_thread_object,
+      typename ScheduledChannel<T>::Callback callback);
 
   void Start();  ///< Entering running state
   void Stop();
@@ -31,21 +32,24 @@ class Scheduler {
   SchedulerImpl* impl_;
 
   ChannelImpl* CreateChannelImpl(char* name, int capacity, int packet_size,
-    void* mutex_state, ChannelBase::InternalCallback callback);
+                                 void* single_thread_object,
+                                 ChannelBase::InternalCallback callback);
 };
 
 template <class T>
 PolledChannel<T> Scheduler::CreatePolledChannel(char* name, int capacity) {
-  ChannelImpl* chimpl = CreateChannelImpl(name, capacity, sizeof(Packet<T>),
-                                          nullptr, nullptr);
+  ChannelImpl* chimpl =
+      CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
   return PolledChannel<T>(chimpl);
 }
 
 template <class T>
-ScheduledChannel<T> Scheduler::CreateScheduledChannel(char* name, int capacity,
-    void* mutex_state, typename ScheduledChannel<T>::Callback callback) {
-  ChannelImpl* chimpl = CreateChannelImpl(name, capacity, sizeof(Packet<T>),
-    mutex_state, &ScheduledChannel<T>::CallbackTranslator);
+ScheduledChannel<T> Scheduler::CreateScheduledChannel(
+    char* name, int capacity, void* single_thread_object,
+    typename ScheduledChannel<T>::Callback callback) {
+  ChannelImpl* chimpl =
+      CreateChannelImpl(name, capacity, sizeof(Packet<T>), single_thread_object,
+                        &ScheduledChannel<T>::CallbackTranslator);
   return ScheduledChannel<T>(chimpl, callback);
 }
 
