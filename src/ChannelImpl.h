@@ -22,17 +22,17 @@ class ChannelImpl {
   int GetCapacity() const { return capacity_; }
   int GetPacketSize() const { return packet_size_; }
   const char* GetName() const { return name_; }
+  void* GetState() const { return single_thread_object_; }
 
   PacketBase* Acquire(const char* client_name);
-  void Push(PacketBase* packet, ChannelBase* base);
+  void Push(PacketBase* packet);
   PacketBase* GetNext();
+  Timer::Time PeekNext() const;
   void Release(PacketBase* packet);
 
  private:
   struct PacketOrdering {
-    bool operator()(PacketBase* a, PacketBase* b) {
-      return a->timestamp() > b->timestamp();
-    }
+    bool operator()(PacketBase* a, PacketBase* b);
   };
 
   void* single_thread_object_;

@@ -1,7 +1,6 @@
 #ifndef _SCHEDULER_H_
 #define _SCHEDULER_H_
 
-#include <functional>
 #include "pipert/PolledChannel.h"
 #include "pipert/ScheduledChannel.h"
 

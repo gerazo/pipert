@@ -49,7 +49,7 @@ PacketBase* ChannelBase::Acquire(const char* client_name) {
 
 void ChannelBase::Push(PacketBase* packet) {
   assert(impl_);
-  impl_->Push(packet, this);
+  impl_->Push(packet);
 }
 
 PacketBase* ChannelBase::GetNext() {

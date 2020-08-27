@@ -1,84 +1,77 @@
 #include "SchedulerImpl.h"
+
+#include <algorithm>
 #include "ChannelImpl.h"
 
 namespace pipert {
 
 SchedulerImpl::SchedulerImpl(int workers_number)
-    : workers_number_(workers_number) {
-  workers_.reserve(workers_number_);
+  : workers_number_(workers_number) {
+  workers_.reserve(workers_number);
 }
 
-SchedulerImpl::~SchedulerImpl() { Stop(); }
-
-void SchedulerImpl::AddChannel(ChannelBase* channel) {
-  std::lock_guard<std::mutex> guard(m_);
-  channels_.push_back(channel);
-}
-
-void SchedulerImpl::InitStatefulChannel(const void* mem_address) {
-  std::lock_guard<std::mutex> guard(m_);
-  stateful_channels_hash_.insert({mem_address, {true, {}}});
-}
-
-void SchedulerImpl::AddStatefulChannel(const void* mem_address,
-                                      ChannelBase* channel) {
-  m_.lock();
-  StateAndQueue& state_and_queue =
-      stateful_channels_hash_.find(mem_address)->second;
-  // assert if find function gives end
-
-  state_and_queue.second.push(channel);
-
-  if (state_and_queue.first) {
-    state_and_queue.first = false;
-    channels_.push_front(state_and_queue.second.front());
-    state_and_queue.second.pop();
-    m_.unlock();
-  } else {
-    m_.unlock();
-  }
-}
-
-void SchedulerImpl::MoveStatefulChannel(const void* mem_address) {
-  std::lock_guard<std::mutex> guard(m_);
-  StateAndQueue& state_and_queue =
-      stateful_channels_hash_.find(mem_address)->second;
-  if (state_and_queue.second.empty()) {
-    state_and_queue.first = true;
-  } else {
-    channels_.push_front(state_and_queue.second.front());
-    state_and_queue.second.pop();
-  }
+SchedulerImpl::~SchedulerImpl() {
+  Stop();
+  assert(channels_.size() == 0);
 }
 
 void SchedulerImpl::Start() {
-  // worker = std::thread([](){ std::cout << "Thread started" << std::endl; });
   keep_running_.store(true, std::memory_order_release);
-  while (workers_number_-- > 0) {
-    std::thread t = std::thread(&SchedulerImpl::RunTasks, this);
-    t.detach();
-    workers_.push_back(&t);
+  int i = workers_number_;
+  while (i-- > 0) {
+    workers_.emplace_back(&SchedulerImpl::RunTasks, this);
   }
 }
 
 void SchedulerImpl::Stop() {
-  // std::lock_guard<std::mutex> guard(m);
-  std::cout << "Stop was called" << std::endl;
   keep_running_.store(false, std::memory_order_release);
+  for (auto& t : workers_) {
+    t.join();
+  }
+  workers_.clear();
+}
+
+void SchedulerImpl::RegisterChannel(ChannelImpl* channel) {
+  // TODO check that threads are not running
+  channels_.push_back(channel);
+  void* state = channel->GetState();
+  state2channel_queues_[state];
+}
+
+void SchedulerImpl::UnregisterChannel(ChannelImpl* channel) {
+  // TODO check that threads are not running
+  auto it = std::find(channels_.begin(), channels_.end(), channel);
+  assert(it != channels_.end());
+  *it = channels_.back();
+  channels_.pop_back();
+}
+
+void SchedulerImpl::JobArrived(ChannelImpl* /*channel*/) {
+  // TODO Refresh this channel state
+}
+
+void SchedulerImpl::JobDropped(ChannelImpl* /*channel*/) {
+  // TODO Refresh this channel state
+}
+
+bool SchedulerImpl::ChannelOrdering::operator()(ChannelImpl* a, ChannelImpl* b) {
+  return a->PeekNext() > b->PeekNext();
+}
+
+SchedulerImpl::StateOrdering::StateOrdering(State2ChannelHeap* state2channel_queues)
+  : state2channel_queues_(state2channel_queues) {}
+
+bool SchedulerImpl::StateOrdering::operator()(void* a, void* b) {
+  assert(state2channel_queues_->count(a) == 1);
+  assert(state2channel_queues_->count(b) == 1);
+  assert(!state2channel_queues_->at(a).empty());
+  assert(!state2channel_queues_->at(b).empty());
+  return ChannelOrdering()(state2channel_queues_->at(a).front(), state2channel_queues_->at(b).front());
 }
 
 void SchedulerImpl::RunTasks() {
   while (keep_running_.load(std::memory_order_acquire)) {
-    m_.lock();
-    if (!channels_.empty()) {
-      //ChannelBase* ch = channels_.front();
-      channels_.pop_front();
-      m_.unlock();
-      // ch->GetCallBack(ch, ch->GetNext()); ?? or
-      // ch->Execute(); and hiding behind all the implementation details, GetNext and calling the callback function
-    } else {
-      m_.unlock();
-    }
+    // TODO
   }
 }
 

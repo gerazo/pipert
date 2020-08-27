@@ -1,55 +1,53 @@
 #ifndef _SCHEDULER_IMPL_H_
 #define _SCHEDULER_IMPL_H_
 
-#include <unistd.h>
 #include <atomic>
-#include <deque>
-#include <functional>
-#include <iostream>
-#include <mutex>
-#include <queue>
+#include <cassert>
 #include <thread>
 #include <unordered_map>
 #include <vector>
-
-#include "pipert/ChannelBase.h"
+#include "AdaptiveSpinLock.h"
+#include "ChannelImpl.h"
 
 namespace pipert {
 
-template <class T>
-class Packet;
-
-template <class T>
-class Channel;
-
-using StateAndQueue = std::pair<bool, std::queue<ChannelBase*>>;
-using StatefulHashtable = std::unordered_map<const void*, StateAndQueue>;
-
 class SchedulerImpl {
  public:
-  using InternalCallback = void (*)(ChannelBase*, PacketBase*);
-
   SchedulerImpl(int workers_number);
-
   ~SchedulerImpl();
-
-  void AddChannel(ChannelBase* channel);
-
-  void InitStatefulChannel(const void* mem_address);
-  void AddStatefulChannel(const void* mem_address, ChannelBase* channel);
-
-  void MoveStatefulChannel(const void* mem_address);
+  SchedulerImpl(const SchedulerImpl&&) = delete;
+  SchedulerImpl& operator=(const SchedulerImpl&&) = delete;
 
   void Start();
-
   void Stop();
 
+  void RegisterChannel(ChannelImpl* channel);
+  void UnregisterChannel(ChannelImpl* channel);
+
+  AdaptiveSpinLock* GetMutex() { return &global_mutex_; }
+  void JobArrived(ChannelImpl* channel);
+  void JobDropped(ChannelImpl* channel);
+
  private:
-  std::deque<ChannelBase*> channels_;
-  // StateAndQueue statefulChannels;
-  StatefulHashtable stateful_channels_hash_;
-  std::mutex m_;
-  std::vector<std::thread*> workers_;
+  using ChannelHeap = std::vector<ChannelImpl*>;
+  using State2ChannelHeap = std::unordered_map<void*, ChannelHeap>;
+  using StateHeap = std::vector<void*>;
+
+  struct ChannelOrdering {
+    bool operator()(ChannelImpl* a, ChannelImpl* b);
+  };
+
+  struct StateOrdering {
+    State2ChannelHeap* state2channel_queues_;
+    StateOrdering(State2ChannelHeap* state2channel_queues);
+    bool operator()(void* a, void* b);
+  };
+
+  std::vector<ChannelImpl*> channels_;
+  AdaptiveSpinLock global_mutex_;
+  StateHeap state_queue_;
+  State2ChannelHeap state2channel_queues_;
+  std::vector<std::thread> workers_;
   std::atomic_bool keep_running_;
   int workers_number_;
 

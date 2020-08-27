@@ -32,6 +32,7 @@ ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size,
 }
 
 ChannelImpl::~ChannelImpl() {
+  scheduler_->UnregisterChannel(this);
   assert(pool_);
   delete[] pool_;
   pool_ = nullptr;
@@ -54,9 +55,8 @@ PacketBase* ChannelImpl::Acquire(const char* client_name) {
   return packet;
 }
 
-void ChannelImpl::Push(PacketBase* packet, ChannelBase* base) {
+void ChannelImpl::Push(PacketBase* packet) {
   // TODO: Record time in packet
-  scheduler_->AddChannel(base);
   std::lock_guard<AdaptiveSpinLock> lock(queued_mutex_);
   assert((int)queued_packets_.size() < capacity_);
   queued_packets_.push_back(packet);
@@ -78,6 +78,12 @@ PacketBase* ChannelImpl::GetNext() {
   return top;
 }
 
+Timer::Time ChannelImpl::PeekNext() const {
+  // No locking as it can only be called from Scheduler
+  assert(!queued_packets_.empty());
+  return queued_packets_.front()->timestamp();
+}
+
 void ChannelImpl::Release(PacketBase* packet) {
   // TODO: Record this time and all data from packet
   assert(reinterpret_cast<int8_t*>(packet) >= pool_);
@@ -86,6 +92,10 @@ void ChannelImpl::Release(PacketBase* packet) {
   std::lock_guard<AdaptiveSpinLock> lock(free_mutex_);
   assert((int)free_packets_.size() < capacity_);
   free_packets_.push_back(packet);
+}
+
+bool ChannelImpl::PacketOrdering::operator()(PacketBase* a, PacketBase* b) {
+  return a->timestamp() > b->timestamp();
 }
 
 bool ChannelImpl::TryDroppingPacket() {
