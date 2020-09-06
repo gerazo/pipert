@@ -9,5 +9,5 @@ link_directories(../build)
  
 include_directories(../include)
 
-add_executable(simple main.cpp)
+add_executable(simple main2.cpp)
 target_link_libraries(simple ${PROJECT_LINK_LIBS} )

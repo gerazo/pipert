@@ -33,6 +33,7 @@ const char* ChannelBase::GetName() const {
 ChannelBase::ChannelBase(ChannelImpl* impl)
   : impl_(impl) {
   assert(impl);
+  impl_->base_ = this; // To be able to call the callback on implementation level
 }
 
 ChannelBase::~ChannelBase() {
@@ -42,12 +43,12 @@ ChannelBase::~ChannelBase() {
   }
 }
 
-PacketBase* ChannelBase::Acquire(const char* client_name) {
+PacketBase* ChannelBase::AcquireBase(const char* client_name) {
   assert(impl_);
   return impl_->Acquire(client_name);
 }
 
-void ChannelBase::Push(PacketBase* packet) {
+void ChannelBase::PushBase(PacketBase* packet) {
   assert(impl_);
   impl_->Push(packet);
 }
@@ -57,7 +58,7 @@ PacketBase* ChannelBase::GetNext() {
   return impl_->GetNext();
 }
 
-void ChannelBase::Release(PacketBase* packet) {
+void ChannelBase::ReleaseBase(PacketBase* packet) {
   assert(impl_);
   impl_->Release(packet);
 }
@@ -65,6 +66,8 @@ void ChannelBase::Release(PacketBase* packet) {
 void ChannelBase::move(ChannelBase&& o) {
   assert(o.impl_);
   impl_ = o.impl_;
+  impl_->base_ = this; // same as the case with constructor
+  assert(impl_->base_);
   o.impl_ = nullptr;
 }
 

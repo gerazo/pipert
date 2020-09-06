@@ -30,7 +30,7 @@ Channel<T>::Channel(ChannelImpl* impl)
 template <class T> template <class... Args>
 PacketToFill<T> Channel<T>::Acquire(const char* client_name, Timer::Time timestamp,
                                     Args&&... args) {
-  Packet<T>* new_packet = reinterpret_cast<Packet<T>*>(Acquire(client_name));
+  Packet<T>* new_packet = reinterpret_cast<Packet<T>*>(AcquireBase(client_name));
   assert(new_packet);
   new(new_packet) Packet<T>(timestamp, std::forward<Args>(args)...);
   return PacketToFill<T>(new_packet, this);
@@ -39,7 +39,7 @@ PacketToFill<T> Channel<T>::Acquire(const char* client_name, Timer::Time timesta
 template <class T>
 void Channel<T>::Push(PacketToFill<T>* filled_packet) {
   assert(!filled_packet->IsEmpty());
-  Push(filled_packet->GetPacket());
+  PushBase(filled_packet->GetPacket());
 }
 
 template <class T>
@@ -47,7 +47,7 @@ void Channel<T>::Release(PacketToProcess<T>* processed_packet) {
   assert(!processed_packet->IsEmpty());
   Packet<T>* packet = processed_packet->GetPacket();
   packet->~Packet();
-  Release(packet);
+  ReleaseBase(packet);
 }
 
 }  // namespace pipert

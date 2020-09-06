@@ -17,7 +17,8 @@ ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size,
       name_(name),
       capacity_(capacity),
       packet_size_(packet_size),
-      scheduler_(scheduler) {
+      scheduler_(scheduler),
+      queued_(false) {
   pool_ = new int8_t[capacity_ * packet_size_];
   assert(pool_);
   free_packets_.reserve(capacity_);
@@ -62,6 +63,7 @@ void ChannelImpl::Push(PacketBase* packet) {
   queued_packets_.push_back(packet);
   std::push_heap(queued_packets_.begin(), queued_packets_.end(),
                  PacketOrdering());
+  scheduler_->JobArrived(this);
 }
 
 PacketBase* ChannelImpl::GetNext() {
@@ -105,6 +107,13 @@ bool ChannelImpl::TryDroppingPacket() {
   PacketBase* packet = GetNext();
   if (packet) Release(packet);
   return packet;
+}
+
+void ChannelImpl::Execute() {
+  PacketBase* packet = GetNext();
+  assert(base_);
+  assert(packet);
+  callback_(base_, packet);
 }
 
 }  // namespace pipert

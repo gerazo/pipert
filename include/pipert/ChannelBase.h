@@ -24,10 +24,10 @@ class ChannelBase {
   ChannelBase(ChannelImpl* impl);
   ~ChannelBase();
 
-  PacketBase* Acquire(const char* client_name);
-  void Push(PacketBase* packet);
+  PacketBase* AcquireBase(const char* client_name);
+  void PushBase(PacketBase* packet);
   PacketBase* GetNext();
-  void Release(PacketBase* packet);
+  void ReleaseBase(PacketBase* packet);
 
  private:
   ChannelImpl* impl_;

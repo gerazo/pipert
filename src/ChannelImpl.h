@@ -30,6 +30,13 @@ class ChannelImpl {
   Timer::Time PeekNext() const;
   void Release(PacketBase* packet);
 
+  void Execute();
+
+  ChannelBase* base_;
+
+  bool IsQueued() const { return queued_; }
+  void SetQueued(bool queued) { queued_ = queued; }
+
  private:
   struct PacketOrdering {
     bool operator()(PacketBase* a, PacketBase* b);
@@ -48,6 +55,8 @@ class ChannelImpl {
   int capacity_;
   int packet_size_;
   SchedulerImpl* scheduler_;
+  bool queued_; // already scheduled
+
 
   bool TryDroppingPacket();  ///< Return true if a packet was dropped
 };

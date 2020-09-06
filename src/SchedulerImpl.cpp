@@ -35,7 +35,8 @@ void SchedulerImpl::RegisterChannel(ChannelImpl* channel) {
   // TODO check that threads are not running
   channels_.push_back(channel);
   void* state = channel->GetState();
-  state2channel_queues_[state];
+  state2channel_queues_[state].reserve(state2channel_queues_[state].capacity() + 1);
+  // for every state we reserve the size of the number of channels regarding to that state
 }
 
 void SchedulerImpl::UnregisterChannel(ChannelImpl* channel) {
@@ -46,8 +47,20 @@ void SchedulerImpl::UnregisterChannel(ChannelImpl* channel) {
   channels_.pop_back();
 }
 
-void SchedulerImpl::JobArrived(ChannelImpl* /*channel*/) {
+void SchedulerImpl::JobArrived(ChannelImpl* channel) {
   // TODO Refresh this channel state
+  std::lock_guard<AdaptiveSpinLock> lock(global_mutex_);
+  void* state = channel->GetState();
+  assert(channel);
+  // Putting the channel into the heap if it is not scheduled yet
+  if (!channel->IsQueued()) {
+    state2channel_queues_[state].push_back(channel);
+    std::push_heap(state2channel_queues_[state].begin(), state2channel_queues_[state].end(), ChannelOrdering());
+    channel->SetQueued(true);
+  } else {
+    // Reordering the heap if the channel is already in
+    std::make_heap(state2channel_queues_[state].begin(), state2channel_queues_[state].end(), ChannelOrdering());
+  }
 }
 
 void SchedulerImpl::JobDropped(ChannelImpl* /*channel*/) {
@@ -71,7 +84,21 @@ bool SchedulerImpl::StateOrdering::operator()(void* a, void* b) {
 
 void SchedulerImpl::RunTasks() {
   while (keep_running_.load(std::memory_order_acquire)) {
-    // TODO
+    auto it = state2channel_queues_.begin();
+    //assert(it);
+    for(; it != state2channel_queues_.end(); ++it) {
+      //std::lock_guard<AdaptiveSpinLock> lock(global_mutex_); // it seems it doesn't work correct
+      m_.lock();
+      if (!it->second.empty()) {
+        // Getting the channel with the most fresh packet
+        std::pop_heap(it->second.begin(), it->second.end(), ChannelOrdering());
+        auto ch = it->second.back();
+        it->second.pop_back();
+        ch->SetQueued(false);
+        ch->Execute();
+      }
+      m_.unlock();
+    }
   }
 }
 

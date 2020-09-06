@@ -8,6 +8,7 @@
 #include <vector>
 #include "AdaptiveSpinLock.h"
 #include "ChannelImpl.h"
+#include <mutex>
 
 namespace pipert {
 
@@ -50,6 +51,7 @@ class SchedulerImpl {
   std::vector<std::thread> workers_;
   std::atomic_bool keep_running_;
   int workers_number_;
+  std::mutex m_;
 
   void RunTasks();
 };
