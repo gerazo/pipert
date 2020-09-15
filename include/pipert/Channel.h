@@ -40,12 +40,14 @@ template <class T>
 void Channel<T>::Push(PacketToFill<T>* filled_packet) {
   assert(!filled_packet->IsEmpty());
   PushBase(filled_packet->GetPacket());
+  filled_packet->SetEmpty();
 }
 
 template <class T>
 void Channel<T>::Release(PacketToProcess<T>* processed_packet) {
   assert(!processed_packet->IsEmpty());
   Packet<T>* packet = processed_packet->GetPacket();
+  processed_packet->SetEmpty();
   packet->~Packet();
   ReleaseBase(packet);
 }

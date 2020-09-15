@@ -27,6 +27,7 @@ class PacketStub {
 
 protected:
   PacketStub(Packet<T>* packet, Channel<T>* channel);
+  void SetEmpty();
 
   Channel<T>* channel_;
   Packet<T>* packet_;
@@ -77,6 +78,11 @@ Packet<T>* PacketStub<T>::GetPacket() {
 template <class T>
 PacketStub<T>::PacketStub(Packet<T>* packet, Channel<T>* channel)
   : channel_(channel), packet_(packet) {}
+
+template <class T>
+void PacketStub<T>::SetEmpty() {
+  packet_ = nullptr;
+}
 
 template <class T>
 void PacketStub<T>::move(PacketStub&& o) {
