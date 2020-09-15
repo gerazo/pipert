@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include "ChannelImpl.h"
+#include <iostream>
 
 namespace pipert {
 
@@ -36,6 +37,7 @@ void SchedulerImpl::RegisterChannel(ChannelImpl* channel) {
   channels_.push_back(channel);
   void* state = channel->GetState();
   state2channel_queues_[state].reserve(state2channel_queues_[state].capacity() + 1);
+  std::cout << "Sch cap: " << state2channel_queues_[state].capacity() << std::endl;
   // for every state we reserve the size of the number of channels regarding to that state
 }
 
@@ -50,6 +52,7 @@ void SchedulerImpl::UnregisterChannel(ChannelImpl* channel) {
 void SchedulerImpl::JobArrived(ChannelImpl* channel) {
   // TODO Refresh this channel state
   std::lock_guard<AdaptiveSpinLock> lock(global_mutex_);
+  std::cout << "Job arrived from Channel: " << channel->GetName() << std::endl;
   void* state = channel->GetState();
   assert(channel);
   // Putting the channel into the heap if it is not scheduled yet
@@ -57,6 +60,7 @@ void SchedulerImpl::JobArrived(ChannelImpl* channel) {
     state2channel_queues_[state].push_back(channel);
     std::push_heap(state2channel_queues_[state].begin(), state2channel_queues_[state].end(), ChannelOrdering());
     channel->SetQueued(true);
+    std::cout << "Channel added to queue" << std::endl;
   } else {
     // Reordering the heap if the channel is already in
     std::make_heap(state2channel_queues_[state].begin(), state2channel_queues_[state].end(), ChannelOrdering());
@@ -84,7 +88,7 @@ bool SchedulerImpl::StateOrdering::operator()(void* a, void* b) {
 
 void SchedulerImpl::RunTasks() {
   while (keep_running_.load(std::memory_order_acquire)) {
-    auto it = state2channel_queues_.begin();
+    /*auto it = state2channel_queues_.begin();
     //assert(it);
     for(; it != state2channel_queues_.end(); ++it) {
       //std::lock_guard<AdaptiveSpinLock> lock(global_mutex_); // it seems it doesn't work correct
@@ -98,7 +102,16 @@ void SchedulerImpl::RunTasks() {
         ch->Execute();
       }
       m_.unlock();
+    }*/
+    m_.lock();
+    if (!state2channel_queues_[nullptr].empty()) {
+      std::pop_heap(state2channel_queues_[nullptr].begin(), state2channel_queues_[nullptr].end(), ChannelOrdering());
+      auto ch = state2channel_queues_[nullptr].back();
+      state2channel_queues_[nullptr].pop_back();
+      ch->SetQueued(false);
+      ch->Execute();
     }
+    m_.unlock();
   }
 }
 

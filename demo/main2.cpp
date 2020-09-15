@@ -15,17 +15,33 @@ struct Human {
 
 class HumanPrinter {
 public:
+  HumanPrinter(pipert::ScheduledChannel<Human>* ch_to_write) : ch_to_write_(ch_to_write) {}
+  
   void Print(pipert::PacketToProcess<Human> packet) {
     std::cout << packet.data().GetName() << std::endl;
+    ch_to_write_->Acquire("Other", pipert::Timer::time(), packet.data());
+  }
+
+private:
+  pipert::ScheduledChannel<Human>* ch_to_write_;
+};
+
+class OtherPrinter {
+public:
+  void Print(pipert::PacketToProcess<Human> packet) {
+    std::cout << "Other: " << packet.data().GetName() << std::endl;
   }
 };
 
 int main() {
   // Scheduler created
   pipert::Scheduler sch(4);
-  HumanPrinter hp;
+  OtherPrinter op;
+  pipert::ScheduledChannel<Human> sc2 = sch.CreateScheduledChannel<Human>("Other", 2, nullptr, std::bind(&OtherPrinter::Print, &op, std::placeholders::_1));
 
-  pipert::ScheduledChannel<Human> sc = sch.CreateScheduledChannel<Human>("Print", 2, &hp, std::bind(&HumanPrinter::Print, &hp, std::placeholders::_1));
+  HumanPrinter hp(&sc2);
+
+  pipert::ScheduledChannel<Human> sc1 = sch.CreateScheduledChannel<Human>("Print", 2, nullptr, std::bind(&HumanPrinter::Print, &hp, std::placeholders::_1));
 
   //auto packet2 = pc.Acquire("Network", pipert::Timer::time(), "Kurt Cobain");
   
@@ -46,11 +62,12 @@ int main() {
   //auto packetBase = sc.GetNext();
 
   for (int i = 0; i < 10; ++i) {
-    auto packet = sc.Acquire("Print", pipert::Timer::time(), "Jimmy Hendrix" + std::to_string(i));
-    usleep(30);
+    usleep(100);
+    auto packet = sc1.Acquire("Print", pipert::Timer::time(), "Jimmy Hendrix" + std::to_string(i));
   }
-  usleep(300);
-
+   
+  usleep(100000);
+  std::cout << "Program will end soon" << std::endl;
   // Stopping the scheduler
   sch.Stop();
   return 0;

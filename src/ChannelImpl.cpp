@@ -114,6 +114,9 @@ void ChannelImpl::Execute() {
   assert(base_);
   assert(packet);
   callback_(base_, packet);
+  if (!queued_packets_.empty()) {
+    scheduler_->JobArrived(this);  
+  }
 }
 
 }  // namespace pipert
