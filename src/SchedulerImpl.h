@@ -44,6 +44,8 @@ class SchedulerImpl {
     bool operator()(void* a, void* b);
   };
 
+  void RunTasks();
+
   std::vector<ChannelImpl*> channels_;
   AdaptiveSpinLock global_mutex_;
   StateHeap state_queue_;
@@ -52,8 +54,6 @@ class SchedulerImpl {
   std::atomic_bool keep_running_;
   int workers_number_;
   std::mutex m_;
-
-  void RunTasks();
 };
 
 }  // namespace pipert

@@ -30,9 +30,9 @@ class ChannelBase {
   void ReleaseBase(PacketBase* packet);
 
  private:
-  ChannelImpl* impl_;
-
   void move(ChannelBase&&);
+
+  ChannelImpl* impl_;
 };
 
 }  // namespace pipert

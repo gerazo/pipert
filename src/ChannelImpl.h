@@ -32,15 +32,17 @@ class ChannelImpl {
 
   void Execute();
 
-  ChannelBase* base_;
-
   bool IsQueued() const { return queued_; }
   void SetQueued(bool queued) { queued_ = queued; }
+
+  ChannelBase* base_;
 
  private:
   struct PacketOrdering {
     bool operator()(PacketBase* a, PacketBase* b);
   };
+
+  bool TryDroppingPacket();  ///< Return true if a packet was dropped
 
   void* single_thread_object_;
   ChannelBase::InternalCallback callback_;
@@ -56,9 +58,6 @@ class ChannelImpl {
   int packet_size_;
   SchedulerImpl* scheduler_;
   bool queued_; // already scheduled
-
-
-  bool TryDroppingPacket();  ///< Return true if a packet was dropped
 };
 
 }  // namespace pipert

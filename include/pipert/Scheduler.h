@@ -28,11 +28,11 @@ class Scheduler {
   void Stop();
 
  private:
-  SchedulerImpl* impl_;
-
   ChannelImpl* CreateChannelImpl(char* name, int capacity, int packet_size,
                                  void* single_thread_object,
                                  ChannelBase::InternalCallback callback);
+
+  SchedulerImpl* impl_;
 };
 
 template <class T>
