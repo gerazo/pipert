@@ -27,21 +27,21 @@ class ChannelImpl {
   PacketBase* Acquire(const char* client_name);
   void Push(PacketBase* packet);
   PacketBase* GetNext();
-  Timer::Time PeekNext() const;
   void Release(PacketBase* packet);
 
-  void Execute();
+  Timer::Time PeekNext() const;
+  PacketBase* PopNext();
+  void Execute(PacketBase* packet);
 
-  bool IsQueued() const { return queued_; }
-  void SetQueued(bool queued) { queued_ = queued; }
-
-  ChannelBase* base_;
+  void SetBase(ChannelBase* base);
 
  private:
   struct PacketOrdering {
     bool operator()(PacketBase* a, PacketBase* b);
   };
 
+  bool IsScheduled() const { return callback_; }
+  AdaptiveSpinLock& GetQueuedMutex();
   bool TryDroppingPacket();  ///< Return true if a packet was dropped
 
   void* single_thread_object_;
@@ -57,7 +57,7 @@ class ChannelImpl {
   int capacity_;
   int packet_size_;
   SchedulerImpl* scheduler_;
-  bool queued_; // already scheduled
+  ChannelBase* base_;
 };
 
 }  // namespace pipert

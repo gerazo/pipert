@@ -8,7 +8,10 @@ namespace pipert {
 
 class Timer {
  public:
-  using Time = int64_t;
+  using Time = int_least64_t;
+
+  static const Time kMinTime = INT_LEAST64_MIN;
+  static const Time kMaxTime = INT_LEAST64_MAX;
 
   static Time time();  // return time since epoch in microseconds
 

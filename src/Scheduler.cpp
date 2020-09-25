@@ -31,7 +31,6 @@ ChannelImpl* Scheduler::CreateChannelImpl(
   assert(impl_);
   ChannelImpl* ch_impl = new ChannelImpl(name, capacity, packet_size,
       single_thread_object, callback, impl_);
-  impl_->RegisterChannel(ch_impl);
   return ch_impl;
 }
 

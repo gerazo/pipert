@@ -14,8 +14,8 @@ class PolledChannel : public Channel<T> {
 };
 
 template<class T>
-PolledChannel<T>::PolledChannel(ChannelImpl* imp)
-  : Channel<T>(imp) {}
+PolledChannel<T>::PolledChannel(ChannelImpl* impl)
+  : Channel<T>(impl) {}
 
 template <class T>
 PacketToProcess<T> PolledChannel<T>::Poll() {
