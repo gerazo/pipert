@@ -15,7 +15,8 @@ SchedulerImpl::SchedulerImpl(int workers_number)
 }
 
 SchedulerImpl::~SchedulerImpl() {
-  Stop();
+  if(running_.load(std::memory_order_acquire))
+    Stop();
   assert(channels_.size() == 0);
 }
 
@@ -92,13 +93,15 @@ void SchedulerImpl::JobsUpdated(ChannelImpl* channel, bool was_push) {
   void* state = channel->GetState();
   auto& chq = state2channel_queues_[state];
   assert(!chq.heap.empty());
+  assert(std::count(chq.heap.begin(), chq.heap.end(), channel) == 1);
+  bool was_top = (chq.heap.front() == channel);
   Timer::Time earliest = chq.heap.front()->PeekNext();
   MoveToTopInHeap(chq.heap, channel);
   std::pop_heap(chq.heap.begin(), chq.heap.end(), ChannelOrdering());
   chq.heap.pop_back();
   chq.heap.push_back(channel);
   std::push_heap(chq.heap.begin(), chq.heap.end(), ChannelOrdering());
-  if (chq.enabled && chq.heap.front()->PeekNext() != earliest) {
+  if (chq.enabled && (chq.heap.front()->PeekNext() != earliest || was_top)) {
     MoveToTopInHeap(state_queue_, state);
     std::pop_heap(state_queue_.begin(), state_queue_.end(),
                   StateOrdering(&state2channel_queues_));
@@ -118,12 +121,12 @@ void SchedulerImpl::JobsDropped(ChannelImpl* channel) {
   void* state = channel->GetState();
   auto& chq = state2channel_queues_[state];
   assert(!chq.heap.empty());
-  Timer::Time earliest = chq.heap.front()->PeekNext();
+  assert(std::count(chq.heap.begin(), chq.heap.end(), channel) == 1);
+  bool was_top = (chq.heap.front() == channel);
   MoveToTopInHeap(chq.heap, channel);
   std::pop_heap(chq.heap.begin(), chq.heap.end(), ChannelOrdering());
   chq.heap.pop_back();
-  if (chq.enabled &&
-      (chq.heap.empty() || chq.heap.front()->PeekNext() > earliest)) {
+  if (chq.enabled && was_top) {
     MoveToTopInHeap(state_queue_, state);
     std::pop_heap(state_queue_.begin(), state_queue_.end(),
                   StateOrdering(&state2channel_queues_));
