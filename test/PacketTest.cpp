@@ -37,3 +37,22 @@ TEST(PacketTest, ChangeDataInPacket) {
   EXPECT_EQ(packet_.data().name_, "Kurt Cobain");
   EXPECT_EQ(packet_.data().age_, 27);
 }
+
+TEST(PacketTest, HandlingOfRValues){
+  // Given
+  auto now = pipert::Timer::time();
+  Human a = Human("Hossam", 20);
+  // When
+  pipert::Packet<Human> packet_(now, a);
+  // Then
+  EXPECT_EQ(packet_.data().name_, "Hossam");
+  EXPECT_EQ(packet_.data().age_, 20);
+}
+
+// TEST(PacketTest, WrongInputShouldThrowAnError){
+//   // Given
+//   auto now = pipert::Timer::time();
+//   // When
+//   // Then
+//   EXPECT_THROW()
+// }
