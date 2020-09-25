@@ -11,3 +11,6 @@ include_directories(../include)
 
 add_executable(simple main2.cpp)
 target_link_libraries(simple ${PROJECT_LINK_LIBS} )
+
+target_compile_options(simple PRIVATE $<$<CONFIG:Debug>:-fsanitize=address>)
+set_target_properties(simple PROPERTIES LINK_FLAGS_DEBUG "-fsanitize=address")
