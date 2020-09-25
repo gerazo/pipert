@@ -12,7 +12,7 @@ class SchedulerImpl;
 
 class ChannelImpl {
  public:
-  ChannelImpl(char* name, int capacity, int packet_size,
+  ChannelImpl(const char* name, int capacity, int packet_size,
               void* single_thread_object,
               ChannelBase::InternalCallback callback, SchedulerImpl* scheduler);
   ~ChannelImpl();
@@ -53,7 +53,7 @@ class ChannelImpl {
   AdaptiveSpinLock queued_mutex_;
   std::vector<PacketBase*>
       queued_packets_;  // heap having the oldest timestamp on top
-  char* name_;
+  const char* name_;
   int capacity_;
   int packet_size_;
   SchedulerImpl* scheduler_;

@@ -8,7 +8,7 @@
 
 namespace pipert {
 
-ChannelImpl::ChannelImpl(char* name, int capacity, int packet_size,
+ChannelImpl::ChannelImpl(const char* name, int capacity, int packet_size,
                          void* single_thread_object,
                          ChannelBase::InternalCallback callback,
                          SchedulerImpl* scheduler)

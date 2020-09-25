@@ -26,11 +26,11 @@ void Scheduler::Stop() {
 }
 
 ChannelImpl* Scheduler::CreateChannelImpl(
-    char* name, int capacity, int packet_size, void* single_thread_object,
+    const char* name, int capacity, int packet_size, void* single_thread_object,
     ChannelBase::InternalCallback callback) {
   assert(impl_);
   ChannelImpl* ch_impl = new ChannelImpl(name, capacity, packet_size,
-      single_thread_object, callback, impl_);
+                                         single_thread_object, callback, impl_);
   return ch_impl;
 }
 
