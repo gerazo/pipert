@@ -10,7 +10,8 @@ class SchedulerImpl;
 
 class Scheduler {
  public:
-  Scheduler(int workers);  ///< Entering preparation state
+   /// Entering preparation state (0 workers = autodetect max CPUs)
+  Scheduler(int workers = 0);
   ~Scheduler();
 
   Scheduler(const Scheduler&) = delete;

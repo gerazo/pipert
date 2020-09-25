@@ -1,5 +1,6 @@
 #include "SchedulerImpl.h"
 
+#include <cassert>
 #include <iostream>
 #include <mutex>
 
@@ -9,6 +10,7 @@ namespace pipert {
 
 SchedulerImpl::SchedulerImpl(int workers_number)
     : keep_running_(false), running_(false), workers_number_(workers_number) {
+  assert(workers_number > 0);
   workers_.reserve(workers_number);
 }
 

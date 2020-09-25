@@ -1,13 +1,16 @@
 #include "pipert/Scheduler.h"
 
 #include <cassert>
+#include <thread>
 #include "ChannelImpl.h"
 #include "SchedulerImpl.h"
 #include "pipert/PacketStub.h"
 
 namespace pipert {
 
-Scheduler::Scheduler(int workers) : impl_(new SchedulerImpl(workers)) {}
+Scheduler::Scheduler(int workers)
+    : impl_(new SchedulerImpl(workers == 0 ? std::thread::hardware_concurrency()
+                                           : workers)) {}
 
 Scheduler::~Scheduler() {
   assert(impl_);
