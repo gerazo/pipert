@@ -28,6 +28,11 @@ void Scheduler::Stop() {
   impl_->Stop();
 }
 
+bool Scheduler::IsRunning() {
+  assert(impl_);
+  return impl_->IsRunning();
+}
+
 ChannelImpl* Scheduler::CreateChannelImpl(
     const char* name, int capacity, int packet_size, void* single_thread_object,
     ChannelBase::InternalCallback callback) {

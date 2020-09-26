@@ -27,6 +27,7 @@ class Scheduler {
 
   void Start();  ///< Entering running state
   void Stop();
+  bool IsRunning();
 
  private:
   ChannelImpl* CreateChannelImpl(const char* name, int capacity,
