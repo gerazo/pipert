@@ -3,9 +3,14 @@ project(pipert CXX)
 enable_testing()
 
 
-# Configuration
+# All source files compiled into the library
 set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp SchedulerImpl.cpp Timer.cpp)
-set(TEST_SOURCES PacketTest.cpp SchedulerTest.cpp)
+
+# Put all test files here which can run using the library through its interface
+set(BBTEST_SOURCES PacketTest.cpp SchedulerTest.cpp)
+
+# Put those tests here which need the implementation or better run using the static library
+set(WBTEST_SOURCES PacketTest.cpp)
 
 
 # General settings
@@ -48,9 +53,14 @@ foreach(CPPFILE ${SOURCES})
   set(REAL_SOURCES ${REAL_SOURCES} src/${CPPFILE})
 endforeach(CPPFILE)
 
-unset(REAL_TEST_SOURCES)
-foreach(CPPFILE ${TEST_SOURCES})
-  set(REAL_TEST_SOURCES ${REAL_TEST_SOURCES} test/${CPPFILE})
+unset(REAL_WBTEST_SOURCES)
+foreach(CPPFILE ${WBTEST_SOURCES})
+  set(REAL_WBTEST_SOURCES ${REAL_WBTEST_SOURCES} test/${CPPFILE})
+endforeach(CPPFILE)
+
+unset(REAL_BBTEST_SOURCES)
+foreach(CPPFILE ${BBTEST_SOURCES})
+  set(REAL_BBTEST_SOURCES ${REAL_BBTEST_SOURCES} test/${CPPFILE})
 endforeach(CPPFILE)
 
 
@@ -60,21 +70,34 @@ find_package(Threads)
 include(googletest.cmake)
 
 
-# Targets
+# Target: static library
 add_library(${PROJECT_NAME}_static STATIC ${REAL_SOURCES})
 SetupTarget(${PROJECT_NAME}_static)
 
+# Target: dynamic library
 add_library(${PROJECT_NAME} SHARED ${REAL_SOURCES})
 SetupTarget(${PROJECT_NAME})
 if(Threads_FOUND)
   target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
-add_executable(${PROJECT_NAME}_test ${REAL_TEST_SOURCES})
-SetupTarget(${PROJECT_NAME}_test)
+# Target: tests linking to static library, seeing into implementation (whitebox)
+add_executable(${PROJECT_NAME}_wbtest ${REAL_WBTEST_SOURCES})
+SetupTarget(${PROJECT_NAME}_wbtest)
+target_include_directories(${PROJECT_NAME}_wbtest PRIVATE "src")
+target_link_libraries(${PROJECT_NAME}_wbtest ${PROJECT_NAME}_static gtest_main)
 if(Threads_FOUND)
-  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME}_static gtest_main ${CMAKE_THREAD_LIBS_INIT})
+  target_link_libraries(${PROJECT_NAME}_wbtest ${CMAKE_THREAD_LIBS_INIT})
 else()
-  target_link_libraries(${PROJECT_NAME}_test ${PROJECT_NAME}_static gtest_main)
 endif()
-add_test(NAME ${PROJECT_NAME}_test COMMAND ${PROJECT_NAME}_test)
+add_test(NAME ${PROJECT_NAME}_wbtest COMMAND ${PROJECT_NAME}_wbtest)
+
+# Target: tests linking to dynamic library, not seeing implementation (blackbox)
+add_executable(${PROJECT_NAME}_bbtest ${REAL_BBTEST_SOURCES})
+SetupTarget(${PROJECT_NAME}_bbtest)
+target_link_libraries(${PROJECT_NAME}_bbtest ${PROJECT_NAME} gtest_main)
+if(Threads_FOUND)
+  target_link_libraries(${PROJECT_NAME}_bbtest ${CMAKE_THREAD_LIBS_INIT})
+else()
+endif()
+add_test(NAME ${PROJECT_NAME}_bbtest COMMAND ${PROJECT_NAME}_bbtest)
