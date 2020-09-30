@@ -29,7 +29,7 @@ You need the following packages installed on your system to run the build:
  - `gcc`, `g++` for compiling with GCC or
  - `clang`, `clang++` and `llvm` for compiling with Clang
 Optionally:
- - `clang-format` is used to keep our coding convetions
+ - `clang-format` is used to keep our coding conventions
 
 How to start:
  1. Download this repo
