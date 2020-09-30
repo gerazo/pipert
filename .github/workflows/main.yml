@@ -10,6 +10,10 @@ on:
   pull_request:
     branches: [ master ]
 
+defaults:
+  run:
+    shell: sh
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -22,7 +26,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # Runs a single command using the runners shell
+      - name: Install ninja-build tool
+        uses: seanmiddleditch/gha-setup-ninja@v2
+
       - name: Debug on GCC
         run: CC=gcc CXX=g++ ./run.sh -ci -dir build_gcc_debug -mode Debug
 
