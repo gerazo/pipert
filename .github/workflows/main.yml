@@ -26,8 +26,8 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      - name: Install ninja-build tool
-        uses: seanmiddleditch/gha-setup-ninja@v2
+      - name: Install extra dependencies
+        run: sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install ninja-build llvm
 
       - name: Debug on GCC
         run: CC=gcc CXX=g++ ./run.sh -ci -dir build_gcc_debug -mode Debug
