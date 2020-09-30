@@ -6,8 +6,7 @@ namespace pipert {
 
 int AdaptiveSpinLock::spins_before_yield_ = 0;
 
-AdaptiveSpinLock::AdaptiveSpinLock()
-  : mutex_(ATOMIC_FLAG_INIT) {
+AdaptiveSpinLock::AdaptiveSpinLock() {
   if (!spins_before_yield_) {
     spins_before_yield_ = ((std::thread::hardware_concurrency() == 1) ? 1 : kSpinsBeforeYield);
   }
