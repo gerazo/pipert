@@ -25,6 +25,9 @@ set(USE_ADDRESS_SANITIZER ON CACHE BOOL "Use -fsanitize=address for leak checkin
 set(USE_COVERAGE_ANALYSIS ON CACHE BOOL "Use -fprofile-arcs -ftest-coverage for making a coverage analysis.")
 set_property(CACHE USE_COVERAGE_ANALYSIS PROPERTY STRINGS "ON" "HTML" "OFF")
 
+set(GENERATE_DOCS ON CACHE BOOL "Generate HTML documentation for the project.")
+
+
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set(CMAKE_AR gcc-ar)
   set(CMAKE_RANLIB gcc-ranlib)
@@ -122,9 +125,20 @@ if(GCOVR)
       add_custom_target(coverage gcovr  --gcov-executable "${GCOV_EXE}" -su -e googletest-src)
     elseif(${USE_COVERAGE_ANALYSIS} STREQUAL "HTML")
       add_custom_target(coverage gcovr --gcov-executable "${GCOV_EXE}" --html-details -su -e googletest-src -o coverage.html
-                        COMMENT "Open coverage.html for the report.")
+                        COMMENT "Generating coverage report into coverage.html...")
     endif()
   endif()
 else()
   message(STATUS "Install gcovr to get coverage reports!")
+endif()
+
+#Target: docs
+find_program(DOXYGEN doxygen)
+if(DOXYGEN)
+  if(GENERATE_DOCS)
+    add_custom_target(docs ALL doxygen ../Doxyfile
+                      COMMENT "Generating documentation into docs...")
+  endif()
+else()
+  message(STATUS "Install doxygen to get the documentation generated!")
 endif()
