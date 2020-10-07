@@ -112,7 +112,6 @@ while [ "$1" != "" ]; do
       echo "Using \"$MODE\" as build mode."
       ;;
     "-nodocs")
-      shift
       DOCOPTS="-DGENERATE_DOCS=OFF"
       echo "Will not generate documentation."
       ;;
