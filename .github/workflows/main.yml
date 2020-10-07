@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install extra dependencies
-        run: sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install ninja-build llvm
+        run: sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install ninja-build llvm gcovr
 
       - name: Debug on GCC
         run: CC=gcc CXX=g++ ./run.sh -ci -dir build_gcc_debug -mode Debug

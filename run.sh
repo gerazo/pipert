@@ -15,6 +15,17 @@ help () {
   exit 1
 }
 
+generate_coverage () {
+  if [ "$COVERAGE" != "OFF" ]; then
+    echo "Generating coverage report..."
+    ninja coverage
+    if [ "$?" != "0" ]; then
+      echo "Coverage report generation failed, exiting."
+      exit 6
+    fi
+  fi
+}
+
 run_test () {
   echo "Running tests..."
   ninja $NINJAFLAGS test
@@ -22,6 +33,7 @@ run_test () {
     echo "Tests failed, exiting."
     exit 5
   fi
+  generate_coverage
 }
 
 run_build () {
@@ -37,6 +49,16 @@ run_build () {
 run_cmake () {
   DIR="$1"
   MODE="$2"
+
+  COVERAGE="OFF"
+  if [ "$MODE" = "Debug" ]; then
+    if [ "$NINJAFLAGS" = "" ]; then
+      COVERAGE="HTML"
+    else
+      COVERAGE="ON"
+    fi
+  fi
+
   if [ -d "$DIR" ]; then
     echo "\"$DIR\" already exists, skipping CMake run."
     cd "$DIR"
@@ -44,7 +66,7 @@ run_cmake () {
     echo "Running CMake for \"$DIR\" ..."
     mkdir "$DIR"
     cd "$DIR"
-    cmake -G "$GENERATOR" -DCMAKE_BUILD_TYPE="$MODE" ..
+    cmake -G "$GENERATOR" -DCMAKE_BUILD_TYPE="$MODE" -DUSE_COVERAGE_ANALYSIS="$COVERAGE" ..
     if [ "$?" != "0" ]; then
       echo "CMake failed, exiting."
       exit 3
@@ -98,9 +120,9 @@ done
 echo "Running PipeRT build..."
 
 if [ -z "$DIR" ] || [ -z "$MODE" ]; then
-  echo "Running standard Debug build in build_debug..."
+  echo "Running standard Debug build into build_debug folder..."
   run_cmake "build_debug" "Debug"
-  echo "Running standard Release build in build_release..."
+  echo "Running standard Release build into build_release folder..."
   run_cmake "build_release" "Release"
 else
   run_cmake "$DIR" "$MODE"
