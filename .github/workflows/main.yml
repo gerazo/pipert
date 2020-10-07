@@ -30,13 +30,13 @@ jobs:
         run: sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install ninja-build llvm gcovr
 
       - name: Debug on GCC
-        run: CC=gcc CXX=g++ ./run.sh -ci -nodocs -dir build_gcc_debug -mode Debug
+        run: CC=gcc CXX=g++ ./devbuild.sh -ci -nodocs -dir build_gcc_debug -mode Debug
 
       - name: Release on GCC
-        run: CC=gcc CXX=g++ ./run.sh -ci -nodocs -dir build_gcc_release -mode Release
+        run: CC=gcc CXX=g++ ./devbuild.sh -ci -nodocs -dir build_gcc_release -mode Release
 
       - name: Debug on Clang
-        run: CC=clang CXX=clang++ ./run.sh -ci -nodocs -dir build_clang_debug -mode Debug
+        run: CC=clang CXX=clang++ ./devbuild.sh -ci -nodocs -dir build_clang_debug -mode Debug
 
       - name: Release on Clang
-        run: CC=clang CXX=clang++ ./run.sh -ci -nodocs -dir build_clang_release -mode Release
+        run: CC=clang CXX=clang++ ./devbuild.sh -ci -nodocs -dir build_clang_release -mode Release
