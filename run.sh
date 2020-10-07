@@ -16,7 +16,7 @@ help () {
 }
 
 generate_coverage () {
-  if [ "$COVERAGE" != "OFF" ]; then
+  if [ "$COVERAGE" != "OFF" ] && command -v gcovr; then
     echo "Generating coverage report..."
     ninja coverage
     if [ "$?" != "0" ]; then
