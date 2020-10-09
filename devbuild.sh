@@ -4,7 +4,7 @@ GENERATOR="Ninja"
 NINJAFLAGS=""
 DIR=""
 MODE=""
-DOCOPTS=""
+NODOCS=""
 
 help () {
   echo "Options:"
@@ -17,15 +17,27 @@ help () {
   exit 1
 }
 
+generate_docs () {
+  if [ "$NODOCS" = "" ] && command -v doxygen; then
+    echo "Generating documentation..."
+    ninja $NINJAFLAGS docs
+    if [ "$?" != "0" ]; then
+      echo "Documentation generation failed, exiting."
+      exit 7
+    fi
+  fi
+}
+
 generate_coverage () {
   if [ "$COVERAGE" != "OFF" ] && command -v gcovr; then
     echo "Generating coverage report..."
-    ninja coverage
+    ninja $NINJAFLAGS coverage
     if [ "$?" != "0" ]; then
       echo "Coverage report generation failed, exiting."
       exit 6
     fi
   fi
+  generate_docs
 }
 
 run_test () {
@@ -112,7 +124,7 @@ while [ "$1" != "" ]; do
       echo "Using \"$MODE\" as build mode."
       ;;
     "-nodocs")
-      DOCOPTS="-DGENERATE_DOCS=OFF"
+      NODOCS="YEAH"
       echo "Will not generate documentation."
       ;;
     *)
@@ -127,10 +139,10 @@ echo "Running PipeRT build..."
 
 if [ -z "$DIR" ] || [ -z "$MODE" ]; then
   echo "Running standard Debug build into build_debug folder..."
-  DOCOPTS="-DGENERATE_DOCS=OFF"
+  NODOCS="YEAH"
   run_cmake "build_debug" "Debug"
   echo "Running standard Release build into build_release folder..."
-  DOCOPTS=""
+  NODOCS=""
   run_cmake "build_release" "Release"
 else
   run_cmake "$DIR" "$MODE"
