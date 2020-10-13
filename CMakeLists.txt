@@ -6,10 +6,10 @@ enable_testing()
 # All source files compiled into the library
 set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp SchedulerImpl.cpp Timer.cpp)
 
-# Put all test files here which can run using the library through its interface
+# Put all test files here which can run using the library only through its public interface
 set(BBTEST_SOURCES PacketTest.cpp SchedulerTest.cpp)
 
-# Put those tests here which need the implementation or better run using the static library
+# Put those tests here which really, desperately need the implementation
 set(WBTEST_SOURCES PacketTest.cpp)
 
 
@@ -63,7 +63,7 @@ foreach(CPPFILE ${SOURCES})
 endforeach(CPPFILE)
 
 unset(REAL_WBTEST_SOURCES)
-foreach(CPPFILE ${WBTEST_SOURCES})
+foreach(CPPFILE ${BBTEST_SOURCES} ${WBTEST_SOURCES})
   set(REAL_WBTEST_SOURCES ${REAL_WBTEST_SOURCES} test/${CPPFILE})
 endforeach(CPPFILE)
 
@@ -90,7 +90,17 @@ if(Threads_FOUND)
   target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
-# Target: tests linking to static library, seeing into implementation (whitebox)
+# Target: only blackbox tests link to dynamic library
+add_executable(${PROJECT_NAME}_bbtest ${REAL_BBTEST_SOURCES})
+SetupTarget(${PROJECT_NAME}_bbtest)
+target_link_libraries(${PROJECT_NAME}_bbtest ${PROJECT_NAME} gtest_main)
+if(Threads_FOUND)
+  target_link_libraries(${PROJECT_NAME}_bbtest ${CMAKE_THREAD_LIBS_INIT})
+else()
+endif()
+add_test(NAME ${PROJECT_NAME}_bbtest COMMAND ${PROJECT_NAME}_bbtest)
+
+# Target: all tests (whitebox+blackbox) link to static library
 add_executable(${PROJECT_NAME}_wbtest ${REAL_WBTEST_SOURCES})
 SetupTarget(${PROJECT_NAME}_wbtest)
 target_include_directories(${PROJECT_NAME}_wbtest PRIVATE "src")
@@ -100,16 +110,6 @@ if(Threads_FOUND)
 else()
 endif()
 add_test(NAME ${PROJECT_NAME}_wbtest COMMAND ${PROJECT_NAME}_wbtest)
-
-# Target: tests linking to dynamic library, not seeing implementation (blackbox)
-add_executable(${PROJECT_NAME}_bbtest ${REAL_BBTEST_SOURCES})
-SetupTarget(${PROJECT_NAME}_bbtest)
-target_link_libraries(${PROJECT_NAME}_bbtest ${PROJECT_NAME} gtest_main)
-if(Threads_FOUND)
-  target_link_libraries(${PROJECT_NAME}_bbtest ${CMAKE_THREAD_LIBS_INIT})
-else()
-endif()
-add_test(NAME ${PROJECT_NAME}_bbtest COMMAND ${PROJECT_NAME}_bbtest)
 
 # Target: coverage
 find_program(GCOVR gcovr)
