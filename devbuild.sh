@@ -73,10 +73,15 @@ run_cmake () {
     fi
   fi
 
-  if [ -d "$DIR" ]; then
+  CMAKE_OK="cmake.ok"
+  if [ -d "$DIR" ] && [ -f "$DIR"/"$CMAKE_OK" ]; then
     echo "\"$DIR\" already exists, skipping CMake run."
     cd "$DIR"
   else
+    if [ -d "$DIR" ]; then
+      echo "Detected previous failed CMake run, removing..."
+      rm -rf "$DIR"
+    fi
     echo "Running CMake for \"$DIR\" ..."
     mkdir "$DIR"
     cd "$DIR"
@@ -85,6 +90,7 @@ run_cmake () {
       echo "CMake failed, exiting."
       exit 3
     fi
+    >"$CMAKE_OK"
   fi
   run_build
   cd ..
