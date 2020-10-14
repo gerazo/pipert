@@ -4,6 +4,7 @@ GENERATOR="Ninja"
 NINJAFLAGS=""
 DIR=""
 MODE=""
+NODOCS=""
 
 help () {
   echo "Options:"
@@ -12,7 +13,31 @@ help () {
   echo " -ci                    CI mode: log more, do not stop on errors"
   echo " -dir <build_dir>       Use build_dir folder for this build"
   echo " -mode <mode>           CMake build mode (Debug / Release)"
+  echo " -nodocs                Do not generate HTML documentation"
   exit 1
+}
+
+generate_docs () {
+  if [ "$NODOCS" = "" ] && command -v doxygen; then
+    echo "Generating documentation..."
+    ninja $NINJAFLAGS docs
+    if [ "$?" != "0" ]; then
+      echo "Documentation generation failed, exiting."
+      exit 7
+    fi
+  fi
+}
+
+generate_coverage () {
+  if [ "$COVERAGE" != "OFF" ] && command -v gcovr; then
+    echo "Generating coverage report..."
+    ninja $NINJAFLAGS coverage
+    if [ "$?" != "0" ]; then
+      echo "Coverage report generation failed, exiting."
+      exit 6
+    fi
+  fi
+  generate_docs
 }
 
 run_test () {
@@ -22,6 +47,7 @@ run_test () {
     echo "Tests failed, exiting."
     exit 5
   fi
+  generate_coverage
 }
 
 run_build () {
@@ -37,18 +63,34 @@ run_build () {
 run_cmake () {
   DIR="$1"
   MODE="$2"
-  if [ -d "$DIR" ]; then
+
+  COVERAGE="OFF"
+  if [ "$MODE" = "Debug" ]; then
+    if [ "$NINJAFLAGS" = "" ]; then
+      COVERAGE="HTML"
+    else
+      COVERAGE="ON"
+    fi
+  fi
+
+  CMAKE_OK="cmake.ok"
+  if [ -d "$DIR" ] && [ -f "$DIR"/"$CMAKE_OK" ]; then
     echo "\"$DIR\" already exists, skipping CMake run."
     cd "$DIR"
   else
+    if [ -d "$DIR" ]; then
+      echo "Detected previous failed CMake run, removing..."
+      rm -rf "$DIR"
+    fi
     echo "Running CMake for \"$DIR\" ..."
     mkdir "$DIR"
     cd "$DIR"
-    cmake -G "$GENERATOR" -DCMAKE_BUILD_TYPE="$MODE" ..
+    cmake -G "$GENERATOR" -DCMAKE_BUILD_TYPE="$MODE" -DUSE_COVERAGE_ANALYSIS="$COVERAGE" "$DOCOPTS" ..
     if [ "$?" != "0" ]; then
       echo "CMake failed, exiting."
       exit 3
     fi
+    >"$CMAKE_OK"
   fi
   run_build
   cd ..
@@ -87,6 +129,10 @@ while [ "$1" != "" ]; do
       MODE="$1"
       echo "Using \"$MODE\" as build mode."
       ;;
+    "-nodocs")
+      NODOCS="YEAH"
+      echo "Will not generate documentation."
+      ;;
     *)
       echo "Unknown parameter \"$1\". Use -h for help."
       exit 2
@@ -98,9 +144,11 @@ done
 echo "Running PipeRT build..."
 
 if [ -z "$DIR" ] || [ -z "$MODE" ]; then
-  echo "Running standard Debug build in build_debug..."
+  echo "Running standard Debug build into build_debug folder..."
+  NODOCS="YEAH"
   run_cmake "build_debug" "Debug"
-  echo "Running standard Release build in build_release..."
+  echo "Running standard Release build into build_release folder..."
+  NODOCS=""
   run_cmake "build_release" "Release"
 else
   run_cmake "$DIR" "$MODE"

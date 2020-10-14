@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.13)
 project(pipert CXX)
 enable_testing()
 
@@ -6,10 +6,10 @@ enable_testing()
 # All source files compiled into the library
 set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp SchedulerImpl.cpp Timer.cpp)
 
-# Put all test files here which can run using the library through its interface
+# Put all test files here which can run using the library only through its public interface
 set(BBTEST_SOURCES PacketTest.cpp SchedulerTest.cpp)
 
-# Put those tests here which need the implementation or better run using the static library
+# Put those tests here which really, desperately need the implementation
 set(WBTEST_SOURCES PacketTest.cpp)
 
 
@@ -21,6 +21,10 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 set(USE_ADDRESS_SANITIZER ON CACHE BOOL "Use -fsanitize=address for leak checking.")
+
+set(USE_COVERAGE_ANALYSIS ON CACHE BOOL "Use -fprofile-arcs -ftest-coverage for making a coverage analysis.")
+set_property(CACHE USE_COVERAGE_ANALYSIS PROPERTY STRINGS "ON" "HTML" "OFF")
+
 
 if(${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
   set(CMAKE_AR gcc-ar)
@@ -39,12 +43,17 @@ function(SetupTarget target_name)
   target_compile_options(${target_name} PRIVATE -Wall -pedantic -Wextra -Werror)
   if(USE_ADDRESS_SANITIZER)
     target_compile_options(${target_name} PRIVATE $<$<CONFIG:Debug>:-fsanitize=address>)
-    set_target_properties(${target_name} PROPERTIES LINK_FLAGS_DEBUG "-fsanitize=address")
+    target_link_options(${target_name} PRIVATE $<$<CONFIG:Debug>:-fsanitize=address>)
+  endif()
+  if(USE_COVERAGE_ANALYSIS)
+    target_compile_options(${target_name} PRIVATE $<$<CONFIG:Debug>:-fprofile-arcs>)
+    target_compile_options(${target_name} PRIVATE $<$<CONFIG:Debug>:-ftest-coverage>)
+    target_link_options(${target_name} PRIVATE $<$<CONFIG:Debug>:-fprofile-arcs>)
   endif()
   target_compile_options(${target_name} PRIVATE $<$<CONFIG:Release>:-flto>)
   target_compile_options(${target_name} PRIVATE $<$<CONFIG:RelWithDebInfo>:-flto>)
-  set_target_properties(${target_name} PROPERTIES LINK_FLAGS_RELEASE "-flto")
-  set_target_properties(${target_name} PROPERTIES LINK_FLAGS_RELWITHDEBINFO "-flto")
+  target_link_options(${target_name} PRIVATE $<$<CONFIG:Release>:-flto>)
+  target_link_options(${target_name} PRIVATE $<$<CONFIG:RelWithDebInfo>:-flto>)
   target_include_directories(${target_name} PRIVATE "include")
 endfunction(SetupTarget)
 
@@ -54,7 +63,7 @@ foreach(CPPFILE ${SOURCES})
 endforeach(CPPFILE)
 
 unset(REAL_WBTEST_SOURCES)
-foreach(CPPFILE ${WBTEST_SOURCES})
+foreach(CPPFILE ${BBTEST_SOURCES} ${WBTEST_SOURCES})
   set(REAL_WBTEST_SOURCES ${REAL_WBTEST_SOURCES} test/${CPPFILE})
 endforeach(CPPFILE)
 
@@ -81,7 +90,17 @@ if(Threads_FOUND)
   target_link_libraries(${PROJECT_NAME} ${CMAKE_THREAD_LIBS_INIT})
 endif()
 
-# Target: tests linking to static library, seeing into implementation (whitebox)
+# Target: only blackbox tests link to dynamic library
+add_executable(${PROJECT_NAME}_bbtest ${REAL_BBTEST_SOURCES})
+SetupTarget(${PROJECT_NAME}_bbtest)
+target_link_libraries(${PROJECT_NAME}_bbtest ${PROJECT_NAME} gtest_main)
+if(Threads_FOUND)
+  target_link_libraries(${PROJECT_NAME}_bbtest ${CMAKE_THREAD_LIBS_INIT})
+else()
+endif()
+add_test(NAME ${PROJECT_NAME}_bbtest COMMAND ${PROJECT_NAME}_bbtest)
+
+# Target: all tests (whitebox+blackbox) link to static library
 add_executable(${PROJECT_NAME}_wbtest ${REAL_WBTEST_SOURCES})
 SetupTarget(${PROJECT_NAME}_wbtest)
 target_include_directories(${PROJECT_NAME}_wbtest PRIVATE "src")
@@ -92,12 +111,30 @@ else()
 endif()
 add_test(NAME ${PROJECT_NAME}_wbtest COMMAND ${PROJECT_NAME}_wbtest)
 
-# Target: tests linking to dynamic library, not seeing implementation (blackbox)
-add_executable(${PROJECT_NAME}_bbtest ${REAL_BBTEST_SOURCES})
-SetupTarget(${PROJECT_NAME}_bbtest)
-target_link_libraries(${PROJECT_NAME}_bbtest ${PROJECT_NAME} gtest_main)
-if(Threads_FOUND)
-  target_link_libraries(${PROJECT_NAME}_bbtest ${CMAKE_THREAD_LIBS_INIT})
-else()
+# Target: coverage
+find_program(GCOVR gcovr)
+if(GCOVR)
+  if(USE_COVERAGE_ANALYSIS AND ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    set(GCOV_EXE "gcov")
+    if(${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+      set(GCOV_EXE "llvm-cov gcov")
+    endif()
+    if(${USE_COVERAGE_ANALYSIS} STREQUAL "ON")
+      add_custom_target(coverage gcovr  --gcov-executable "${GCOV_EXE}" -su -e googletest-src)
+    elseif(${USE_COVERAGE_ANALYSIS} STREQUAL "HTML")
+      add_custom_target(coverage gcovr --gcov-executable "${GCOV_EXE}" --html-details -su -e googletest-src -o coverage.html
+                        COMMENT "Generating coverage report into coverage.html...")
+    endif()
+  endif()
+elseif(USE_COVERAGE_ANALYSIS)
+  message(STATUS "Install gcovr to get coverage reports!")
 endif()
-add_test(NAME ${PROJECT_NAME}_bbtest COMMAND ${PROJECT_NAME}_bbtest)
+
+#Target: docs
+find_program(DOXYGEN doxygen)
+if(DOXYGEN)
+  add_custom_target(docs doxygen ../Doxyfile
+                    COMMENT "Generating documentation into docs...")
+else()
+  message(STATUS "Install doxygen to get the documentation generated!")
+endif()
