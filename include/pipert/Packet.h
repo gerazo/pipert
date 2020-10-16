@@ -6,18 +6,52 @@
 
 namespace pipert {
 
+/// Represents data which is transmitted between nodes for processing.
+///
+/// Packets contain data which can be processed in one run by a node.
+/// Packets are sent to a processing node by being placed onto the Channel
+/// which was created by that receiving node.
+/// (Nodes are user written objects which do any operations on data.)
+///
+/// Packets are always allocated in the buffer of a Channel at setup time.
+/// No memory allocations are done during runtime, packets are always reused
+/// from the buffer, so they always stay in place.
+/// Packets normally do not exist alone without their containing Channels.
+///
+/// Packets are going through the following phases during runtime:
+/// - _Free_: Packet is waiting to be used by anyone who has access to its
+///           Channel.
+/// - _Being Filled_: After Packet acquisition, the caller fills the Packet
+///                 with data.
+/// - _Queued_: The filled Packet is put back onto the queue of a Channel where
+///           it is waiting to be processed.
+/// - _Being Processed_: Packet was sent to the processing code which is
+///                    currently using it.
+///
+/// See alsoPacketBase::timestamp()
+///
+/// \tparam T Type of user data which this packet will contain.
+///           This type will be constructed and destructed in place.
+///           No copying will be done during the lifetime of the Packet.
+///           All data should be placed into this object (POD).
+///           Doing extra memory allocations on construction
+///           (and pointing to them) will slow down the system
+///           or will have even worse consequences.
 template <class T>
 class Packet : public PacketBase {
  public:
+  /// Constructs a Packet by initializing the contained datatype in it.
+  /// \param timestamp The exact time when this data or the observed phenomenon was recorded.
+  /// \param args Constructor parameters of user type T which will be constructed in place.
   template <class... Args>
   Packet(Timer::Time timestamp, Args&&... args);
   ~Packet() {}
 
-  const T& data() const;
-  T& data();
+  const T& data() const;  ///< \return Read-only reference to the data.
+  T& data();  ///< \return Reference to the contained data.
 
  private:
-  T data_;  // the data stored in the package
+  T data_;  ///< Data stored in this package
 };
 
 template <class T> template <class... Args>

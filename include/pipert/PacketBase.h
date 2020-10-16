@@ -5,18 +5,27 @@
 
 namespace pipert {
 
+/// Non-templated base of Packet to contain all metadata about the data
+/// being carried.
+///
+/// See Packet for details.
 class PacketBase {
  public:
   PacketBase(const PacketBase&) = delete;
   PacketBase& operator=(const PacketBase&) = delete;
 
+  /// The base of scheduling work and meeting deadlines in the Scheduler.
+  /// \returns The exact time when the phenomenon has happened which this
+  ///          data is a result of (e.g. recording time).
+  ///          When transforming data, this timestamp has to be kept in order
+  ///          to facilitate the correct, real-time order of scheduling.
   Timer::Time timestamp() const { return timestamp_; }
 
  protected:
   PacketBase(Timer::Time timestamp) : timestamp_(timestamp) {};
 
  private:
-  Timer::Time timestamp_;  ///< time when data came into the system
+  Timer::Time timestamp_;  ///< Time when data was recorded.
 };
 
 }  // namespace pipert

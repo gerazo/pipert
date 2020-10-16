@@ -11,6 +11,14 @@ namespace pipert {
 template <class T>
 class Channel;
 
+/// A RAII object connecting a Packet and its containing Channel.
+///
+/// This objects points to the connected Packet and Channel, so
+/// the connected objects are never moved when this object is passed around.
+/// Submitting this as a parameter or returning as a value is supported
+/// through the implemented move operations.
+///
+/// \tparam T See template paramter T of Packet
 template <class T>
 class PacketStub {
  public:
@@ -19,18 +27,20 @@ class PacketStub {
   PacketStub(PacketStub&&);
   PacketStub& operator=(PacketStub&&);
 
+  /// The represented operation is done, nothing is connected anymore.
+  /// \returns True if a Packet (and a Channel) is no longer connected.
   bool IsEmpty() const;
-  Timer::Time timestamp() const;
-  const T& data() const;
-  T& data();
-  Packet<T>* GetPacket();
+  Timer::Time timestamp() const;  ///< See PacketBase::timestamp()
+  const T& data() const;  ///< See Packet::data()
+  T& data();  ///< See Packet::data()
+  Packet<T>* GetPacket();  ///< \returns The referred Packet object.
 
 protected:
   PacketStub(Packet<T>* packet, Channel<T>* channel);
-  void SetEmpty();
+  void SetEmpty();  ///< Operation was finished, connection is over.
 
-  Channel<T>* channel_;
-  Packet<T>* packet_;
+  Channel<T>* channel_;  ///< The connected Channel.
+  Packet<T>* packet_;  ///< The connected Packet.
 
  private:
   void move(PacketStub&&);
