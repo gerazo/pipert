@@ -10,6 +10,7 @@ namespace pipert {
 
 class SchedulerImpl;
 
+/// (_Part of internal implementation._)
 class ChannelImpl {
  public:
   ChannelImpl(const char* name, int capacity, int packet_size,

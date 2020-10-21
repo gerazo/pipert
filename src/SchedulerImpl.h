@@ -15,6 +15,7 @@
 
 namespace pipert {
 
+/// (_Part of internal implementation._)
 class SchedulerImpl {
  public:
   SchedulerImpl(int workers_number);
