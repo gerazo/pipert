@@ -43,6 +43,7 @@ class Packet : public PacketBase {
   /// Constructs a Packet by initializing the contained datatype in place.
   /// \param timestamp The exact time when this data or the
   ///                  observed phenomenon was recorded.
+  ///                  See PacketBase::timestamp() for details.
   /// \param args Constructor parameters of user type T which will be
   ///             constructed in place.
   template <class... Args>
