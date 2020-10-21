@@ -9,7 +9,7 @@ namespace pipert {
 /// General timing utility for monitoring and profiling.
 ///
 /// Its features are:
-/// - Defines the format in which all timestamps in the library are kept.
+/// - Defines type `Time` in which all timestamps in the library are kept.
 /// - Gives direct access to `std::chrono::high_resolution_clock`.
 /// - Allows short term time measurements for internal usage.
 class Timer {
@@ -24,10 +24,11 @@ class Timer {
   /// Timeline end.
   static const Time kMaxTime = INT_LEAST64_MAX;
 
+  /// Returns the current time.
   /// \return Time spent since _epoch_ in __microseconds__.
   static Time time();
 
-  /// Start measuring time interval.
+  /// Start time interval measurement.
   void tic();
 
   /// End time interval measurement.

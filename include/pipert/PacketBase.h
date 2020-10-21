@@ -5,10 +5,10 @@
 
 namespace pipert {
 
-/// Non-templated base of Packet to contain all metadata about the data
+/// Template free base of Packet to contain all metadata about the data
 /// being carried.
 ///
-/// See Packet for details.
+/// See Packet for more detail.
 class PacketBase {
  public:
   PacketBase(const PacketBase&) = delete;

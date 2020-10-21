@@ -14,7 +14,8 @@ namespace pipert {
 ///
 /// See PacketStub for details.
 ///
-/// \tparam T See template paramter T of Packet
+/// \tparam T Follows the template paramter of Packet.
+///           See template paramter T of Packet for details.
 template <class T>
 class PacketToFill : public PacketStub<T> {
  public:
@@ -28,7 +29,7 @@ class PacketToFill : public PacketStub<T> {
   /// You can do an early submission by using this.
   /// It is useful as the data is immediately queded for
   /// processing on pushing.
-  /// As a result, this object will become empty, see PacketStub::IsEmpty()
+  /// As a result, this object will become empty, see PacketStub::IsEmpty().
   void Push();
 
   friend void Channel<T>::Push(PacketToFill<T>* filled_packet);

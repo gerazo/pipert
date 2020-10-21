@@ -14,11 +14,12 @@ class Channel;
 /// A RAII object connecting a Packet and its containing Channel.
 ///
 /// This objects points to the connected Packet and Channel, so
-/// the connected objects are never moved when this object is passed around.
+/// the connected objects are never moved when this _stub_ is passed around.
 /// Submitting this as a parameter or returning as a value is supported
 /// through the implemented move operations.
 ///
-/// \tparam T See template paramter T of Packet
+/// \tparam T Follows the template paramter of Packet.
+///           See template paramter T of Packet for details.
 template <class T>
 class PacketStub {
  public:
@@ -27,13 +28,20 @@ class PacketStub {
   PacketStub(PacketStub&&);
   PacketStub& operator=(PacketStub&&);
 
-  /// The represented operation is done, nothing is connected anymore.
+  /// This _stub_ is empty if the represented operation is done
+  /// and nothing is connected anymore.
   /// \returns True if a Packet (and a Channel) is no longer connected.
   bool IsEmpty() const;
+
   Timer::Time timestamp() const;  ///< See PacketBase::timestamp()
+
   const T& data() const;  ///< See Packet::data()
+
   T& data();  ///< See Packet::data()
-  Packet<T>* GetPacket();  ///< \returns The referred Packet object.
+
+  /// Gets the Packet object which is connected to this PacketStub.
+  /// \returns The referred Packet object or nullptr if this _stub_ is empty.
+  Packet<T>* GetPacket();
 
 protected:
   PacketStub(Packet<T>* packet, Channel<T>* channel);
