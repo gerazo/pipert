@@ -39,8 +39,8 @@ namespace pipert {
 ///   pool hidden in the implementation. Anyone who has access to a Channel can
 ///   send data through it by acquiring and filling up a Packet.
 /// - _Pushing_ a PacketToFill to be queued for processing.
-/// - _Releasing_ an already processed PacketToProcess from the packet pool to be
-///   "freed" so its memory location can be reused.
+/// - _Releasing_ an already processed PacketToProcess from the packet pool to
+///   be "freed" so its memory location can be reused.
 ///
 /// \tparam T User supplied data type representing the data stored in the
 ///           `Packet<T>` objects that flow through the Channel buffer.
@@ -104,15 +104,16 @@ class Channel : public ChannelBase {
 };
 
 template <class T>
-Channel<T>::Channel(ChannelImpl* impl)
-  : ChannelBase(impl) {}
+Channel<T>::Channel(ChannelImpl* impl) : ChannelBase(impl) {}
 
-template <class T> template <class... Args>
-PacketToFill<T> Channel<T>::Acquire(const char* client_name, Timer::Time timestamp,
-                                    Args&&... args) {
-  Packet<T>* new_packet = reinterpret_cast<Packet<T>*>(AcquireBase(client_name));
+template <class T>
+template <class... Args>
+PacketToFill<T> Channel<T>::Acquire(const char* client_name,
+                                    Timer::Time timestamp, Args&&... args) {
+  Packet<T>* new_packet =
+      reinterpret_cast<Packet<T>*>(AcquireBase(client_name));
   assert(new_packet);
-  new(new_packet) Packet<T>(timestamp, std::forward<Args>(args)...);
+  new (new_packet) Packet<T>(timestamp, std::forward<Args>(args)...);
   return PacketToFill<T>(new_packet, this);
 }
 

@@ -38,7 +38,7 @@ class PacketToFill : public PacketStub<T> {
 
 template <class T>
 PacketToFill<T>::PacketToFill(Packet<T>* packet, Channel<T>* channel)
-  : PacketStub<T>(packet, channel) {
+    : PacketStub<T>(packet, channel) {
   assert(this->channel_);
   // can be created empty
 }

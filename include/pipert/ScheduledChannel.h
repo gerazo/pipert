@@ -37,25 +37,25 @@ class ScheduledChannel : public Channel<T> {
   ScheduledChannel(ScheduledChannel&&) = default;
   ScheduledChannel& operator=(ScheduledChannel&&) = default;
 
-
  private:
   /// The callback containing the registered callback function.
   Callback processing_fun_;
 };
 
 template <class T>
-ScheduledChannel<T>::ScheduledChannel(ChannelImpl* impl, Callback processing_fun)
-  : Channel<T>(impl), processing_fun_(processing_fun) {}
+ScheduledChannel<T>::ScheduledChannel(ChannelImpl* impl,
+                                      Callback processing_fun)
+    : Channel<T>(impl), processing_fun_(processing_fun) {}
 
 template <class T>
 void ScheduledChannel<T>::CallbackTranslator(ChannelBase* this_channel,
                                              PacketBase* packet) {
   assert(this_channel);
   ScheduledChannel<T>* my_this =
-    reinterpret_cast<ScheduledChannel<T>*>(this_channel);
+      reinterpret_cast<ScheduledChannel<T>*>(this_channel);
   assert(my_this);
-  my_this->processing_fun_(PacketToProcess<T>(
-      reinterpret_cast<Packet<T>*>(packet), my_this));
+  my_this->processing_fun_(
+      PacketToProcess<T>(reinterpret_cast<Packet<T>*>(packet), my_this));
 }
 
 }  // namespace pipert

@@ -38,7 +38,7 @@ class PacketToProcess : public PacketStub<T> {
 
 template <class T>
 PacketToProcess<T>::PacketToProcess(Packet<T>* packet, Channel<T>* channel)
-  : PacketStub<T>(packet, channel) {
+    : PacketStub<T>(packet, channel) {
   assert(this->channel_);
   // can be created empty
 }

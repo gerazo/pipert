@@ -62,9 +62,10 @@ class Packet : public PacketBase {
   T data_;  ///< Data stored in this package
 };
 
-template <class T> template <class... Args>
+template <class T>
+template <class... Args>
 Packet<T>::Packet(Timer::Time timestamp, Args&&... args)
-  : PacketBase(timestamp), data_(std::forward<Args>(args)...) {}
+    : PacketBase(timestamp), data_(std::forward<Args>(args)...) {}
 
 template <class T>
 const T& Packet<T>::data() const {

@@ -3,8 +3,8 @@
 
 #include <cassert>
 #include <utility>
-#include "pipert/Packet.h"
 #include "pipert/Channel.h"
+#include "pipert/Packet.h"
 
 namespace pipert {
 
@@ -43,12 +43,12 @@ class PacketStub {
   /// \returns The referred Packet object or nullptr if this _stub_ is empty.
   Packet<T>* GetPacket();
 
-protected:
+ protected:
   PacketStub(Packet<T>* packet, Channel<T>* channel);
   void SetEmpty();  ///< Operation was finished, connection is over.
 
   Channel<T>* channel_;  ///< The connected Channel.
-  Packet<T>* packet_;  ///< The connected Packet.
+  Packet<T>* packet_;    ///< The connected Packet.
 
  private:
   void move(PacketStub&&);
@@ -95,7 +95,7 @@ Packet<T>* PacketStub<T>::GetPacket() {
 
 template <class T>
 PacketStub<T>::PacketStub(Packet<T>* packet, Channel<T>* channel)
-  : channel_(channel), packet_(packet) {}
+    : channel_(channel), packet_(packet) {}
 
 template <class T>
 void PacketStub<T>::SetEmpty() {
