@@ -8,6 +8,7 @@ namespace pipert {
 /// Template free base of Packet to contain all metadata about the data
 /// being carried.
 ///
+/// This is basically a raw Packet without information on the contained data.
 /// See Packet for more detail.
 class PacketBase {
  public:

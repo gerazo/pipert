@@ -64,9 +64,11 @@ class Channel : public ChannelBase {
   PacketToFill<T> Acquire(const char* client_name, Timer::Time timestamp,
                           Args&&... args);
 
+  /// Sends the filled Packet into the queue for processing.
   /// Same as PacketToFill<T>::Push().
   void Push(PacketToFill<T>* filled_packet);
 
+  /// Frees up the Packet after being done with its processing.
   /// Same as PacketToProcess<T>::Release().
   void Release(PacketToProcess<T>* processed_packet);
 

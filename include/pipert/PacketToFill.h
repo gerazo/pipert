@@ -30,6 +30,7 @@ class PacketToFill : public PacketStub<T> {
   /// It is useful as the data is immediately queded for
   /// processing on pushing.
   /// As a result, this object will become empty, see PacketStub::IsEmpty().
+  /// Also see Channel::Push().
   void Push();
 
   friend void Channel<T>::Push(PacketToFill<T>* filled_packet);

@@ -30,6 +30,7 @@ class PacketToProcess : public PacketStub<T> {
   /// It is useful as the data is immediately freed for
   /// reusing on releasing.
   /// As a result, this object will become empty, see PacketStub::IsEmpty().
+  /// Also see Channel::Release().
   void Release();
 
   friend void Channel<T>::Release(PacketToProcess<T>* processed_packet);
