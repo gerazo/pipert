@@ -8,8 +8,53 @@ namespace pipert {
 
 class SchedulerImpl;
 
-/// The main object of a pipeline owning all Channels and
+/// The main object of a pipeline owning all Channel objects and
 /// being responsible for scheduling.
+///
+/// One Scheduler object governs a complete DSP pipeline and all operations,
+/// data structures connected to it.
+/// Scheduler runs a real-time system when it is in its _running state_,
+/// so no memory allocations are done during the operation of the pipeline.
+/// This means that any configuration including creating Channel objects
+/// should be done before setting the pipleine into a the _running_ state by
+/// using the Start() method.
+///
+/// Scheduler keeps up a fixed number of _worker threads_ which are used to
+/// execute processing functions of _nodes_ connected to the receiver side
+/// of ScheduledChannel objects.
+/// The scheduling is done by minimizing the delay between useful work units
+/// and also minimizing the amount of time a Packet spends in the pipeline.
+///
+/// During the operation of the pipeline, no memory is allocated.
+/// All Channel objects use a fixed, preconfigured size buffer where Packet
+/// objects stay in place.
+/// This way, buffers are not moved in memory and transforming operations
+/// push the data forward from one buffer to an other one residing in the
+/// next Channel in the pipeline.
+///
+/// There is an option to connect your own, custom threads to the pipeline by
+/// using a PolledChannel.
+/// A PolledChannel has all the buffering functionality but the Packet objects
+/// in its buffer are not subject to scheduling done by the Scheduler.
+/// Instead, the user can poll the buffer from a custom thread.
+/// This can be used to implement _UI threads_ or creating _exit points_ from
+/// the pipeline transferring data to an other system.
+///
+/// A Scheduler runned pipeline is really flexible. You can have arbitrary
+/// number of _entry and exit points_ and also _feedback loops_ in the chain.
+/// Until timestamps are correct, scheduling is done accordingly.
+///
+/// To ease creating and changing pipelines during development,
+/// the structure of a pipeline is not stored by the system.
+/// Instead, direct connections and references to Channel objects from user
+/// supplied _nodes_ are governing the direction of data.
+/// However, this data flow can be traced and measured nicely by the built-in
+/// monitoring system.
+///
+/// You can have multiple Scheduler objects running in parallel.
+/// This means you will run more, completely independent pipelines together.
+/// However, you should keep in mind that these will fight for the same CPU
+/// resources despite being isolated in memory.
 class Scheduler {
  public:
   /// Creates a Scheduler object and the system enters preparation state.
