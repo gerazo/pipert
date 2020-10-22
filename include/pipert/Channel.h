@@ -10,23 +10,23 @@
 
 namespace pipert {
 
-/// A Channel receiving data of type T into its buffer through
-/// `Packet<T>` objects.
+/// A Channel represents storage for a single stage in the data processing
+/// chain, and receives data of type T into its buffer through `Packet<T>`
+/// objects.
 ///
 /// A Channel is a circular buffer of `Packet<T>` objects which are used to
 /// pass data around in the DSP pipeline.
-/// Channels are always owned by a Scheduler object, they do not exist alone.
-/// They are always connected to a _Node_ object which receives data by them.
-/// Usually the _Node_ object is the one which creates these by using
-/// Scheduler::CreateScheduledChannel() or Scheduler::CreatePolledChannel().
-/// Anyone who has access to a Channel can send data through it by acquiring a
-/// Packet and filling it up.
-///
-/// A Channel has a fixed size buffer which is created at _set up_ time.
+/// This buffer is of a fixed size, allocated at _set up_ time.
 /// No memory allocation is done during _run-time_ in the system.
 ///
+/// Channels are always owned by a Scheduler object, they do not exist alone.
+/// They are always connected to a _Node_ object which receives data through
+/// them.
+/// Usually the _Node_ object is the one that creates Channels using
+/// Scheduler::CreateScheduledChannel() or Scheduler::CreatePolledChannel().
+///
 /// Packets filled up with data can either be
-/// - Automatically shceduled for processing (job) by a worker thread.
+/// - Automatically scheduled for processing (job) by a worker thread.
 ///   See ScheduledChannel for details.
 /// - Manually polled for new data by your own, custom thread.
 ///   See PolledChannel for details.
@@ -34,48 +34,72 @@ namespace pipert {
 /// In either case, the order of scheduling is respected
 /// (earliest deadline first).
 ///
-/// \tparam T User supplied data type that is used as the data
-///           received by this Channel.
-///           `Packet<T>` objects will be created in the Channel buffer to
-///           facilitate the passing of data and scheduling of jobs on them.
+/// Therefore, a Channel exposes the interface for:
+/// - _Acquiring_ a PacketToFill by requesting a memory address from the packet
+///   pool hidden in the implementation. Anyone who has access to a Channel can
+///   send data through it by acquiring and filling up a Packet.
+/// - _Pushing_ a PacketToFill to be queued for processing.
+/// - _Releasing_ an already processed PacketToProcess from the packet pool to be
+///   "freed" so its memory location can be reused.
+///
+/// \tparam T User supplied data type representing the data stored in the
+///           `Packet<T>` objects that flow through the Channel buffer.
 template <class T>
 class Channel : public ChannelBase {
  public:
-  /// Acquire an empty Packet to be filled up with data.
+  /// Acquire an empty Packet from the pool to be filled up with data.
   ///
-  /// The Packet will be newly created in-place in the Channel buffer.
-  /// If the data sender is ready by filling up the Packet, the discarded
+  /// The Packet will be created anew in-place in the Channel buffer.
+  /// After the data sender is done filling up the Packet, the discarded
   /// `PacketToFill<T>` object will automatically queue this Packet for
-  /// processing / scheduling (RAII).
-  /// An alternative option is to use PacketToFill<T>::Push() to force
-  /// early queuing before stub destruction.
+  /// processing / scheduling (following RAII).
+  /// See PacketToFill<T>::Push() for forcing early queueing of packets before
+  /// the destruction of the PacketStub.
   ///
   /// \param client_name Name of _Node_, sender object or data source for
   ///                    identification purposes in logs and monitoring.
-  /// \param timestamp Timestamp for the new Packet.
-  ///                  See PacketBase::timestamp() for details.
-  /// \param args Constructor parameters of type T. T will be
-  ///             created in-place by passing these to its constructor.
+  /// \param timestamp The exact time when the PacketToFill was requested to be
+  ///                  acquired. See PacketBase::timestamp() for details.
+  /// \param args Constructor parameters of type T which will be
+  ///             created in-place.
   /// \return PacketToFill _stub_  pointing to the created Packet or
   ///         an empty object (see PacketStub::IsEmpty()) if there is
-  ///         no free Packet available in the buffer.
+  ///         no free space available for a Packet in the buffer.
   ///         The latter case refers to a scaling problem.
   template <class... Args>
   PacketToFill<T> Acquire(const char* client_name, Timer::Time timestamp,
                           Args&&... args);
 
-  /// Sends the filled Packet into the queue for processing.
+  /// Push a filled packet to be queued for processing in this Channel.
+  ///
+  /// Normally called upon the destruction of a PacketToFill.
   /// Same as PacketToFill<T>::Push().
+  ///
+  /// \param filled_packet The filled PacketToFill that will be pushed to be
+  ///                      queued for processing.
   void Push(PacketToFill<T>* filled_packet);
 
-  /// Frees up the Packet after being done with its processing.
+  /// Release a contained Packet from the packet queue of this Channel, freeing
+  /// its position in the packet pool to be reused again.
+  ///
+  /// Cuts the connection to the Packet in the PacketToProcess.
+  /// Explicitly destructs the data contained in the Packet.
+  ///
+  /// Normally called upon the destruction of a PacketToProcess.
   /// Same as PacketToProcess<T>::Release().
+  ///
+  /// \param processed_packet The processed PacketToProcess whose associated
+  ///                         Packet will be released from the packet pool.
   void Release(PacketToProcess<T>* processed_packet);
 
  protected:
-  /// A Channel can only be created directly from the implementation.
-  /// Call Scheduler::CreateScheduledChannel() or
-  /// Scheduler::CreatePolledChannel() to create one.
+  /// Construct a Channel using an implementation that must be provided.
+  ///
+  /// A Channel can only be created directly in the system implementation.
+  /// If you wish to create one, call Scheduler::CreateScheduledChannel() or
+  /// Scheduler::CreatePolledChannel().
+  ///
+  /// \param impl The obligatorily provided hidden implementation of Channel.
   Channel(ChannelImpl* impl);
 };
 

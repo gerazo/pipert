@@ -13,7 +13,7 @@ class Channel;
 
 /// A RAII object connecting a Packet and its containing Channel.
 ///
-/// This objects points to the connected Packet and Channel, so
+/// This object points to the connected Packet and Channel, so
 /// the connected objects are never moved when this _stub_ is passed around.
 /// Submitting this as a parameter or returning as a value is supported
 /// through the implemented move operations.
