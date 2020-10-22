@@ -130,11 +130,11 @@ class ChannelImpl {
   /// This is a heap having the oldest timestamp on top.
   std::vector<PacketBase*> queued_packets_;
 
-  const char* name_;  ///< See GetName().
-  int capacity_;  ///< See GetCapacity().
-  int packet_size_;  ///< See GetPacketSize().
+  const char* name_;          ///< See GetName().
+  int capacity_;              ///< See GetCapacity().
+  int packet_size_;           ///< See GetPacketSize().
   SchedulerImpl* scheduler_;  ///< The connected Scheduler implementation.
-  ChannelBase* base_;  ///< See SetBase().
+  ChannelBase* base_;         ///< See SetBase().
 };
 
 }  // namespace pipert

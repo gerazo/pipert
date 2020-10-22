@@ -16,60 +16,114 @@
 namespace pipert {
 
 /// (_Part of internal implementation._)
+///
+/// This is the implementation of the Scheduler logic.
+/// Every Scheduler has a SchedulerImpl behind.
 class SchedulerImpl {
  public:
+  /// Constructor.
+  ///
+  /// \param workers_number See Scheduler::Scheduler().
   SchedulerImpl(int workers_number);
+
+  /// Destructor.
+  ///
+  /// SchedulerImpl is created and destroyed in sync with Scheduler.
   ~SchedulerImpl();
+
   SchedulerImpl(const SchedulerImpl&&) = delete;
   SchedulerImpl& operator=(const SchedulerImpl&&) = delete;
 
-  // Use these in configuration phase before running
+  /// Newly created channel is registered.
+  /// This is used in configuration phase before running
+  /// and it is automatically called by Channel construction.
   void RegisterChannel(ChannelImpl* channel);
+
+  /// About to be destroyed channel is unregistered.
+  /// This is used in configuration phase before running,
+  /// and it is automatically called by Channel destruction.
   void UnregisterChannel(ChannelImpl* channel);
 
-  void Start();  // Enter running phase
-  void Stop();   // Leave runnig phase
+  /// Enter the running state.
+  /// See Scheduler::Start().
+  void Start();
+
+  /// Enter the stopped/preparation/configuration state.
+  /// See Scheduler::Stop().
+  void Stop();
+
+  /// Return current state.
+  /// See Scheduler::IsRunning().
   bool IsRunning() { return running_.load(std::memory_order_acquire); }
 
+  /// Return the Scheduler level mutex for job queues.
+  /// This is also used by all ScheduledChannel objects connected.
   AdaptiveSpinLock& GetMutex() { return global_mutex_; }
+
+  /// ChannelImpl signals new jobs in queue.
+  /// \param channel The signalling ChannelImpl.
   void JobsArrived(ChannelImpl* channel);
+
+  /// ChannelImpl signals updated jobs in queue.
+  /// \param channel The signalling ChannelImpl.
+  /// \param was_push True if the modification was a result of a new job,
+  ///        false if the modification was a result of a dropped job.
   void JobsUpdated(ChannelImpl* channel, bool was_push);
+
+  /// ChannelImpl signals dropped jobs in queue.
+  /// \param channel The signalling ChannelImpl.
   void JobsDropped(ChannelImpl* channel);
 
  private:
+  /// Heaps are used because they are working as in-place queues.
   using ChannelHeap = std::vector<ChannelImpl*>;
+
+  /// Certain heaps belonging to a channel are disabled because the channel
+  /// of a stateful node has a thread curerntly executing a job.
+  /// Until the job is done, no other threads are allowed to enter.
   struct EnabledChannelHeap {
     EnabledChannelHeap() : enabled(true) {}
     bool enabled;
     ChannelHeap heap;
   };
+
+  /// Monitor object to channel heap mapping.
   using State2ChannelHeap = std::unordered_map<void*, EnabledChannelHeap>;
+
+  /// Heap of monitor objects.
   using StateHeap = std::vector<void*>;
 
+  /// Ordering of channels based on earliest timestamp for ChannelHeap.
   struct ChannelOrdering {
     bool operator()(ChannelImpl* a, ChannelImpl* b);
   };
 
+  /// Ordering of monitor objects based on earliest timestamp for StateHeap.
   struct StateOrdering {
     State2ChannelHeap* state2channel_queues_;
     StateOrdering(State2ChannelHeap* state2channel_queues);
     bool operator()(void* a, void* b);
   };
 
+  /// Special method to force something to the top of the heap.
+  /// This is useful to remove and reinsert something in a heap when the
+  /// item is modified.
   template <class T>
   static void MoveToTopInHeap(std::vector<T>& heap, T value);
 
+  /// Worker thread code getting a new job and executing it.
+  /// If there are no jobs available, it sleeps until there is new work.
   void RunTasks();
 
-  std::vector<ChannelImpl*> channels_;
-  AdaptiveSpinLock global_mutex_;
-  std::condition_variable_any global_covar_;
-  StateHeap state_queue_;
-  State2ChannelHeap state2channel_queues_;
-  std::vector<std::thread> workers_;
-  std::atomic_bool keep_running_;
-  std::atomic_bool running_;
-  int workers_number_;
+  std::vector<ChannelImpl*> channels_;        ///< All registered channels.
+  AdaptiveSpinLock global_mutex_;             ///< See GetMutex().
+  std::condition_variable_any global_covar_;  ///< CV for wakeing up threads.
+  StateHeap state_queue_;  ///< Queue for states in timestamp order.
+  State2ChannelHeap state2channel_queues_;  ///< State to channel mapping.
+  std::vector<std::thread> workers_;        ///< Worker thread pool.
+  std::atomic_bool keep_running_;           ///< Tells threads to run or not.
+  std::atomic_bool running_;  ///< Tells what state was reached by all threads.
+  int workers_number_;        ///< Real number of wroker threads.
 };
 
 template <class T>
