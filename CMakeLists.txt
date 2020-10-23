@@ -120,9 +120,9 @@ if(GCOVR)
       set(GCOV_EXE "llvm-cov gcov")
     endif()
     if(${USE_COVERAGE_ANALYSIS} STREQUAL "ON")
-      add_custom_target(coverage gcovr  --gcov-executable "${GCOV_EXE}" -su -e googletest-src)
+      add_custom_target(coverage gcovr  --gcov-executable "${GCOV_EXE}" -su -r .. -e ../test -e googletest-src)
     elseif(${USE_COVERAGE_ANALYSIS} STREQUAL "HTML")
-      add_custom_target(coverage gcovr --gcov-executable "${GCOV_EXE}" --html-details -su -e googletest-src -o coverage.html
+      add_custom_target(coverage gcovr --gcov-executable "${GCOV_EXE}" --html-details -su -r .. -e ../test -e googletest-src -o coverage.html
                         COMMENT "Generating coverage report into coverage.html...")
     endif()
   endif()
