@@ -6,8 +6,8 @@
 
 namespace pipert {
 
-/// A Channel which packets are automatically scheduled for processing by a
-/// worker thread pool.
+/// A Channel whose packets are automatically scheduled to be processed by a
+/// worker thread pool in a Scheduler.
 ///
 /// A ScheduledChannel has all its enqueued Packet objects queued in the
 /// owning Scheduler of the system as well.
@@ -16,18 +16,18 @@ namespace pipert {
 /// of the Scheduler.
 /// See Scheduler for details.
 ///
-/// \tparam T Same as in case of `Channel<T>`.
+/// \tparam T Same as in the case of `Channel<T>`.
 template <class T>
 class ScheduledChannel : public Channel<T> {
  public:
   /// This is the callback function type which is called by the worker thread
   /// when a new Packet is scheduled for processing.
-  /// It should contain the processing function for T data type.
+  /// It should contain the processing function for data of type T.
   /// Its parameter is a stub pointing to the selected Packet object.
   using Callback = std::function<void(PacketToProcess<T>)>;
 
   /// (_Internal implementation_) Translates from C-style callback
-  /// into C++-style user registered function object.
+  /// into C++-style user-registered function object.
   static void CallbackTranslator(ChannelBase* this_channel, PacketBase* packet);
 
   /// A Channel can only be created directly from the implementation.

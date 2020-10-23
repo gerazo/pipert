@@ -5,8 +5,8 @@
 
 namespace pipert {
 
-/// A Channel which packets can be manually received for processing by the
-/// user's custom thread.
+/// A Channel whose packets can be manually received for processing by the
+/// user's custom threads.
 ///
 /// A PolledChannel is for using your own thread which is independent from the
 /// scheduling done by the owning Scheduler object.
@@ -14,9 +14,9 @@ namespace pipert {
 /// - You need a dedicated thread for certain actions (fixed thread affinity).
 ///   Using UI libraries or libraries which are not thread safe and need to be
 ///   called exclusively from one thread can be a good example.
-/// - You need to make an exit point of the DSP pipeline and you need to
+/// - You need to make an exit point from the DSP pipeline and you need to
 ///   transmit the resulting data. This is usually done by dedicated
-///   communication threads (also many times a library requirement).
+///   communication threads (many times, this is also a library requirement).
 ///
 /// Keep in mind that
 /// PipeRT pipelines can have multiple inputs and outputs, so it is not a
@@ -25,7 +25,7 @@ namespace pipert {
 /// Also note that one thread can simultaneously poll multiple PolledChannel
 /// objects if it is needed (can be useful for your main thread).
 ///
-/// \tparam T Same as in case of `Channel<T>`.
+/// \tparam T Same as in the case of `Channel<T>`.
 template <class T>
 class PolledChannel : public Channel<T> {
  public:
@@ -40,7 +40,7 @@ class PolledChannel : public Channel<T> {
   ///
   /// This function returns immediately.
   /// It gets the next Packet out of the Channel queue and returns it.
-  /// It can return an empty stub in case of no available Packet.
+  /// It can return an empty stub in case no Packets are available.
   /// \return PacketToProcess _stub_  pointing to the next Packet to be
   ///         processed or an empty object (see PacketStub::IsEmpty()) if
   ///         there is no queued Packet available in the buffer.

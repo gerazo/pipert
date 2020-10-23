@@ -18,7 +18,7 @@ namespace pipert {
 /// (_Part of internal implementation._)
 ///
 /// This is the implementation of the Scheduler logic.
-/// Every Scheduler has a SchedulerImpl behind.
+/// Every Scheduler must have a SchedulerImpl behind it.
 class SchedulerImpl {
  public:
   /// Constructor.
@@ -34,14 +34,14 @@ class SchedulerImpl {
   SchedulerImpl(const SchedulerImpl&&) = delete;
   SchedulerImpl& operator=(const SchedulerImpl&&) = delete;
 
-  /// Newly created channel is registered.
-  /// This is used in configuration phase before running
-  /// and it is automatically called by Channel construction.
+  /// Register a Channel that was newly created.
+  /// This is used in the configuration phase before running
+  /// and is automatically called at the end of Channel construction.
   void RegisterChannel(ChannelImpl* channel);
 
-  /// About to be destroyed channel is unregistered.
+  /// Unregister a Channel that is about the be destroyed.
   /// This is used in configuration phase before running,
-  /// and it is automatically called by Channel destruction.
+  /// and is automatically called before the destruction of a Channel.
   void UnregisterChannel(ChannelImpl* channel);
 
   /// Enter the running state.
@@ -56,7 +56,7 @@ class SchedulerImpl {
   /// See Scheduler::IsRunning().
   bool IsRunning() { return running_.load(std::memory_order_acquire); }
 
-  /// Return the Scheduler level mutex for job queues.
+  /// Return the Scheduler-level mutex for job queues.
   /// This is also used by all ScheduledChannel objects connected.
   AdaptiveSpinLock& GetMutex() { return global_mutex_; }
 
@@ -75,11 +75,11 @@ class SchedulerImpl {
   void JobsDropped(ChannelImpl* channel);
 
  private:
-  /// Heaps are used because they are working as in-place queues.
+  /// Heaps are used as they can work as in-place queues.
   using ChannelHeap = std::vector<ChannelImpl*>;
 
   /// Certain heaps belonging to a channel are disabled because the channel
-  /// of a stateful node has a thread curerntly executing a job.
+  /// of a stateful node has a thread currently executing a job.
   /// Until the job is done, no other threads are allowed to enter.
   struct EnabledChannelHeap {
     EnabledChannelHeap() : enabled(true) {}
@@ -98,7 +98,7 @@ class SchedulerImpl {
     bool operator()(ChannelImpl* a, ChannelImpl* b);
   };
 
-  /// Ordering of monitor objects based on earliest timestamp for StateHeap.
+  /// Ordering of monitor objects based on the earliest timestamp for StateHeap.
   struct StateOrdering {
     State2ChannelHeap* state2channel_queues_;
     StateOrdering(State2ChannelHeap* state2channel_queues);
