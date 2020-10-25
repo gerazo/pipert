@@ -30,6 +30,14 @@ const char* ChannelBase::GetName() const {
   return impl_->GetName();
 }
 
+int ChannelBase::GetFreePacketSize() {
+  return impl_->GetFreePacketSize();
+}
+
+int ChannelBase::GetQueuedPacketSize() {
+  return impl_->GetQueuedPacketSize();
+}
+
 ChannelBase::ChannelBase(ChannelImpl* impl)
   : impl_(impl) {
   assert(impl);

@@ -120,6 +120,16 @@ void ChannelImpl::Execute(PacketBase* packet) {
   callback_(base_, packet);
 }
 
+int ChannelImpl::GetFreePacketSize() {
+  std::lock_guard<AdaptiveSpinLock> lock(free_mutex_);
+  return free_packets_.size();
+}
+
+int ChannelImpl::GetQueuedPacketSize() {
+  std::lock_guard<AdaptiveSpinLock> lock(GetQueuedMutex());
+  return queued_packets_.size();
+}
+
 bool ChannelImpl::PacketOrdering::operator()(PacketBase* a, PacketBase* b) {
   return a->timestamp() > b->timestamp();
 }

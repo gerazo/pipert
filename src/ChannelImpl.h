@@ -33,6 +33,9 @@ class ChannelImpl {
   PacketBase* PopNext();
   void Execute(PacketBase* packet);
 
+  int GetFreePacketSize();
+  int GetQueuedPacketSize();
+
   void SetBase(ChannelBase* base);
 
  private:
