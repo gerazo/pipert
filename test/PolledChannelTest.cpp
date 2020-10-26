@@ -1,7 +1,7 @@
 #include "pipert/PolledChannel.h"
+#include "pipert/Scheduler.h"
 #include "gtest/gtest.h"
 
-#include "pipert/Scheduler.h"
 
  class PolledChannelTest : public ::testing::Test {
   protected:
