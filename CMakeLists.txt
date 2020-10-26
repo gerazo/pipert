@@ -96,7 +96,6 @@ SetupTarget(${PROJECT_NAME}_bbtest)
 target_link_libraries(${PROJECT_NAME}_bbtest ${PROJECT_NAME} gtest_main)
 if(Threads_FOUND)
   target_link_libraries(${PROJECT_NAME}_bbtest ${CMAKE_THREAD_LIBS_INIT})
-else()
 endif()
 add_test(NAME ${PROJECT_NAME}_bbtest COMMAND ${PROJECT_NAME}_bbtest)
 
@@ -107,8 +106,8 @@ target_include_directories(${PROJECT_NAME}_wbtest PRIVATE "src")
 target_link_libraries(${PROJECT_NAME}_wbtest ${PROJECT_NAME}_static gtest_main)
 if(Threads_FOUND)
   target_link_libraries(${PROJECT_NAME}_wbtest ${CMAKE_THREAD_LIBS_INIT})
-else()
 endif()
+target_link_libraries(${PROJECT_NAME}_wbtest ${PROJECT_NAME}_static)
 add_test(NAME ${PROJECT_NAME}_wbtest COMMAND ${PROJECT_NAME}_wbtest)
 
 # Target: coverage
