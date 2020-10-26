@@ -52,9 +52,11 @@ PacketBase* ChannelImpl::Acquire(const char* client_name) {
       free_packets_.pop_back();
     }
   }
-  assert(reinterpret_cast<int8_t*>(packet) >= pool_);
-  assert(reinterpret_cast<int8_t*>(packet) < pool_ + packet_size_ * capacity_);
-  assert((reinterpret_cast<int8_t*>(packet) - pool_) % packet_size_ == 0);
+  assert(!packet || reinterpret_cast<int8_t*>(packet) >= pool_);
+  assert(!packet ||
+         reinterpret_cast<int8_t*>(packet) < pool_ + packet_size_ * capacity_);
+  assert(!packet ||
+         (reinterpret_cast<int8_t*>(packet) - pool_) % packet_size_ == 0);
   return packet;
 }
 

@@ -31,8 +31,9 @@ template <class T> template <class... Args>
 PacketToFill<T> Channel<T>::Acquire(const char* client_name, Timer::Time timestamp,
                                     Args&&... args) {
   Packet<T>* new_packet = reinterpret_cast<Packet<T>*>(AcquireBase(client_name));
-  assert(new_packet);
-  new(new_packet) Packet<T>(timestamp, std::forward<Args>(args)...);
+  if (new_packet) {
+    new(new_packet) Packet<T>(timestamp, std::forward<Args>(args)...);
+  }
   return PacketToFill<T>(new_packet, this);
 }
 
