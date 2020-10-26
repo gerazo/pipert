@@ -20,6 +20,9 @@ class ChannelBase {
   int GetPacketSize() const;
   const char* GetName() const;
 
+  int GetFreePacketSize();
+  int GetQueuedPacketSize();
+
  protected:
   ChannelBase(ChannelImpl* impl);
   ~ChannelBase();

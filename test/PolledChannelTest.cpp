@@ -119,3 +119,41 @@ TEST_F(PolledChannelTest, PolledChannelPollPacketToProcessWithAutoReleaseTest) {
   EXPECT_EQ(polled_channel.GetFreePacketSize(), channel_capacity);
   EXPECT_EQ(polled_channel.GetQueuedPacketSize(), 0);
 }
+
+TEST_F(PolledChannelTest, PolledChannelDropPacketAfterPushTest) {
+  int channel_capacity = 1;
+  pipert::PolledChannel<int> polled_channel = scheduler_.CreatePolledChannel<int>("TestChannel", channel_capacity);
+  pipert::Timer::Time old_time = pipert::Timer::time();
+  pipert::Timer::Time new_time = pipert::Timer::time();
+  pipert::PacketToFill<int> packet_to_fill = polled_channel.Acquire("TestChannel", old_time, 32);
+  packet_to_fill.Push();
+  packet_to_fill = polled_channel.Acquire("TestChannel", new_time, 42);
+  packet_to_fill.Push();
+  pipert::PacketToProcess<int> packet_to_process = polled_channel.Poll();
+  EXPECT_FALSE(packet_to_process.IsEmpty());
+  EXPECT_EQ(packet_to_process.data(), 42);
+  EXPECT_EQ(packet_to_process.timestamp(), new_time);
+  packet_to_process.Release();
+  EXPECT_EQ(polled_channel.GetFreePacketSize(), channel_capacity);
+  EXPECT_EQ(polled_channel.GetQueuedPacketSize(), 0);
+  EXPECT_TRUE(packet_to_process.IsEmpty());
+}
+
+TEST_F(PolledChannelTest, PolledChannelDropPacketBeforePushTest) {
+  int channel_capacity = 1;
+  pipert::PolledChannel<int> polled_channel = scheduler_.CreatePolledChannel<int>("TestChannel", channel_capacity);
+  pipert::Timer::Time old_time = pipert::Timer::time();
+  pipert::Timer::Time new_time = pipert::Timer::time();
+  pipert::PacketToFill<int> packet_to_fill_old = polled_channel.Acquire("TestChannel", old_time, 32);
+  pipert::PacketToFill<int> packet_to_fill_new = polled_channel.Acquire("TestChannel", new_time, 42);
+  packet_to_fill_old.Push();
+  packet_to_fill_new.Push();
+  pipert::PacketToProcess<int> packet_to_process = polled_channel.Poll();
+  EXPECT_FALSE(packet_to_process.IsEmpty());
+  EXPECT_EQ(packet_to_process.data(), 42);
+  EXPECT_EQ(packet_to_process.timestamp(), new_time);
+  packet_to_process.Release();
+  EXPECT_EQ(polled_channel.GetFreePacketSize(), channel_capacity);
+  EXPECT_EQ(polled_channel.GetQueuedPacketSize(), 0);
+  EXPECT_TRUE(packet_to_process.IsEmpty());
+}
