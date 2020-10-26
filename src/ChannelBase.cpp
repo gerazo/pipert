@@ -30,12 +30,12 @@ const char* ChannelBase::GetName() const {
   return impl_->GetName();
 }
 
-int ChannelBase::GetFreePacketSize() {
-  return impl_->GetFreePacketSize();
+int ChannelBase::GetFreeBufferLength() const {
+  return impl_->GetFreeBufferLength();
 }
 
-int ChannelBase::GetQueuedPacketSize() {
-  return impl_->GetQueuedPacketSize();
+int ChannelBase::GetQueuedBufferLength() const {
+  return impl_->GetQueuedBufferLength();
 }
 
 ChannelBase::ChannelBase(ChannelImpl* impl)

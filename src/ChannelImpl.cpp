@@ -122,12 +122,12 @@ void ChannelImpl::Execute(PacketBase* packet) {
   callback_(base_, packet);
 }
 
-int ChannelImpl::GetFreePacketSize() {
+int ChannelImpl::GetFreeBufferLength() {
   std::lock_guard<AdaptiveSpinLock> lock(free_mutex_);
   return free_packets_.size();
 }
 
-int ChannelImpl::GetQueuedPacketSize() {
+int ChannelImpl::GetQueuedBufferLength() {
   std::lock_guard<AdaptiveSpinLock> lock(GetQueuedMutex());
   return queued_packets_.size();
 }
