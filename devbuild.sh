@@ -42,7 +42,7 @@ generate_coverage () {
 
 run_test () {
   echo "Running tests..."
-  ninja $NINJAFLAGS test
+  CTEST_OUTPUT_ON_FAILURE=1 ninja $NINJAFLAGS test
   if [ "$?" != "0" ]; then
     echo "Tests failed, exiting."
     exit 5

@@ -52,9 +52,11 @@ PacketBase* ChannelImpl::Acquire(const char* client_name) {
       free_packets_.pop_back();
     }
   }
-  assert(reinterpret_cast<int8_t*>(packet) >= pool_);
-  assert(reinterpret_cast<int8_t*>(packet) < pool_ + packet_size_ * capacity_);
-  assert((reinterpret_cast<int8_t*>(packet) - pool_) % packet_size_ == 0);
+  assert(!packet || reinterpret_cast<int8_t*>(packet) >= pool_);
+  assert(!packet ||
+         reinterpret_cast<int8_t*>(packet) < pool_ + packet_size_ * capacity_);
+  assert(!packet ||
+         (reinterpret_cast<int8_t*>(packet) - pool_) % packet_size_ == 0);
   return packet;
 }
 
@@ -118,6 +120,16 @@ void ChannelImpl::Execute(PacketBase* packet) {
   assert(base_);
   assert(packet);
   callback_(base_, packet);
+}
+
+int ChannelImpl::GetFreeBufferLength() {
+  std::lock_guard<AdaptiveSpinLock> lock(free_mutex_);
+  return free_packets_.size();
+}
+
+int ChannelImpl::GetQueuedBufferLength() {
+  std::lock_guard<AdaptiveSpinLock> lock(GetQueuedMutex());
+  return queued_packets_.size();
 }
 
 bool ChannelImpl::PacketOrdering::operator()(PacketBase* a, PacketBase* b) {
