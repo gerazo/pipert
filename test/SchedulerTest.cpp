@@ -31,10 +31,10 @@ void SchedulerInitTestWithParameter(int workers) {
 void DoNothing() { return; }
 
 TEST(SchedulerDeathTest, InitializationWithParameter) {
-#ifdef DEBUG
+#ifndef NDEBUG
   EXPECT_DEATH(SchedulerInitTestWithParameter(-5), ".*");
   EXPECT_DEATH(SchedulerInitTestWithParameter(-1), ".*");
-#endif  // DEBUG
+#endif  // NDEBUG
 
   EXPECT_EXIT(SchedulerInitTestWithParameter(0), ::testing::ExitedWithCode(0),
               ".*");
