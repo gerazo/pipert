@@ -41,6 +41,12 @@ class ChannelBase {
   ///         logging and monitoring.
   const char* GetName() const;
 
+  /// Returns how many, currently usable packets are present in the Channel.
+  int GetFreeBufferLength() const;
+
+  /// Returns how many packets are standing in the queue of the Channel.
+  int GetQueuedBufferLength() const;
+
  protected:
   /// Construct a ChannelBase using an implementation that must be provided.
   /// Calls to ChannelBase will be delegated to this implementation.

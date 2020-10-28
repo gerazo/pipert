@@ -81,6 +81,12 @@ class ChannelImpl {
   /// Sends the packet for execution.
   void Execute(PacketBase* packet);
 
+  /// See ChannelBase::GetFreeBufferLength()
+  int GetFreeBufferLength();
+
+  /// See ChannelBase::GetQueuedBufferLength()
+  int GetQueuedBufferLength();
+
   /// Sets the public interface objects.
   /// It allows the interface to be moved.
   void SetBase(ChannelBase* base);
