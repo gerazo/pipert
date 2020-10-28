@@ -1,6 +1,8 @@
 #include "pipert/Scheduler.h"
 #include "gtest/gtest.h"
 
+#include <string>
+
 class Human {
  public:
   Human(const std::string& name, int age) : name_(name), age_(age) {}
