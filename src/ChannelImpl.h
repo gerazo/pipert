@@ -16,6 +16,17 @@ class SchedulerImpl;
 /// This template free code has all necessary data extracted from
 /// the templated public interface.
 /// Every kind of Channel object has a ChannelImpl backing it up.
+///
+/// For an overview of the packet processing workflow, see the following
+/// diagrams.
+///
+/// \image html channel_creation_2.svg width=\textwidth
+/// \image html processing_packets_1.svg width=\textwidth
+/// \image html processing_packets_2.svg width=\textwidth
+/// \image html processing_packets_3.svg width=\textwidth
+/// \image html processing_packets_4.svg width=\textwidth
+/// \image html processing_packets_5.svg width=\textwidth
+
 class ChannelImpl {
  public:
   /// Real construction of Channel implementation.

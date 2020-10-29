@@ -16,6 +16,11 @@ namespace pipert {
 /// of the Scheduler.
 /// See Scheduler for details.
 ///
+/// For an overview on the process of creating a ScheduledChannel, see the
+/// following diagram.
+///
+/// \image html channel_creation_1.svg width=\textwidth
+///
 /// \tparam T Same as in the case of `Channel<T>`.
 template <class T>
 class ScheduledChannel : public Channel<T> {
