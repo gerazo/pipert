@@ -75,7 +75,7 @@ void SharedIncrementor(int times) {
 }
 
 TEST(AdaptiveSpinLockTest, ThreadsSyncedCorrectly) {
-  const int cycles = 10;
+  const int cycles = 100;
   std::thread threads[thread_num];
   val = 0;
   g_lock = new pipert::AdaptiveSpinLock();
