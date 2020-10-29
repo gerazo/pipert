@@ -4,13 +4,13 @@ enable_testing()
 
 
 # All source files compiled into the library
-set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp SchedulerImpl.cpp Timer.cpp)
+set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp SchedulerImpl.cpp Timer.cpp ThreadId.cpp)
 
 # Put all test files here which can run using the library only through its public interface
 set(BBTEST_SOURCES PacketTest.cpp SchedulerTest.cpp PolledChannelTest.cpp)
 
 # Put those tests here which really, desperately need the implementation
-set(WBTEST_SOURCES PacketTest.cpp)
+set(WBTEST_SOURCES ThreadIdTest.cpp)
 
 
 # General settings
