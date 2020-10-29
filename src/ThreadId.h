@@ -6,6 +6,7 @@
 
 namespace pipert {
 
+/// (Part of internal implementation.)
 /// Helps in tagging and identifying the currently running thread.
 ///
 /// The implementation uses `thread_local` variables which are supposed to have
