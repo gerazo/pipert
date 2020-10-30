@@ -4,6 +4,8 @@
 #include <thread>
 #include <string>
 
+namespace {
+
 class Human {
  public:
   Human(const std::string& name, int age) : name_(name), age_(age) {}
@@ -23,6 +25,8 @@ using MyTypes = ::testing::Types<char, int, Human>;
 TYPED_TEST_SUITE(SchedulerTest, MyTypes, );
 
 void DoNothing() { return; }
+
+}  // namespace
 
 TEST(Scheduler, SchedulerInitializationTest) {
   pipert::Scheduler sch0;
