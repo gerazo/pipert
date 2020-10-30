@@ -30,6 +30,8 @@ class SchedulerImpl {
   void Stop();   // Leave runnig phase
   bool IsRunning() { return running_.load(std::memory_order_acquire); }
 
+  /// Return number of worker threads.
+  /// See Scheduler::GetWorkerNumber().
   int GetWorkerNumber() { return workers_number_; }
 
   AdaptiveSpinLock& GetMutex() { return global_mutex_; }

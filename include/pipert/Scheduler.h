@@ -29,6 +29,9 @@ class Scheduler {
   void Stop();
   bool IsRunning();
 
+  /// Tells the number of worker threads allocated to Scheduler.
+  ///
+  /// \pre We should be in _preparation/running/stopped_ state.
   int GetWorkerNumber();
 
  private:
