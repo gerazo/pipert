@@ -33,6 +33,11 @@ bool Scheduler::IsRunning() {
   return impl_->IsRunning();
 }
 
+int Scheduler::GetWorkersNumber() {
+  assert(impl_);
+  return impl_->GetWorkersNumber();
+}
+
 ChannelImpl* Scheduler::CreateChannelImpl(
     const char* name, int capacity, int packet_size, void* single_thread_object,
     ChannelBase::InternalCallback callback) {

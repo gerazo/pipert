@@ -29,6 +29,8 @@ class Scheduler {
   void Stop();
   bool IsRunning();
 
+  int GetWorkersNumber();
+
  private:
   ChannelImpl* CreateChannelImpl(const char* name, int capacity,
                                  int packet_size, void* single_thread_object,
