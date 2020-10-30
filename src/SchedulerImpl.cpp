@@ -45,6 +45,8 @@ void SchedulerImpl::UnregisterChannel(ChannelImpl* channel) {
 
 void SchedulerImpl::Start() {
   assert(!running_.load(std::memory_order_acquire));
+  if(running_.load(std::memory_order_acquire))
+    return;
   running_.store(true, std::memory_order_release);
   keep_running_.store(true, std::memory_order_release);
   int i = workers_number_;
@@ -55,6 +57,8 @@ void SchedulerImpl::Start() {
 
 void SchedulerImpl::Stop() {
   assert(running_.load(std::memory_order_acquire));
+  if(!running_.load(std::memory_order_acquire))
+    return;
   keep_running_.store(false, std::memory_order_release);
   global_covar_.notify_all();
   for (auto& t : workers_) {

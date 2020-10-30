@@ -10,7 +10,7 @@ class SchedulerImpl;
 
 class Scheduler {
  public:
-   /// Entering preparation state (0 workers = autodetect max CPUs)
+   /// Entering preparation state (workers <= 0 = autodetect max CPUs)
   Scheduler(int workers = 0);
   ~Scheduler();
 
