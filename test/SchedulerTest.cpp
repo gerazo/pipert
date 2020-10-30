@@ -1,71 +1,62 @@
 #include "pipert/Scheduler.h"
 #include "gtest/gtest.h"
 
-#include <iostream>
-#include <utility>
+#include <thread>
+#include <string>
+
+namespace {
 
 class Human {
-public:
+ public:
   Human(const std::string& name, int age) : name_(name), age_(age) {}
 
   std::string GetName() const { return name_; }
   int GetAge() const { return age_; }
 
-private: 
+ private:
   std::string name_;
   int age_;
 };
 
-class Printer {
-public:
-  void Print(pipert::PacketToProcess<Human> packet) {
-    std::cout << packet.data().GetName() << " - " <<  packet.data().GetAge() << std::endl;
-  }
-};
+template <class T>
+class SchedulerTest : public testing::Test {};
 
-/*
-TEST(SchedulerTest, SchedulerState) {
-    pipert::Scheduler sch1(0);
-    pipert::Scheduler sch2(2);
+using MyTypes = ::testing::Types<char, int, Human>;
+TYPED_TEST_SUITE(SchedulerTest, MyTypes, );
 
-    EXPECT_EQ(sch1.IsRunning(), false);
-    EXPECT_EQ(sch2.IsRunning(), false);
+void DoNothing() { return; }
 
-    sch1.Start();
-    EXPECT_EQ(sch1.IsRunning(), true);
-    EXPECT_EQ(sch2.IsRunning(), false);
+}  // namespace
 
-    sch1.Stop();
-    sch2.Start();
-    EXPECT_EQ(sch1.IsRunning(), false);
-    EXPECT_EQ(sch2.IsRunning(), true);
+TEST(Scheduler, SchedulerInitializationTest) {
+  pipert::Scheduler sch0;
+  pipert::Scheduler sch1(-1);
+  pipert::Scheduler sch2(0);
+  pipert::Scheduler sch3(1);
 
-    sch1.Start();
-    sch2.Start();
-    EXPECT_EQ(sch1.IsRunning(), true);
-    EXPECT_EQ(sch2.IsRunning(), true);
-
-    sch1.Stop();
-    sch2.Stop();
-    EXPECT_EQ(sch1.IsRunning(), false);
-    EXPECT_EQ(sch2.IsRunning(), false);
+  EXPECT_EQ(sch0.GetWorkerNumber(), std::thread::hardware_concurrency());
+  EXPECT_EQ(sch1.GetWorkerNumber(), std::thread::hardware_concurrency());
+  EXPECT_EQ(sch2.GetWorkerNumber(), std::thread::hardware_concurrency());
+  EXPECT_EQ(sch3.GetWorkerNumber(), 1);
 }
-*/
-/*
-TEST(SchedulerTest, ChannelCreation) {
-    pipert::Scheduler sch(1);
-    pipert::PolledChannel<std::pair<Human, Human> > pc =
-          sch.CreatePolledChannel<std::pair<Human, Human> >("PolledChannel", 1);
 
-    EXPECT_EQ(pc.GetCapacity(), 1);
-    EXPECT_EQ(pc.GetPacketSize(), sizeof(pipert::Packet<std::pair<Human, Human> >));
-    EXPECT_EQ(pc.GetName(), "PolledChannel");
+TYPED_TEST(SchedulerTest, PolledChannelCreationWithTypes) {
+  pipert::Scheduler sch(0);
+  pipert::PolledChannel<TypeParam> pc =
+      sch.CreatePolledChannel<TypeParam>("PolledChannel", 1);
 
-    Printer p;
-    pipert::ScheduledChannel<Human> sc = sch.CreateScheduledChannel<Human>("ScheduledChannel", 2, nullptr, std::bind(&Printer::Print, &p, std::placeholders::_1));
-
-    EXPECT_EQ(sc.GetCapacity(), 2);
-    EXPECT_EQ(sc.GetPacketSize(), sizeof(pipert::Packet<Human>));
-    EXPECT_EQ(sc.GetName(), "ScheduledChannel");
+  EXPECT_EQ(pc.GetName(), "PolledChannel");
+  EXPECT_EQ(pc.GetCapacity(), 1);
+  EXPECT_EQ(pc.GetPacketSize(), sizeof(pipert::Packet<TypeParam>));
 }
-*/
+
+TYPED_TEST(SchedulerTest, ScheduledChannelCreationWithTypes) {
+  pipert::Scheduler sch(0);
+  pipert::ScheduledChannel<TypeParam> sc =
+      sch.CreateScheduledChannel<TypeParam>("ScheduledChannel", 1, nullptr,
+                                            std::bind(&DoNothing));
+
+  EXPECT_EQ(sc.GetName(), "ScheduledChannel");
+  EXPECT_EQ(sc.GetCapacity(), 1);
+  EXPECT_EQ(sc.GetPacketSize(), sizeof(pipert::Packet<TypeParam>));
+}

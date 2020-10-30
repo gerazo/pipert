@@ -56,6 +56,10 @@ class SchedulerImpl {
   /// See Scheduler::IsRunning().
   bool IsRunning() { return running_.load(std::memory_order_acquire); }
 
+  /// Returns the number of worker threads.
+  /// See Scheduler::GetWorkerNumber().
+  int GetWorkerNumber() { return workers_number_; }
+
   /// Return the Scheduler-level mutex for job queues.
   /// This is also used by all ScheduledChannel objects connected.
   AdaptiveSpinLock& GetMutex() { return global_mutex_; }

@@ -67,8 +67,8 @@ class Scheduler {
   /// You can enter _running state_ by calling Start().
   ///
   /// \param workers Number of worker threads to be used for scheduling.
-  ///                By default, it detects the number of CPUs in the system
-  ///                and starts that many threads.
+  ///                By default or for non-positive numbers, it detects the
+  ///                number of CPUs in the system and starts that many threads.
   Scheduler(int workers = 0);
 
   /// Destroys the object.
@@ -168,6 +168,9 @@ class Scheduler {
   /// Tells the current state of Scheduler (running or stopped/preparation).
   /// \return True if Scheduler is running.
   bool IsRunning();
+
+  /// Tells the number of worker threads allocated to Scheduler.
+  int GetWorkerNumber();
 
  private:
   /// Part of internal implementation where a raw channel implementation is

@@ -9,7 +9,7 @@
 namespace pipert {
 
 Scheduler::Scheduler(int workers)
-    : impl_(new SchedulerImpl(workers == 0 ? std::thread::hardware_concurrency()
+    : impl_(new SchedulerImpl(workers <= 0 ? std::thread::hardware_concurrency()
                                            : workers)) {}
 
 Scheduler::~Scheduler() {
@@ -31,6 +31,11 @@ void Scheduler::Stop() {
 bool Scheduler::IsRunning() {
   assert(impl_);
   return impl_->IsRunning();
+}
+
+int Scheduler::GetWorkerNumber() {
+  assert(impl_);
+  return impl_->GetWorkerNumber();
 }
 
 ChannelImpl* Scheduler::CreateChannelImpl(
