@@ -30,7 +30,7 @@ class SchedulerImpl {
   void Stop();   // Leave runnig phase
   bool IsRunning() { return running_.load(std::memory_order_acquire); }
 
-  int GetWorkersNumber() { return workers_number_; }
+  int GetWorkerNumber() { return workers_number_; }
 
   AdaptiveSpinLock& GetMutex() { return global_mutex_; }
   void JobsArrived(ChannelImpl* channel);

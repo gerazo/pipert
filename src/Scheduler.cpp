@@ -33,9 +33,9 @@ bool Scheduler::IsRunning() {
   return impl_->IsRunning();
 }
 
-int Scheduler::GetWorkersNumber() {
+int Scheduler::GetWorkerNumber() {
   assert(impl_);
-  return impl_->GetWorkersNumber();
+  return impl_->GetWorkerNumber();
 }
 
 ChannelImpl* Scheduler::CreateChannelImpl(

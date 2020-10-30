@@ -29,7 +29,7 @@ class Scheduler {
   void Stop();
   bool IsRunning();
 
-  int GetWorkersNumber();
+  int GetWorkerNumber();
 
  private:
   ChannelImpl* CreateChannelImpl(const char* name, int capacity,

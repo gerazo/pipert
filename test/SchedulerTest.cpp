@@ -30,10 +30,10 @@ TEST(Scheduler, SchedulerInitializationTest) {
   pipert::Scheduler sch2(0);
   pipert::Scheduler sch3(1);
 
-  EXPECT_EQ(sch0.GetWorkersNumber(), std::thread::hardware_concurrency());
-  EXPECT_EQ(sch1.GetWorkersNumber(), std::thread::hardware_concurrency());
-  EXPECT_EQ(sch2.GetWorkersNumber(), std::thread::hardware_concurrency());
-  EXPECT_EQ(sch3.GetWorkersNumber(), 1);
+  EXPECT_EQ(sch0.GetWorkerNumber(), std::thread::hardware_concurrency());
+  EXPECT_EQ(sch1.GetWorkerNumber(), std::thread::hardware_concurrency());
+  EXPECT_EQ(sch2.GetWorkerNumber(), std::thread::hardware_concurrency());
+  EXPECT_EQ(sch3.GetWorkerNumber(), 1);
 }
 
 TYPED_TEST(SchedulerTest, PolledChannelCreationWithTypes) {
