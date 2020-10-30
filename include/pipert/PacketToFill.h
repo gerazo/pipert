@@ -5,6 +5,17 @@
 
 namespace pipert {
 
+/// A RAII object representing a Packet which is about to be filled with data.
+///
+/// You can access the connected Packet being in the buffer of a Channel
+/// and fill it with data.
+/// The connected Packet is automatically queued in the connected Channel on
+/// the destruction of this object.
+///
+/// See PacketStub for details.
+///
+/// \tparam T Follows the template paramter of Packet.
+///           See template paramter T of Packet for details.
 template <class T>
 class PacketToFill : public PacketStub<T> {
  public:
@@ -12,14 +23,22 @@ class PacketToFill : public PacketStub<T> {
   ~PacketToFill();
   PacketToFill(PacketToFill&&) = default;
   PacketToFill& operator=(PacketToFill&&) = default;
-  void Push();  ///< Force submitting packet before the destruction of this stub
+
+  /// Force submission of packet before the destruction of this stub.
+  ///
+  /// You can do an early submission by using this.
+  /// It is useful as the data is immediately queded for
+  /// processing on pushing.
+  /// As a result, this object will become empty, see PacketStub::IsEmpty().
+  /// Also see Channel::Push().
+  void Push();
 
   friend void Channel<T>::Push(PacketToFill<T>* filled_packet);
 };
 
 template <class T>
 PacketToFill<T>::PacketToFill(Packet<T>* packet, Channel<T>* channel)
-  : PacketStub<T>(packet, channel) {
+    : PacketStub<T>(packet, channel) {
   assert(this->channel_);
   // can be created empty
 }

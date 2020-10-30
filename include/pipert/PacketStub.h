@@ -3,14 +3,23 @@
 
 #include <cassert>
 #include <utility>
-#include "pipert/Packet.h"
 #include "pipert/Channel.h"
+#include "pipert/Packet.h"
 
 namespace pipert {
 
 template <class T>
 class Channel;
 
+/// A RAII object connecting a Packet and its containing Channel.
+///
+/// This object points to the connected Packet and Channel, so
+/// the connected objects are never moved when this _stub_ is passed around.
+/// Submitting this as a parameter or returning as a value is supported
+/// through the implemented move operations.
+///
+/// \tparam T Follows the template paramter of Packet.
+///           See template paramter T of Packet for details.
 template <class T>
 class PacketStub {
  public:
@@ -19,18 +28,27 @@ class PacketStub {
   PacketStub(PacketStub&&);
   PacketStub& operator=(PacketStub&&);
 
+  /// This _stub_ is empty if the represented operation is done
+  /// and nothing is connected anymore.
+  /// \returns True if a Packet (and a Channel) is no longer connected.
   bool IsEmpty() const;
-  Timer::Time timestamp() const;
-  const T& data() const;
-  T& data();
+
+  Timer::Time timestamp() const;  ///< See PacketBase::timestamp()
+
+  const T& data() const;  ///< See Packet::data()
+
+  T& data();  ///< See Packet::data()
+
+  /// Gets the Packet object which is connected to this PacketStub.
+  /// \returns The referred Packet object or nullptr if this _stub_ is empty.
   Packet<T>* GetPacket();
 
-protected:
+ protected:
   PacketStub(Packet<T>* packet, Channel<T>* channel);
-  void SetEmpty();
+  void SetEmpty();  ///< Operation was finished, connection is over.
 
-  Channel<T>* channel_;
-  Packet<T>* packet_;
+  Channel<T>* channel_;  ///< The connected Channel.
+  Packet<T>* packet_;    ///< The connected Packet.
 
  private:
   void move(PacketStub&&);
@@ -77,7 +95,7 @@ Packet<T>* PacketStub<T>::GetPacket() {
 
 template <class T>
 PacketStub<T>::PacketStub(Packet<T>* packet, Channel<T>* channel)
-  : channel_(channel), packet_(packet) {}
+    : channel_(channel), packet_(packet) {}
 
 template <class T>
 void PacketStub<T>::SetEmpty() {
