@@ -2,19 +2,19 @@
 #include "pipert/Scheduler.h"
 #include "gtest/gtest.h"
 
-struct Human {
-    std::string name;
-    Human(const std::string& name) : name (name) {}
+namespace{
+    class OtherPrinter {
+        public:
+        void Print(pipert::PacketToProcess<int> packet) {
+            std::cout << "Other: " << packet.data() << std::endl;
+        }
+        void Add(pipert::PacketToProcess<int> packet) {
+            std::cout << packet.data() << std::endl;
+            packet.data() = 11;
+        }
+    };
 
-    std::string GetName() const { return name; }
-};
-
-class OtherPrinter {
-    public:
-    void Print(pipert::PacketToProcess<int> packet) {
-        std::cout << "Other: " << packet.data() << std::endl;
-    }
-};
+} //namespace
 
 class ScheduledChannelTest : public ::testing::Test {
     protected:
@@ -87,13 +87,26 @@ TEST_F(ScheduledChannelTest, ScheduledChannelPushPacketToFillTest) {
 }
 
 TEST_F(ScheduledChannelTest, ScheduledChannelAutoPushPacketToFillTest) {
+    // Given
     int channel_capacity = 2;
     ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&OtherPrinter::Print, &op_, std::placeholders::_1));
+    // When
     {
         ::pipert::PacketToFill<int> packet_to_fill = channel.Acquire("TestChannel", default_time_, 42);
         EXPECT_EQ(channel.GetFreeBufferLength(), channel_capacity - 1);
         EXPECT_EQ(channel.GetQueuedBufferLength(), 0);
     }
+    //Then
     EXPECT_EQ(channel.GetFreeBufferLength(), channel_capacity - 1);
     EXPECT_EQ(channel.GetQueuedBufferLength(), 1);
+}
+
+TEST_F(ScheduledChannelTest, ScheduledChannelCallbackTranslatorTest) {
+    // Given
+    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&OtherPrinter::Add, &op_, std::placeholders::_1));
+    ::pipert::PacketToFill<int> packet = channel.Acquire("TestChannel", default_time_, 10);
+    // When
+    channel.CallbackTranslator(&channel, packet.GetPacket());
+    // Given
+    EXPECT_EQ(packet.data(), 11);
 }
