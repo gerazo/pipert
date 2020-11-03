@@ -62,27 +62,39 @@ TEST(AdaptiveSpinLockTest, WorksWithStdUniqueLock) {
   lock.unlock();
 }
 
-const int thread_num = 7;
-int val;
-pipert::AdaptiveSpinLock* g_lock = nullptr;
+namespace {
 
-void SharedIncrementor(int times) {
-  ASSERT_TRUE(g_lock);
-  for (int i = 0; i < times; i++) {
-    std::lock_guard<pipert::AdaptiveSpinLock> guard(*g_lock);
-    val++;
+class SharedIncrementStore {
+ public:
+  SharedIncrementStore(const int threads) : threads_(threads){};
+
+ public:
+  void Increment(int cycles) {
+    std::lock_guard<pipert::AdaptiveSpinLock> guard(slock_);
+    for (int i = 0; i < cycles; ++i) val_++;
   }
+  int GetVal() const { return val_; }
+
+ private:
+  pipert::AdaptiveSpinLock slock_;
+  const int threads_;
+  int val_;
+};
+
+static SharedIncrementStore& SharedIncrementorInstance(const int cycles) {
+  static SharedIncrementStore si(cycles);
+  return si;
 }
 
-TEST(AdaptiveSpinLockTest, ThreadsSyncedCorrectly) {
-  const int cycles = 100;
+}  // namespace
+
+TEST(AdaptiveSpinLockTest, ThreadsSyncCorrectly) {
+  const int cycles = 50000;
+  const int thread_num = 20;
   std::thread threads[thread_num];
-  val = 0;
-  g_lock = new pipert::AdaptiveSpinLock();
+  SharedIncrementStore& shinc = SharedIncrementorInstance(cycles);
   for (int i = 0; i < thread_num; i++)
-    threads[i] = std::thread(SharedIncrementor, cycles);
+    threads[i] = std::thread(&SharedIncrementStore::Increment, &shinc, cycles);
   for (int i = 0; i < thread_num; i++) threads[i].join();
-  EXPECT_EQ(val, thread_num * cycles);
-  delete g_lock;
-  g_lock = nullptr;
+  EXPECT_EQ(shinc.GetVal(), thread_num * cycles);
 }
