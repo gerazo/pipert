@@ -3,13 +3,9 @@
 #include "gtest/gtest.h"
 
 namespace{
-    class OtherPrinter {
+    class PacketDateSetter {
         public:
-        void Print(pipert::PacketToProcess<int> packet) {
-            std::cout << "Other: " << packet.data() << std::endl;
-        }
-        void Add(pipert::PacketToProcess<int> packet) {
-            std::cout << packet.data() << std::endl;
+        void Set(pipert::PacketToProcess<int> packet) {
             packet.data() = 11;
         }
     };
@@ -22,7 +18,7 @@ class ScheduledChannelTest : public ::testing::Test {
     ::pipert::Timer::Time default_time_;
     ::pipert::Timer::Time old_time_;
     ::pipert::Timer::Time new_time_;
-    OtherPrinter op_;
+    PacketDateSetter pds_;
 
     ScheduledChannelTest() 
         : scheduler_(1),
@@ -45,16 +41,16 @@ class ScheduledChannelTest : public ::testing::Test {
 
 TEST_F(ScheduledChannelTest, ScheduledChannelCreationWithSchedulerBasicChannelInfoTest) {
     // When
-    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&OtherPrinter::Print, &op_, std::placeholders::_1));
+    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
     // Then
-    EXPECT_EQ(channel.GetName(), "TestChannel");
+    EXPECT_STREQ(channel.GetName(), "TestChannel");
     EXPECT_EQ(channel.GetCapacity(), 2);
     EXPECT_EQ(channel.GetPacketSize(), sizeof(::pipert::Packet<int>));
 }
 
 TEST_F(ScheduledChannelTest, ScheduledChannelCreationWithSchedulerBufferInfoTest) {
     // When
-    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&OtherPrinter::Print, &op_, std::placeholders::_1));
+    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
     // Then
     EXPECT_EQ(channel.GetFreeBufferLength(), 2);
     EXPECT_EQ(channel.GetQueuedBufferLength(), 0);
@@ -63,9 +59,9 @@ TEST_F(ScheduledChannelTest, ScheduledChannelCreationWithSchedulerBufferInfoTest
 TEST_F(ScheduledChannelTest, ScheduledChannelAcquireTest) {
     // Given
     const int value = 42;
-    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&OtherPrinter::Print, &op_, std::placeholders::_1));
+    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
     // When
-    ::pipert::PacketToFill<int> packet = channel.Acquire("TestChannel", default_time_, value);
+    ::pipert::PacketToFill<int> packet = channel.Acquire("DataSupplier", default_time_, value);
     // Then
     EXPECT_EQ(channel.GetFreeBufferLength(), 1);
     EXPECT_EQ(channel.GetQueuedBufferLength(), 0);
@@ -76,7 +72,7 @@ TEST_F(ScheduledChannelTest, ScheduledChannelAcquireTest) {
 TEST_F(ScheduledChannelTest, ScheduledChannelPushPacketToFillTest) {
     // Given
     const int value = 42;
-    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&OtherPrinter::Print, &op_, std::placeholders::_1));
+    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
     ::pipert::PacketToFill<int> packet_to_fill = channel.Acquire("TestChannel", default_time_, value);
     // When
     packet_to_fill.Push(); 
@@ -89,7 +85,7 @@ TEST_F(ScheduledChannelTest, ScheduledChannelPushPacketToFillTest) {
 TEST_F(ScheduledChannelTest, ScheduledChannelAutoPushPacketToFillTest) {
     // Given
     int channel_capacity = 2;
-    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&OtherPrinter::Print, &op_, std::placeholders::_1));
+    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
     // When
     {
         ::pipert::PacketToFill<int> packet_to_fill = channel.Acquire("TestChannel", default_time_, 42);
@@ -103,7 +99,7 @@ TEST_F(ScheduledChannelTest, ScheduledChannelAutoPushPacketToFillTest) {
 
 TEST_F(ScheduledChannelTest, ScheduledChannelCallbackTranslatorTest) {
     // Given
-    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&OtherPrinter::Add, &op_, std::placeholders::_1));
+    ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
     ::pipert::PacketToFill<int> packet = channel.Acquire("TestChannel", default_time_, 10);
     // When
     channel.CallbackTranslator(&channel, packet.GetPacket());
