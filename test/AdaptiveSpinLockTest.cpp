@@ -64,37 +64,92 @@ TEST(AdaptiveSpinLockTest, WorksWithStdUniqueLock) {
 
 namespace {
 
-class SharedIncrementStore {
+class SharedIncrementor {
  public:
-  SharedIncrementStore(const int threads) : threads_(threads){};
-
- public:
-  void Increment(int cycles) {
-    std::lock_guard<pipert::AdaptiveSpinLock> guard(slock_);
-    for (int i = 0; i < cycles; ++i) val_++;
+  void StartThreads(void func (SharedIncrementor&)) {
+    for(unsigned int i = 0; i < threads_.size(); ++i)
+      threads_[i] = std::thread(func, std::ref(*this));
   }
+  void JoinThreads() {
+    for(unsigned int i = 0; i < threads_.size(); ++i)
+      threads_[i].join();
+  }
+
+  void SetThreads(const int count) { threads_.resize(count); }
+  int GetThreads() const { return threads_.size(); }
+  void SetCycles(const int cycles) { cycles_ = cycles; }
+  int GetCycles() const { return cycles_; }
+  void ResetVal() { val_ = 0; }
+  void IncrementVal() { val_++; }
   int GetVal() const { return val_; }
 
  private:
-  pipert::AdaptiveSpinLock slock_;
-  const int threads_;
+  std::vector<std::thread> threads_;
+  int cycles_;
   int val_;
 };
 
-static SharedIncrementStore& SharedIncrementorInstance(const int cycles) {
-  static SharedIncrementStore si(cycles);
+static SharedIncrementor& SharedIncrementorInstance() {
+  static SharedIncrementor si;
   return si;
+}
+
+void LockEveryStep(SharedIncrementor& shinc) {
+  static pipert::AdaptiveSpinLock slock(2);
+  for(int i = 0; i < shinc.GetCycles(); ++i) {
+    std::lock_guard<pipert::AdaptiveSpinLock> guard(slock);
+    shinc.IncrementVal();
+  }
+}
+void LockYieldEveryStep(SharedIncrementor& shinc) {
+  static pipert::AdaptiveSpinLock slock(2);
+  for(int i = 0; i < shinc.GetCycles(); ++i) {
+    {
+      std::lock_guard<pipert::AdaptiveSpinLock> guard(slock);
+      shinc.IncrementVal();
+    }
+    std::this_thread::yield();
+  }
+}
+void LockOnce(SharedIncrementor& shinc) {
+  static pipert::AdaptiveSpinLock slock(1);
+  std::lock_guard<pipert::AdaptiveSpinLock> guard(slock);
+  for(int i = 0; i < shinc.GetCycles(); ++i) {
+    shinc.IncrementVal();
+  }
 }
 
 }  // namespace
 
-TEST(AdaptiveSpinLockTest, ThreadsSyncCorrectly) {
-  const int cycles = 50000;
-  const int thread_num = 20;
-  std::thread threads[thread_num];
-  SharedIncrementStore& shinc = SharedIncrementorInstance(cycles);
-  for (int i = 0; i < thread_num; i++)
-    threads[i] = std::thread(&SharedIncrementStore::Increment, &shinc, cycles);
-  for (int i = 0; i < thread_num; i++) threads[i].join();
-  EXPECT_EQ(shinc.GetVal(), thread_num * cycles);
+TEST(AdaptiveSpinLockTest, ThreadsLockEveryStep) {
+  SharedIncrementor& shinc = SharedIncrementorInstance();
+
+  shinc.SetThreads(std::thread::hardware_concurrency() * 2);
+  shinc.SetCycles(1000);
+  shinc.ResetVal();
+  shinc.StartThreads(LockEveryStep);
+  shinc.JoinThreads();
+  EXPECT_EQ(shinc.GetVal(), shinc.GetThreads() * shinc.GetCycles());
+}
+
+TEST(AdaptiveSpinLockTest, ThreadsLockAndYieldEveryStep) {
+  SharedIncrementor& shinc = SharedIncrementorInstance();
+
+  shinc.SetThreads(std::thread::hardware_concurrency() * 2);
+  shinc.SetCycles(1000);
+  shinc.ResetVal();
+  shinc.StartThreads(LockYieldEveryStep);
+  shinc.JoinThreads();
+  EXPECT_EQ(shinc.GetVal(), shinc.GetThreads() * shinc.GetCycles());
+}
+
+TEST(AdaptiveSpinLockTest, ThreadsLockOnce) {
+  SharedIncrementor& shinc = SharedIncrementorInstance();
+
+  shinc.SetThreads(std::thread::hardware_concurrency() * 2);
+  shinc.SetCycles(10000);
+  shinc.ResetVal();
+  shinc.StartThreads(LockOnce);
+  shinc.JoinThreads();
+  EXPECT_EQ(shinc.GetVal(), shinc.GetThreads() * shinc.GetCycles());
 }

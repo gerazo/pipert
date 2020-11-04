@@ -24,7 +24,7 @@ class AdaptiveSpinLock {
   static const int kSpinsBeforeYield = 256;
   static int spins_before_yield_;
 
-  AdaptiveSpinLock();
+  AdaptiveSpinLock(const int spins_before_yield = kSpinsBeforeYield);
   AdaptiveSpinLock(const AdaptiveSpinLock&) = delete;
   AdaptiveSpinLock& operator=(const AdaptiveSpinLock&) = delete;
 
