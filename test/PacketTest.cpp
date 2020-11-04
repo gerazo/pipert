@@ -1,5 +1,7 @@
-#include "pipert/Packet.h"
 #include "gtest/gtest.h"
+#include "pipert/Packet.h"
+
+namespace {
 
 struct Human {
   std::string name_;
@@ -7,6 +9,8 @@ struct Human {
 
   Human(const std::string& name, int age) : name_(name), age_(age) {}
 };
+
+}  // namespace
 
 TEST(PacketTest, InitializationWithData) {
   auto now = pipert::Timer::time();
@@ -38,7 +42,7 @@ TEST(PacketTest, ChangeDataInPacket) {
   EXPECT_EQ(packet_.data().age_, 27);
 }
 
-TEST(PacketTest, HandlingOfRValues){
+TEST(PacketTest, HandlingOfRValues) {
   // Given
   auto now = pipert::Timer::time();
   Human a = Human("Hossam", 20);
