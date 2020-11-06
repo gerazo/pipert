@@ -89,11 +89,6 @@ class SharedIncrementor {
   int val_;
 };
 
-static SharedIncrementor& SharedIncrementorInstance() {
-  static SharedIncrementor si;
-  return si;
-}
-
 void LockEveryStep(SharedIncrementor& shinc) {
   static pipert::AdaptiveSpinLock slock(2);
   for(int i = 0; i < shinc.GetCycles(); ++i) {
@@ -122,7 +117,7 @@ void LockOnce(SharedIncrementor& shinc) {
 }  // namespace
 
 TEST(AdaptiveSpinLockTest, ThreadsLockEveryStep) {
-  SharedIncrementor& shinc = SharedIncrementorInstance();
+  SharedIncrementor shinc;
 
   shinc.SetThreads(std::thread::hardware_concurrency() * 2);
   shinc.SetCycles(1000);
@@ -133,7 +128,7 @@ TEST(AdaptiveSpinLockTest, ThreadsLockEveryStep) {
 }
 
 TEST(AdaptiveSpinLockTest, ThreadsLockAndYieldEveryStep) {
-  SharedIncrementor& shinc = SharedIncrementorInstance();
+  SharedIncrementor shinc;
 
   shinc.SetThreads(std::thread::hardware_concurrency() * 2);
   shinc.SetCycles(1000);
@@ -144,7 +139,7 @@ TEST(AdaptiveSpinLockTest, ThreadsLockAndYieldEveryStep) {
 }
 
 TEST(AdaptiveSpinLockTest, ThreadsLockOnce) {
-  SharedIncrementor& shinc = SharedIncrementorInstance();
+  SharedIncrementor shinc;
 
   shinc.SetThreads(std::thread::hardware_concurrency() * 2);
   shinc.SetCycles(10000);

@@ -24,6 +24,20 @@ class AdaptiveSpinLock {
   static const int kSpinsBeforeYield = 256;
   static int spins_before_yield_;
 
+  /// Construct an AdaptiveSpinLock mutex.
+  ///
+  /// \param spins_before_yield An optional parameter that corresponds to the
+  ///        amount of cycles the lock will spin for while trying to lock its
+  ///        mutex. Because of differences between specific hardware and the
+  ///        behavior of OS schedulers, the optimal setting for this parameter
+  ///        changes between use cases. It is only useful to experiment with
+  ///        this parameter if you really know what you are doing, and even
+  ///        then, it will probably require quite some experimentation to find
+  ///        the setting most suitable for your particular use case.
+  ///        Higher values will result in more busy waiting for locks and
+  ///        therefore more wasted CPU time, while lower values will shorten
+  ///        the time before a the lock gives up its timeslice, possibly
+  ///        leading to higher delay on lock acquisitions.
   AdaptiveSpinLock(const int spins_before_yield = kSpinsBeforeYield);
   AdaptiveSpinLock(const AdaptiveSpinLock&) = delete;
   AdaptiveSpinLock& operator=(const AdaptiveSpinLock&) = delete;
