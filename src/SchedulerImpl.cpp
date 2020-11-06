@@ -59,7 +59,10 @@ void SchedulerImpl::Stop() {
   assert(running_.load(std::memory_order_acquire));
   if(!running_.load(std::memory_order_acquire))
     return;
-  keep_running_.store(false, std::memory_order_release);
+  {
+    std::unique_lock<AdaptiveSpinLock> lock(global_mutex_);
+    keep_running_.store(false, std::memory_order_release);
+  }
   global_covar_.notify_all();
   for (auto& t : workers_) {
     t.join();
