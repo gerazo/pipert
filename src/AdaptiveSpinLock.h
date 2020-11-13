@@ -20,9 +20,9 @@ namespace pipert {
 /// Use this for short operations to minimize delay in other threads.
 class AdaptiveSpinLock {
  public:
-  /// Cycles to spin before giving up the rest of the timeslice.
+  /// Default number of cycles to spin before giving up the rest of the
+  /// timeslice.
   static const int kSpinsBeforeYield = 256;
-  static int spins_before_yield_;
 
   /// Construct an AdaptiveSpinLock mutex.
   ///
@@ -55,6 +55,7 @@ class AdaptiveSpinLock {
 
  private:
   std::atomic_flag mutex_ = ATOMIC_FLAG_INIT;
+  int spins_before_yield_ = 0;
 };
 
 }  // namespace pipert

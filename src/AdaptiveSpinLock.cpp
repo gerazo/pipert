@@ -4,8 +4,6 @@
 
 namespace pipert {
 
-int AdaptiveSpinLock::spins_before_yield_ = 0;
-
 AdaptiveSpinLock::AdaptiveSpinLock(const int spins_before_yield) {
   if (!spins_before_yield_) {
     spins_before_yield_ = ((std::thread::hardware_concurrency() == 1) ? 1 : spins_before_yield);
