@@ -40,6 +40,20 @@ TEST(Scheduler, SchedulerInitializationTest) {
   EXPECT_EQ(sch3.GetWorkerNumber(), 1);
 }
 
+TEST(Scheduler, StartStopRestartTest) {
+  pipert::Scheduler sch;
+
+  EXPECT_FALSE(sch.IsRunning());
+  sch.Start();
+  EXPECT_TRUE(sch.IsRunning());
+  sch.Stop();
+  EXPECT_FALSE(sch.IsRunning());
+  sch.Start();
+  EXPECT_TRUE(sch.IsRunning());
+  sch.Stop();
+  EXPECT_FALSE(sch.IsRunning());
+}
+
 TYPED_TEST(SchedulerTest, PolledChannelCreationWithTypes) {
   pipert::Scheduler sch(0);
   pipert::PolledChannel<TypeParam> pc =
