@@ -119,11 +119,11 @@ if(GCOVR)
     endif()
     if(${USE_COVERAGE_ANALYSIS} STREQUAL "ON")
       add_custom_target(
-        coverage gcovr  --gcov-executable "${GCOV_EXE}" -su -r .. -e ../test -e googletest-src)
+        coverage gcovr --gcov-executable "${GCOV_EXE}" --delete -su -r .. -e ../test -e googletest-src) 
     elseif(${USE_COVERAGE_ANALYSIS} STREQUAL "HTML")
       add_custom_target(
         coverage ${CMAKE_COMMAND} -E make_directory coverage
-        COMMAND gcovr --gcov-executable "${GCOV_EXE}" --html-details -su -r .. -e ../test -e googletest-src -o coverage/coverage.html
+        COMMAND gcovr --gcov-executable "${GCOV_EXE}" --delete --html-details -su -r .. -e ../test -e googletest-src -o coverage/coverage.html 
         COMMENT "Generating coverage report into coverage/coverage.html...")
     endif()
   endif()
