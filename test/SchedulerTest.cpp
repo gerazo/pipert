@@ -18,6 +18,39 @@ class Human {
   int age_;
 };
 
+class HumanReverser {
+ public:
+  HumanReverser(pipert::PolledChannel<Human>* pc_to_write) : pc_to_write_(pc_to_write) {}
+
+  void ReverseName(pipert::PacketToProcess<Human> p) {
+    EXPECT_EQ(p.data().GetName(), "Jimi Hendrix");
+    EXPECT_TRUE(p.data().GetAge() >= 28 &&
+                p.data().GetAge() <= 37);
+    std::string name(p.data().GetName());
+    std::reverse(name.begin(), name.end());
+    pc_to_write_->Acquire("OutChannel", p.timestamp() + 10, name, p.data().GetAge());
+  }
+
+ private:
+  pipert::PolledChannel<Human>* pc_to_write_;
+};
+
+class HumanPrinter {
+ public:
+  HumanPrinter(pipert::ScheduledChannel<Human>* ch_to_write) : ch_to_write_(ch_to_write) {}
+
+  void PrintName(pipert::PacketToProcess<Human> p) {
+    EXPECT_EQ(p.data().GetName(), "Jimi Hendrix");
+    EXPECT_TRUE(p.data().GetAge() >= 28 &&
+                p.data().GetAge() <= 37);
+    // std::cout << packet.data().GetName() << std::endl;
+    ch_to_write_->Acquire("Other", p.timestamp() + 5, p.data());
+  }
+
+ private:
+  pipert::ScheduledChannel<Human>* ch_to_write_;
+};
+
 template <class T>
 class SchedulerTest : public testing::Test {};
 
@@ -73,4 +106,42 @@ TYPED_TEST(SchedulerTest, ScheduledChannelCreationWithTypes) {
   EXPECT_EQ(sc.GetName(), "ScheduledChannel");
   EXPECT_EQ(sc.GetCapacity(), 1);
   EXPECT_EQ(sc.GetPacketSize(), sizeof(pipert::Packet<TypeParam>));
+}
+
+TEST(Scheduler, SchedulerPipeLineTest) {
+  pipert::Scheduler sch;
+  int channel_capacity = 10;
+
+  pipert::PolledChannel<Human> pc =
+      sch.CreatePolledChannel<Human>("OutChannel", channel_capacity);
+
+  HumanReverser hr(&pc);
+  pipert::ScheduledChannel<Human> sc2 =
+      sch.CreateScheduledChannel<Human>("ReverserChannel", channel_capacity, nullptr,
+                                        std::bind(&HumanReverser::ReverseName, &hr, std::placeholders::_1));
+
+  HumanPrinter hp(&sc2);
+  pipert::ScheduledChannel<Human> sc1 =
+      sch.CreateScheduledChannel<Human>("PrinterChannel", channel_capacity, nullptr,
+                                        std::bind(&HumanPrinter::PrintName, &hp, std::placeholders::_1));
+
+  sch.Start();
+
+  pipert::Timer::Time time = pipert::Timer::time();
+  for(int i = 0; i < 10; i++) {
+    pipert::PacketToFill<Human> packet_to_fill = sc1.Acquire("Reverser", time, "Jimi Hendrix", 28 + i);
+  }
+
+  usleep(1000);
+
+  sch.Stop();
+
+  for(pipert::PacketToProcess<Human> packet_to_process = pc.Poll();
+      !packet_to_process.IsEmpty();
+      packet_to_process = pc.Poll()) {
+    EXPECT_EQ(packet_to_process.data().GetName(), "xirdneH imiJ");
+    EXPECT_TRUE(packet_to_process.data().GetAge() >= 28 &&
+                packet_to_process.data().GetAge() <= 37);
+    EXPECT_EQ(packet_to_process.timestamp(), time + 15);
+  }
 }
