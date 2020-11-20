@@ -98,6 +98,9 @@ class ChannelImpl {
   /// See ChannelBase::GetQueuedBufferLength()
   int GetQueuedBufferLength();
 
+  /// See ChannelBase::GetDroppedPacketsNumber()
+  int GetDroppedPacketsNumber();
+
   /// Sets the public interface objects.
   /// It allows the interface to be moved.
   void SetBase(ChannelBase* base);
@@ -150,6 +153,7 @@ class ChannelImpl {
   const char* name_;          ///< See GetName().
   int capacity_;              ///< See GetCapacity().
   int packet_size_;           ///< See GetPacketSize().
+  std::atomic_int dropped_packets_number_; ///< See GetDroppedPacketsNumber().
   SchedulerImpl* scheduler_;  ///< The connected Scheduler implementation.
   ChannelBase* base_;         ///< See SetBase().
 };

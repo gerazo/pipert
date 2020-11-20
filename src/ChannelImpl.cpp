@@ -17,6 +17,7 @@ ChannelImpl::ChannelImpl(const char* name, int capacity, int packet_size,
       name_(name),
       capacity_(capacity),
       packet_size_(packet_size),
+      dropped_packets_number_(0),
       scheduler_(scheduler),
       base_(nullptr) {
   pool_ = new int8_t[capacity_ * packet_size_];
@@ -132,6 +133,10 @@ int ChannelImpl::GetQueuedBufferLength() {
   return queued_packets_.size();
 }
 
+int ChannelImpl::GetDroppedPacketsNumber() {
+  return dropped_packets_number_.load();
+}
+
 bool ChannelImpl::PacketOrdering::operator()(PacketBase* a, PacketBase* b) {
   return a->timestamp() > b->timestamp();
 }
@@ -146,7 +151,10 @@ bool ChannelImpl::TryDroppingPacket() {
   // Dropping earliest policy is executed
   // TODO: Signal dropped packet correctly with times
   PacketBase* packet = GetNext();
-  if (packet) Release(packet);
+  if (packet) {
+    Release(packet);
+    ++dropped_packets_number_;
+  }
   return packet;
 }
 

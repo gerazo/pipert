@@ -141,6 +141,7 @@ TEST_F(PolledChannelTest, PolledChannelDropPacketAfterPushTest) {
   packet_to_fill = polled_channel.Acquire("TestChannel", new_time_, 42);
   packet_to_fill.Push();
   ::pipert::PacketToProcess<int> packet_to_process = polled_channel.Poll();
+  EXPECT_EQ(polled_channel.GetDroppedPacketsNumber(), 1);
   EXPECT_FALSE(packet_to_process.IsEmpty());
   EXPECT_EQ(packet_to_process.data(), 42);
   EXPECT_EQ(packet_to_process.timestamp(), new_time_);
@@ -159,6 +160,7 @@ TEST_F(PolledChannelTest, PolledChannelDropPacketBeforePushTest) {
   ::pipert::PacketToFill<int> packet_to_fill_new =
       polled_channel.Acquire("TestChannel", new_time_, 42);
   EXPECT_TRUE(packet_to_fill_new.IsEmpty());
+  EXPECT_EQ(polled_channel.GetDroppedPacketsNumber(), 0);
   packet_to_fill_old.Push();
   ::pipert::PacketToProcess<int> packet_to_process = polled_channel.Poll();
   EXPECT_FALSE(packet_to_process.IsEmpty());

@@ -47,6 +47,9 @@ class ChannelBase {
   /// Returns how many packets are standing in the queue of the Channel.
   int GetQueuedBufferLength() const;
 
+  /// Returns how many packets have been already dropped in the Channel.
+  int GetDroppedPacketsNumber() const;
+
  protected:
   /// Construct a ChannelBase using an implementation that must be provided.
   /// Calls to ChannelBase will be delegated to this implementation.
