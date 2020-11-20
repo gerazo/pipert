@@ -127,7 +127,7 @@ class SchedulerImpl {
   std::vector<std::thread> workers_;        ///< Worker thread pool.
   std::atomic_bool keep_running_;           ///< Tells threads to run or not.
   std::atomic_bool running_;  ///< Tells what state was reached by all threads.
-  int workers_number_;        ///< Real number of wroker threads.
+  int workers_number_;        ///< Real number of worker threads.
 };
 
 template <class T>
