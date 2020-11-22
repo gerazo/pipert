@@ -34,7 +34,7 @@ class Incrementor : public Base {
   void Increment(::pipert::PacketToProcess<int> packet) {
     value_ += packet.data();
     ::pipert::PacketToFill<int> new_packet = decChannel_.Acquire("Decrementor", packet.timestamp(), packet.data());
-    while(packet.IsEmpty()) {
+    while(new_packet.IsEmpty()) {
       new_packet = decChannel_.Acquire("Decrementor", packet.timestamp(), packet.data());
     }
     new_packet.Push();
