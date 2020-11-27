@@ -30,7 +30,7 @@ Measurable (coming soon):
 
 The scheduler manages a pool of worker threads to complete work in user-defined nodes on user-defined processing functions. Initially, when the scheduler is instantiated, it enters the setup phase. In this phase, channels should be created that represent the data processing stages in the pipeline using packet processing functions defined in the user's nodes. There can be two types of channels, scheduled or polled. The former channel type's packets are automatically scheduled to be processed by the worker pool, and the latter type's packets can be received manually be the user's own threads. This can be useful when the use case requires a dedicated thread for certain actions, such as when you need to process data using non-thread-safe librares, or when you need to make an exit point from the DSP pipeline to transmit some results out. When all channels are created, the scheduler can be started, at which point packets can start entering the pipeline.
 
-The processing functions defined in the user's nodes accept a packet to be processed as a parameter. After they are done processing a packet, packets can be sent onto the next channel (one that the user node has knowledge of) in the pipeline by acquiring a packet to be filled from that channel and filling it with the processed data. The filled packet is automatically queued for processing in the next channel upon the destruction of the stub beloning to the filled packet. The space in memory belonging to the processed packet is freed up for reuse automatically upon the destruction of the stub belonging to the packet.
+The processing functions defined in the user's nodes accept a packet to be processed as a parameter. After they are done processing a packet, packets can be sent onto the next channel (one that the user node has knowledge of) in the pipeline by acquiring a packet to be filled from that channel and filling it with the processed data. The filled packet is automatically queued for processing in the next channel upon the destruction of the stub belonging to the filled packet. The space in memory belonging to the processed packet is freed up for reuse automatically upon the destruction of the stub belonging to the packet.
 
 At any point after the scheduler was started, it may be stopped, which means it will instruct all worker threads to finish their processing, wait for them to complete their current tasks, and re-enter the setup/preparation phase.
 
@@ -49,7 +49,7 @@ Steps to build:
 1. Download the repo using `git clone https://github.com/gerazo/pipert.git`
 2. Run `./build.sh` to build the static and dynamic library in release mode
 3. What you need for your project:
-    - an `include` folder
+    - the header files in our `include` folder
     - the dynamic library, `build/libpipert.so` _OR_
     - the static library, `build/libpipert_static.a`
  
