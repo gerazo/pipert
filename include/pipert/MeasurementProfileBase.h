@@ -3,7 +3,7 @@
 
 namespace pipert {
 
-    // this enum define the last level of processing the packet reached in the
+// this enum define the last level of processing the packet reached in the
 // channel
 enum MeasurementProfileProcessStatus {
   NoStatus,
@@ -16,7 +16,7 @@ enum MeasurementProfileProcessStatus {
 class MeasurementProfileBase {
  public:
   bool IsOptionalUserProfile;
-  MeasurementProfileProcessStatus processState; 
+  MeasurementProfileProcessStatus processState;
 
   MeasurementProfileBase(bool isOptionalUserProfile) {
     IsOptionalUserProfile = isOptionalUserProfile;

@@ -1,32 +1,25 @@
+#include "pipert/MeasurementProfileBase.h"
 #include "pipert/PacketBase.h"
 #include "pipert/Timer.h"
-#include "pipert/MeasurementProfileBase.h"
 namespace pipert {
 
-
-//this enum define the last level of processing the packet reached in the channel
-
-
-class MeasurementProfile : MeasurementProfileBase{ 
+class MeasurementProfile : MeasurementProfileBase {
+ private:
   const char* MesurementProfileName;
   const char* ChannelName;
-  Timer::Time packetTimeStamp;
+  Timer::Time PacketTimeStamp;
   Timer::Time AcquireTime;
   Timer::Time PushTime;
   Timer::Time PopTime;
   Timer::Time ExecutionStartTime;
   Timer::Time DroppingTime;
-  MeasurementProfileProcessStatus processStatus;
+  MeasurementProfileProcessStatus ProcessStatus;
 
-  int* threadID;
+  int* ThreadID;
 
-	public:
+ public:
   MeasurementProfile() : MeasurementProfileBase(false) {
-    processStatus = NoStatus;
+    ProcessStatus = NoStatus;
   }
-
-
-   
 };
 }  // namespace pipert
-
