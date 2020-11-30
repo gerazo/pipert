@@ -132,7 +132,8 @@ TEST(Scheduler, SchedulerPipeLineTest) {
     pipert::PacketToFill<Human> packet_to_fill = sc1.Acquire("Reverser", time, "Jimi Hendrix", 28 + i);
   }
 
-  usleep(1000);
+  while(pc.GetQueuedBufferLength() != channel_capacity)
+    std::this_thread::yield();
 
   sch.Stop();
 
