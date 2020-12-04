@@ -25,10 +25,11 @@ void LogAggregate::Log(double event_value) {
 }
 
 std::uint8_t* LogAggregate::Serialize(std::uint8_t* buffer) const {
-  *(std::int32_t*)buffer = ConvertHostToNetworkByteOrder(GetLogCount());
+  *(std::int32_t*)buffer =
+      ConvertHostToNetworkByteOrder((std::int32_t)GetLogCount());
   buffer += 4;
   *(std::int32_t*)buffer =
-      ConvertHostToNetworkByteOrder(GetTimePassedInMicroSecs());
+      ConvertHostToNetworkByteOrder((std::int32_t)GetTimePassedInMicroSecs());
   buffer += 4;
   *(double*)buffer = ConvertHostToNetworkByteOrder(GetMin());
   buffer += 8;
