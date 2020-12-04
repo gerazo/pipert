@@ -5,6 +5,7 @@
 #include <mutex>
 
 #include "ChannelImpl.h"
+#include "ThreadId.h"
 
 namespace pipert {
 
@@ -148,6 +149,7 @@ bool SchedulerImpl::StateOrdering::operator()(void* a, void* b) {
 }
 
 void SchedulerImpl::RunTasks() {
+  ThreadId::TagCurrentThread();
   while (keep_running_.load(std::memory_order_acquire)) {
     void* state = nullptr;
     ChannelImpl* channel = nullptr;
@@ -178,6 +180,7 @@ void SchedulerImpl::RunTasks() {
     }
     if (packet) {
       assert(channel);
+      ThreadId::SetNameOfCurrentThread(channel->GetName());
       channel->Execute(packet);
       if (state != nullptr) {
         // set stateful channels for this state to enabled again
