@@ -7,7 +7,7 @@ enable_testing()
 set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp SchedulerImpl.cpp Timer.cpp ThreadId.cpp)
 
 # Put all test files here which can run using the library only through its public interface
-set(BBTEST_SOURCES PacketTest.cpp PolledChannelTest.cpp SchedulerTest.cpp TimerTest.cpp ScheduledChannelTest.cpp)
+set(BBTEST_SOURCES PacketTest.cpp PolledChannelTest.cpp SchedulerTest.cpp TimerTest.cpp ScheduledChannelTest.cpp MeasurementEventTest.cpp MeasurementProfileTest.cpp)
 
 # Put those tests here which really, desperately need the implementation
 set(WBTEST_SOURCES AdaptiveSpinLockTest.cpp ThreadIdTest.cpp)
