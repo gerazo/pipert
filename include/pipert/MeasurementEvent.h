@@ -7,18 +7,30 @@ namespace pipert {
 class MeasurementEvent {
  public:
   const char* ChannelName;
-  Timer::Time PacketTimeStamp;
-  Timer::Time AcquireTime;
-  Timer::Time PushTime;
-  Timer::Time PopTime;
-  Timer::Time ExecutionStartTime;
-  Timer::Time ExecutionEndTime;
-  Timer::Time DroppingTime;
+  Timer::Time EventTime;
   MeasurementProfileProcessStatus ProcessStatus;
-
   int* ThreadID;
 
+  string SerializeMeasurementEvent() {
 
-};      // namespace pipert
+
+    string serializedMessage = "";
+    serializedMessage.append("EVENT,");
+    serializedMessage.append(std::to_string(*ThreadID));
+    serializedMessage.append(",");
+    serializedMessage.append(ChannelName);
+    serializedMessage.append(",");
+    serializedMessage.append(std::to_string(ProcessStatus));
+    serializedMessage.append(",");
+    serializedMessage.append(std::to_string(EventTime));
+
+
+
+    return serializedMessage;
+  }
+};
+
+
+}// namespace pipert
+
 #endif  //_MeasurementEvent
-}
