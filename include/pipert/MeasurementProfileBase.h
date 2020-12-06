@@ -14,6 +14,7 @@ enum MeasurementProfileProcessStatus {
   ExecuteEnd,
   Dropped
 };
+
 class MeasurementProfileBase {
  public:
   bool IsOptionalUserProfile;
