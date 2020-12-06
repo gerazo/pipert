@@ -6,11 +6,12 @@ namespace pipert {
 // this enum define the last level of processing the packet reached in the
 // channel
 enum MeasurementProfileProcessStatus {
-  NoStatus,
+  NoStatus=0,
   Acquired,
   Pushed,
   Popped,
-  Executed,
+  ExecuteStart,
+  ExecuteEnd,
   Dropped
 };
 class MeasurementProfileBase {
