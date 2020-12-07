@@ -23,7 +23,7 @@ ProfileData::ProfileData(const char* data_group_name)
 }
 
 void ProfileData::InitEvent(const char* event_name) {
-  aggregates_.insert(std::make_pair(event_name, LogAggregate()));
+  aggregates_[event_name];
 }
 
 void ProfileData::Log(const char* event_name, double event_value) {
