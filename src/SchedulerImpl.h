@@ -5,6 +5,7 @@
 #include <atomic>
 #include <cassert>
 #include <condition_variable>
+#include <functional>
 #include <thread>
 #include <unordered_map>
 #include <utility>
@@ -79,23 +80,19 @@ class SchedulerImpl {
   void JobsDropped(ChannelImpl* channel);
 
  private:
-  /// Heaps are used as they can work as in-place queues.
-  using ChannelHeap = std::vector<ChannelImpl*>;
-
   /// Certain heaps belonging to a channel are disabled because the channel
   /// of a stateful node has a thread currently executing a job.
   /// Until the job is done, no other threads are allowed to enter.
   struct EnabledChannelHeap {
-    EnabledChannelHeap() : enabled(true) {}
+    EnabledChannelHeap()
+        : enabled(true), heap(ChannelOrdering()) {}
     bool enabled;
-    ChannelHeap heap;
+    /// A heap is used as it can work as an in-place queue.
+    SteadyHeap<ChannelImpl*, std::function<bool(ChannelImpl*, ChannelImpl*)>> heap;
   };
 
   /// Monitor object to channel heap mapping.
   using State2ChannelHeap = std::unordered_map<void*, EnabledChannelHeap>;
-
-  /// Heap of monitor objects.
-  using StateHeap = std::vector<void*>;
 
   /// Ordering of channels based on earliest timestamp for ChannelHeap.
   struct ChannelOrdering {
@@ -109,39 +106,21 @@ class SchedulerImpl {
     bool operator()(void* a, void* b);
   };
 
-  /// Special method to force something to the top of the heap.
-  /// This is useful to remove and reinsert something in a heap when the
-  /// item is modified.
-  template <class T>
-  static void MoveToTopInHeap(std::vector<T>& heap, T value);
-
   /// Worker thread code getting a new job and executing it.
   /// If there are no jobs available, it sleeps until there is new work.
   void RunTasks();
 
   std::vector<ChannelImpl*> channels_;        ///< All registered channels.
   AdaptiveSpinLock global_mutex_;             ///< See GetMutex().
-  std::condition_variable_any global_covar_;  ///< CV for wakeing up threads.
-  StateHeap state_queue_;  ///< Queue for states in timestamp order.
+  std::condition_variable_any global_covar_;  ///< CV for waking up threads.
+  /// Queue for states in timestamp order as a heap of monitor objects
+  SteadyHeap<void*, std::function<bool(void*, void*)>> state_queue_; 
   State2ChannelHeap state2channel_queues_;  ///< State to channel mapping.
   std::vector<std::thread> workers_;        ///< Worker thread pool.
   std::atomic_bool keep_running_;           ///< Tells threads to run or not.
   std::atomic_bool running_;  ///< Tells what state was reached by all threads.
-  int workers_number_;        ///< Real number of wroker threads.
+  int workers_number_;        ///< Real number of worker threads.
 };
-
-template <class T>
-void SchedulerImpl::MoveToTopInHeap(std::vector<T>& heap, T value) {
-  auto it = std::find(heap.begin(), heap.end(), value);
-  assert(it != heap.end());
-  int i = &*it - &heap[0];
-  while (i > 0) {
-    int j = (i - 1) / 2;
-    assert(j < i);
-    std::swap(heap[j], heap[i]);
-    i = j;
-  }
-}
 
 }  // namespace pipert
 
