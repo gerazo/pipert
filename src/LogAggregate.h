@@ -41,6 +41,9 @@ class LogAggregate {
   void Clear();
 
   /// Serializes data into buffer.
+  ///
+  /// The serialized data does not have a header as the event name is not
+  /// stored here.
   /// \see SerializeNClear().
   /// \note This function is NOT thread-safe, better to be used internally.
   std::uint8_t* Serialize(std::uint8_t* buffer) const;
