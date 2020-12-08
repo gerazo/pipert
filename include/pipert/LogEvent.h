@@ -1,9 +1,10 @@
 #ifndef _LOG_EVENT_H_
 #define _LOG_EVENT_H_
 
-namespace pipert {
+#include "pipert/LogEventBase.h"
+#include "pipert/LogEventTypeRegistrar.h"
 
-class LogEventTypeRegistrar;
+namespace pipert {
 
 /// Encapsulates a logged event type and one corresponding measurement.
 ///
@@ -17,51 +18,17 @@ class LogEventTypeRegistrar;
 ///                 having the same name. It does make sense to use
 ///                 `const char str[]` global variables or constants as IDs.
 template <const char* TYPE_ID>
-class LogEvent {
+class LogEvent : public LogEventBase {
  public:
   /// Constructs a LogEvent object.
   /// \param event_value The measurement the log processor needs to
   ///                    make statistics from.
-  LogEvent(double event_value) : value_(event_value) { (void)registrar_; }
-
-  /// Get the name of the event type this log event represents.
-  /// \return The pointer which serves as an ID and which points to the name.
-  const char* GetName() const { return TYPE_ID; }
-
-  /// Get the measurement value stored in this log event.
-  /// \return The measurement, value always stored in a double precision float.
-  double GetValue() const { return value_; }
+  LogEvent(double event_value) : LogEventBase(TYPE_ID, event_value) {
+    (void)registrar_;
+  }
 
  private:
   static LogEventTypeRegistrar registrar_;
-
-  double value_;
-};
-
-/// This class is responsible to enlist all available event types which can be
-/// instantiated in the system.
-///
-/// This information is automagically collected from all instantiations of
-/// LogEvent in the whole link unit.
-/// Use LogEvent directly and not this class!
-class LogEventTypeRegistrar {
- public:
-  /// Get the length of the array which stores all the available
-  /// log event types which can be instantiated in the system.
-  static int GetRegisterLength();
-
-  /// Gets a log event type from the event type list. See GetRegisterLength().
-  static const char* GetLogEventTypeID(int i);
-
- private:
-  static const int kLogEventTypeRegisterMaxLength = 256;
-
-  static int register_length_;
-  static const char* register_ids_[kLogEventTypeRegisterMaxLength];
-
-  template <const char* TYPE_ID>
-  friend class LogEvent;
-  LogEventTypeRegistrar(const char* type_id);
 };
 
 template <const char* TYPE_ID>

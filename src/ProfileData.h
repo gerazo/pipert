@@ -1,6 +1,8 @@
 #ifndef _PROFILE_DATA_H_
 #define _PROFILE_DATA_H_
 
+#include "pipert/LogEventBase.h"
+
 #include "LogAggregate.h"
 #include "SenderLogger.h"
 
@@ -10,16 +12,15 @@ namespace pipert {
 
 class ProfileData {
  public:
-  static const char* const kEventPushed;
-  static const char* const kEventRetrieved;
-  static const char* const kEventExecuteTime;
-  static const char* const kEventFillTime;
-  static const char* const kEventReadTime;
+  static const char kEventPushed[];
+  static const char kEventRetrieved[];
+  static const char kEventExecuteTime[];
+  static const char kEventFillTime[];
+  static const char kEventReadTime[];
 
   ProfileData(const char* data_group_name);
 
-  void InitEvent(const char* event_name);
-  void Log(const char* event_name, double event_value);
+  void Log(LogEventBase log_event);
 
   const char* GetName() const;
 

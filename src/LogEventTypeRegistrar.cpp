@@ -1,4 +1,4 @@
-#include "pipert/LogEvent.h"
+#include "pipert/LogEventTypeRegistrar.h"
 
 #include <cassert>
 

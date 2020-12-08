@@ -2,35 +2,33 @@
 
 #include <cassert>
 
+#include "pipert/LogEventTypeRegistrar.h"
+
 namespace pipert {
 
-const char* const ProfileData::kEventPushed = "Packet Pushed";
-const char* const ProfileData::kEventRetrieved = "Packet Retrieved";
-const char* const ProfileData::kEventExecuteTime = "Execution Time";
-const char* const ProfileData::kEventFillTime = "Fill Time";
-const char* const ProfileData::kEventReadTime = "Read Time";
+const char ProfileData::kEventPushed[] = "Packet Pushed";
+const char ProfileData::kEventRetrieved[] = "Packet Retrieved";
+const char ProfileData::kEventExecuteTime[] = "Execution Time";
+const char ProfileData::kEventFillTime[] = "Fill Time";
+const char ProfileData::kEventReadTime[] = "Read Time";
 
 ProfileData::ProfileData(const char* data_group_name)
     : data_group_name_(data_group_name), sender_logger_(kEventPushed) {
-  InitEvent(kEventPushed);
-  InitEvent(kEventRetrieved);
-  InitEvent(kEventExecuteTime);
-  InitEvent(kEventFillTime);
-  InitEvent(kEventReadTime);
-}
-
-void ProfileData::InitEvent(const char* event_name) {
-  aggregates_[event_name];
-}
-
-void ProfileData::Log(const char* event_name, double event_value) {
-  auto it = aggregates_.find(event_name);
-  if (it != aggregates_.end()) {
-    it->second.Log(event_value);
-  } else {
-    assert(false);
+  // We should have at least the built-in types registered.
+  assert(LogEventTypeRegistrar::GetRegisterLength() >= 5);
+  for (int i = 0; i < LogEventTypeRegistrar::GetRegisterLength(); i++) {
+    aggregates_[LogEventTypeRegistrar::GetLogEventTypeID(i)];
   }
-  sender_logger_.TrackSender(event_name);
+}
+
+void ProfileData::Log(LogEventBase log_event) {
+  auto it = aggregates_.find(log_event.GetName());
+  if (it != aggregates_.end()) {
+    it->second.Log(log_event.GetValue());
+  } else {
+    assert(false);  // We cannot have an unregistered event type.
+  }
+  sender_logger_.TrackSender(log_event.GetName());
 }
 
 const char* ProfileData::GetName() const { return data_group_name_; }
