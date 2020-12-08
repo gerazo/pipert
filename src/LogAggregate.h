@@ -1,5 +1,5 @@
-#ifndef _LOGAGGREGATE_H_
-#define _LOGAGGREGATE_H_
+#ifndef _LOG_AGGREGATE_H_
+#define _LOG_AGGREGATE_H_
 
 #include <cstdint>
 
@@ -80,4 +80,4 @@ class LogAggregate {
 
 }  // namespace pipert
 
-#endif  //_LOGAGGREGATE_H_
+#endif  //_LOG_AGGREGATE_H_

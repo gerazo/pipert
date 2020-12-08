@@ -1,5 +1,5 @@
-#ifndef _SENDERLOGGER_H_
-#define _SENDERLOGGER_H_
+#ifndef _SENDER_LOGGER_H_
+#define _SENDER_LOGGER_H_
 
 #include <array>
 #include <cstdint>
@@ -81,4 +81,4 @@ class SenderLogger {
 
 }  // namespace pipert
 
-#endif  // _SENDERLOGGER_H_
+#endif  // _SENDER_LOGGER_H_

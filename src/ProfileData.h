@@ -1,5 +1,5 @@
-#ifndef _PROFILEDATA_H_
-#define _PROFILEDATA_H_
+#ifndef _PROFILE_DATA_H_
+#define _PROFILE_DATA_H_
 
 #include "LogAggregate.h"
 #include "SenderLogger.h"
@@ -33,4 +33,4 @@ class ProfileData {
 
 }  // namespace pipert
 
-#endif  // _PROFILEDATA_H_
+#endif  // _PROFILE_DATA_H_
