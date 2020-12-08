@@ -7,9 +7,12 @@ namespace {
 template <typename T>
 class EndiannessTest : public testing::Test {};
 
-using TestTypes = ::testing::Types<char, short, unsigned short, int,
-                                   unsigned int, long, unsigned long, long long,
-                                   unsigned long long, float, double>;
+using TestTypes =
+    ::testing::Types<char, signed char, unsigned char, short, unsigned short,
+                     int, unsigned int, long, unsigned long, long long,
+                     unsigned long long, float, double, std::uint8_t,
+                     std::uint16_t, std::uint32_t, std::uint64_t, std::int8_t,
+                     std::int16_t, std::int32_t, std::int64_t>;
 TYPED_TEST_SUITE(EndiannessTest, TestTypes, );
 
 }  // namespace

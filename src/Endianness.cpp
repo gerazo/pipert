@@ -27,6 +27,21 @@ double ConvertHostToNetworkByteOrder<double>(double val) {
 }
 
 template <>
+char ConvertHostToNetworkByteOrder<char>(char val) {
+  return val;
+}
+
+template <>
+signed char ConvertHostToNetworkByteOrder<signed char>(signed char val) {
+  return val;
+}
+
+template <>
+unsigned char ConvertHostToNetworkByteOrder<unsigned char>(unsigned char val) {
+  return val;
+}
+
+template <>
 float ConvertNetworkToHostByteOrder<float>(float val) {
   static_assert(sizeof(float) == sizeof(std::uint32_t), "Weird float size");
   union {
@@ -48,6 +63,21 @@ double ConvertNetworkToHostByteOrder<double>(double val) {
   ret.d = val;
   ret.ui64 = ConvertNetworkToHostByteOrder(ret.ui64);
   return ret.d;
+}
+
+template <>
+char ConvertNetworkToHostByteOrder<char>(char val) {
+  return val;
+}
+
+template <>
+signed char ConvertNetworkToHostByteOrder<signed char>(signed char val) {
+  return val;
+}
+
+template <>
+unsigned char ConvertNetworkToHostByteOrder<unsigned char>(unsigned char val) {
+  return val;
 }
 
 }  // namespace pipert
