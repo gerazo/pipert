@@ -107,7 +107,7 @@ class ChannelImpl {
  private:
   /// Ordering between packets based on timestamp.
   struct PacketOrdering {
-    bool operator()(PacketBase* a, PacketBase* b);
+    bool operator()(const PacketBase* a, const PacketBase* b);
   };
 
   /// \return True if this Channel is a scheduled one, false if polled.
@@ -147,7 +147,9 @@ class ChannelImpl {
 
   /// Job (to-be-processed packets) queue.
   /// This is a heap having the oldest timestamp on top.
-  SteadyHeap<PacketBase*, std::function<bool(PacketBase*, PacketBase*)>> queued_packets_;
+  SteadyHeap<PacketBase*,
+             std::function<bool(const PacketBase*, const PacketBase*)>>
+      queued_packets_;
 
   const char* name_;          ///< See GetName().
   int capacity_;              ///< See GetCapacity().

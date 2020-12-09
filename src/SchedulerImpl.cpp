@@ -129,8 +129,8 @@ void SchedulerImpl::JobsDropped(ChannelImpl* channel) {
   }
 }
 
-bool SchedulerImpl::ChannelOrdering::operator()(ChannelImpl* a,
-                                                ChannelImpl* b) {
+bool SchedulerImpl::ChannelOrdering::operator()(const ChannelImpl* a,
+                                                const ChannelImpl* b) {
   return a->PeekNext() > b->PeekNext();
 }
 

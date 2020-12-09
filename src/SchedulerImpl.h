@@ -84,11 +84,12 @@ class SchedulerImpl {
   /// of a stateful node has a thread currently executing a job.
   /// Until the job is done, no other threads are allowed to enter.
   struct EnabledChannelHeap {
-    EnabledChannelHeap()
-        : enabled(true), heap(ChannelOrdering()) {}
+    EnabledChannelHeap() : enabled(true), heap(ChannelOrdering()) {}
     bool enabled;
     /// A heap is used as it can work as an in-place queue.
-    SteadyHeap<ChannelImpl*, std::function<bool(ChannelImpl*, ChannelImpl*)>> heap;
+    SteadyHeap<ChannelImpl*,
+               std::function<bool(const ChannelImpl*, const ChannelImpl*)>>
+        heap;
   };
 
   /// Monitor object to channel heap mapping.
@@ -96,7 +97,7 @@ class SchedulerImpl {
 
   /// Ordering of channels based on earliest timestamp for ChannelHeap.
   struct ChannelOrdering {
-    bool operator()(ChannelImpl* a, ChannelImpl* b);
+    bool operator()(const ChannelImpl* a, const ChannelImpl* b);
   };
 
   /// Ordering of monitor objects based on the earliest timestamp for StateHeap.
@@ -114,7 +115,7 @@ class SchedulerImpl {
   AdaptiveSpinLock global_mutex_;             ///< See GetMutex().
   std::condition_variable_any global_covar_;  ///< CV for waking up threads.
   /// Queue for states in timestamp order as a heap of monitor objects
-  SteadyHeap<void*, std::function<bool(void*, void*)>> state_queue_; 
+  SteadyHeap<void*, std::function<bool(void*, void*)>> state_queue_;
   State2ChannelHeap state2channel_queues_;  ///< State to channel mapping.
   std::vector<std::thread> workers_;        ///< Worker thread pool.
   std::atomic_bool keep_running_;           ///< Tells threads to run or not.

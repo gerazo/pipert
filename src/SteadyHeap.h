@@ -26,54 +26,51 @@ namespace pipert {
 /// yields a max heap, and greater-than yields a min heap.
 template <typename T, typename StrictOrdering>
 class SteadyHeap {
- private:
-  /// The fixed-size space in memory that the heap is realized in.
-  std::vector<T> _heap;
-  /// The strict ordering that is used to compare elements inside the heap.
-  StrictOrdering _ordering;
-
  public:
   /// Construct a SteadyHeap with a strict ordering.
   ///
   /// \param ordering See the template parameter StrictOrdering for more
   /// information. Probably best implemented as a std::function wrapper.
-  SteadyHeap(StrictOrdering ordering) : _ordering(ordering) {}
+  SteadyHeap(StrictOrdering ordering) : ordering_(ordering) {}
 
   /// \return Whether the container is empty.
-  bool empty() const { return _heap.empty(); }
+  bool empty() const { return heap_.empty(); }
 
   /// \return The number of elements in the container.
-  std::size_t size() const { return _heap.size(); }
+  std::size_t size() const { return heap_.size(); }
 
   /// \return The reserved size of the container.
-  std::size_t capacity() const { return _heap.capacity(); }
-
-  /// \return An unmodifiable reference to the element at the top of the heap.
-  const T& front() const { return _heap.front(); }
+  std::size_t capacity() const { return heap_.capacity(); }
 
   /// Reserves the space in memory the heap is allowed to occupy at its fullest.
-  void reserve(std::size_t n) { _heap.reserve(n); }
+  void reserve(std::size_t n) { heap_.reserve(n); }
 
-  /// Finds an element in the heap using `std::find`.
-  typename std::vector<T>::iterator find(const T& value) {
-    return std::find(_heap.begin(), _heap.end(), value);
+  /// \return A constant iterator to the beginning of the collection
+  typename std::vector<T>::const_iterator begin() const {
+    return heap_.begin();
   }
+
+  /// \return A constant iterator to the beginning of the collection
+  typename std::vector<T>::const_iterator end() const { return heap_.end(); }
+
+  /// \return An unmodifiable reference to the element at the top of the heap.
+  const T& front() const { return heap_.front(); }
 
   /// Counts the number of occurrences of an element using `std::count`.
   std::ptrdiff_t count(const T& value) const {
-    return std::count(_heap.begin(), _heap.end(), value);
+    return std::count(heap_.begin(), heap_.end(), value);
   }
 
   /// Push an element onto the heap.
-  void push_heap(T& value) {
-    _heap.push_back(value);
-    std::push_heap(_heap.begin(), _heap.end(), _ordering);
+  void push_heap(const T& value) {
+    heap_.push_back(value);
+    std::push_heap(heap_.begin(), heap_.end(), ordering_);
   }
 
   /// Pop the element at the top of the heap.
   void pop_heap() {
-    std::pop_heap(_heap.begin(), _heap.end(), _ordering);
-    _heap.pop_back();
+    std::pop_heap(heap_.begin(), heap_.end(), ordering_);
+    heap_.pop_back();
   }
 
   /// A special method that forces an element onto the top of the heap, and then
@@ -90,16 +87,22 @@ class SteadyHeap {
   /// force-popped from the heap because it was modified, see
   /// `SteadyHeap::force_pop_heap(T)`.
   void force_to_top(const T& value) {
-    typename std::vector<T>::iterator it = find(value);
-    assert(it != _heap.end());
-    int i = &(*it) - &_heap[0];
+    typename std::vector<T>::iterator it =
+        std::find(heap_.begin(), heap_.end(), value);
+    assert(it != heap_.end());
+    int i = &(*it) - &heap_[0];
     while (i > 0) {
       int j = (i - 1) / 2;
       assert(j < i);
-      std::swap(_heap[i], _heap[j]);
+      std::swap(heap_[i], heap_[j]);
       i = j;
     }
   }
+
+  /// The fixed-size space in memory that the heap is realized in.
+  std::vector<T> heap_;
+  /// The strict ordering that is used to compare elements inside the heap.
+  StrictOrdering ordering_;
 };
 
 }  // namespace pipert

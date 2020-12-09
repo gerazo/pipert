@@ -129,7 +129,7 @@ int ChannelImpl::GetQueuedBufferLength() {
   return queued_packets_.size();
 }
 
-bool ChannelImpl::PacketOrdering::operator()(PacketBase* a, PacketBase* b) {
+bool ChannelImpl::PacketOrdering::operator()(const PacketBase* a, const PacketBase* b) {
   return a->timestamp() > b->timestamp();
 }
 
