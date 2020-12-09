@@ -68,6 +68,17 @@ TEST(LogAggregateTest, SerializedCorrectly) {
   EXPECT_EQ(pipert::ConvertNetworkToHostByteOrder(*(double*)(buf + 24)), 2.0);
 }
 
+TEST(LogAggregateTest, EmptySerializedCorrectly) {
+  pipert::LogAggregate la;
+  std::uint8_t buf[256];
+  std::uint8_t* buf_end = la.Serialize(buf);
+  ASSERT_EQ(buf_end - buf, 32);
+  EXPECT_EQ(pipert::ConvertNetworkToHostByteOrder(*(std::int32_t*)buf), 0);
+  EXPECT_GE(pipert::ConvertNetworkToHostByteOrder(*(std::int32_t*)(buf + 4)),
+            0);
+  EXPECT_EQ(pipert::ConvertNetworkToHostByteOrder(*(double*)(buf + 24)), 0.0);
+}
+
 TEST(LogAggregateTest, AtomicGatheringOfData) {
   pipert::LogAggregate la;
   la.Log(1.0);

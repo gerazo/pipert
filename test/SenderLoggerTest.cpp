@@ -101,6 +101,15 @@ TEST(SenderLoggerTest, SerializedCorrectly) {
   EXPECT_EQ(buf_end[-1], 0);
 }
 
+TEST(SenderLoggerTest, EmptySerializedCorrectly) {
+  pipert::SenderLogger sl(kEventPushed);
+  std::uint8_t buf[256];
+  std::uint8_t* buf_end = sl.Serialize(buf);
+  ASSERT_EQ(buf_end - buf, 4 + strlen("N/A") + 1);
+  EXPECT_EQ(memcmp(buf, "SEND", 4), 0);
+  EXPECT_EQ(buf_end[-1], 0);
+}
+
 TEST(SenderLoggerTest, LongNameSerializedCorrectly) {
   pipert::SenderLogger sl(kEventPushed);
   SimulateSender(kEventPushed, kChannel5, sl);

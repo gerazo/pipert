@@ -50,6 +50,7 @@ std::uint8_t* SenderLogger::Serialize(std::uint8_t* buffer) {
   memcpy(buffer, "SEND", 4);
   buffer += 4;
   const char* top = GetTopSender();
+  if (top == nullptr) top = "N/A";
   int len = (int)strlen((char*)top);
   if (len > kMaxSenderNameLength) len = kMaxSenderNameLength;
   memcpy(buffer, top, len);

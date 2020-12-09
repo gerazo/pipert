@@ -45,12 +45,12 @@ class SenderLogger {
   /// The serialized data has a header of 4 bytes "SEND".
   /// \see SerializeNClear().
   /// \note This function is NOT thread-safe and is better to be used
-  /// internally.
+  ///       internally. It serializes "N/A" as name when there was no sender.
   std::uint8_t* Serialize(std::uint8_t* buffer);
 
   /// Clears data gathered so far.
   /// \note This function is NOT thread-safe and is better to be used
-  /// internally.
+  ///       internally.
   void ClearTopSenders();
 
   /// Gets the sender which sent the most packets.
@@ -58,7 +58,7 @@ class SenderLogger {
   /// low number should be practically enough to track most scenarios.
   /// \return The name of the most frequent sender.
   /// \note This function is NOT thread-safe and is better to be used
-  /// internally.
+  ///       internally.
   const char* GetTopSender();
 
  private:

@@ -15,8 +15,7 @@ const char ProfileData::kEventReadTime[] = "Read Time";
 
 ProfileData::ProfileData(const char* data_group_name)
     : data_group_name_(data_group_name), sender_logger_(kEventPushed) {
-  // We should have at least the built-in types registered.
-  assert(LogEventTypeRegistrar::GetRegisterLength() >= 5);
+  assert(LogEventTypeRegistrar::GetRegisterLength() >= 0);
 
   // prepare the hash to contain every possible event type
   for (int i = 0; i < LogEventTypeRegistrar::GetRegisterLength(); i++) {
@@ -54,13 +53,19 @@ bool ProfileData::GatherNSerialize(std::uint8_t* buffer,
   }
   assert(buf <= buffer_end);
   while (buf <= buffer + safety_limit && serialize_next_ != aggregates_.end()) {
+    std::uint8_t* orig_buf = buf;
     memcpy(buf, "LOGA", 4);
     buf += 4;
     buf = SerializeString(buf, serialize_next_->first);
     assert(buf <= buffer_end);
+    std::int32_t* log_count = (std::int32_t*)buf;
     buf = serialize_next_->second.SerializeNClear(buf);
     assert(buf <= buffer_end);
     serialize_next_++;
+    if (*log_count == 0) {
+      // we skip empty data, so we remove this from the buffer
+      buf = orig_buf;
+    }
   }
   buffer_end = buf;
   return serialize_next_ != aggregates_.end();
