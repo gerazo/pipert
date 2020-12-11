@@ -10,7 +10,7 @@ set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp S
 set(BBTEST_SOURCES PacketTest.cpp PolledChannelTest.cpp SchedulerTest.cpp TimerTest.cpp ScheduledChannelTest.cpp)
 
 # Put those tests here which really, desperately need the implementation
-set(WBTEST_SOURCES AdaptiveSpinLockTest.cpp ThreadIdTest.cpp)
+set(WBTEST_SOURCES AdaptiveSpinLockTest.cpp ThreadIdTest.cpp SteadyHeapTest.cpp)
 
 
 # General settings
