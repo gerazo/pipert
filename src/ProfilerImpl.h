@@ -50,13 +50,23 @@ class ProfilerImpl {
   /// \param profile_data Points to the ProfileData to be added.
   /// \pre This should be used in preparation mode and not when the Scheduler
   ///      is running. (Normally Channel objects are added before running.)
+  ///      The collector thread should not run.
   void AddProfileData(ProfileData* profile_data);
 
   /// Removes ProfileData object registered to this Profiler.
   /// \param profile_data Points to the ProfileData to be removed.
   /// \pre This should be used in preparation mode and not when the Scheduler
   ///      is running. (Normally Channel objects are removed after running.)
+  ///      The collector thread should not run.
   void RemoveProfileData(ProfileData* profile_data);
+
+  /// Start log collector thread (if it is allowed by aggregation time).
+  /// \pre The collector thread should not run.
+  void Start();
+
+  /// Stop log collector thread (if it is allowed by aggregation time).
+  /// \pre The collector thread should run.
+  void Stop();
 
   /// Runs a gather-and-send action manually on the current thread.
   ///

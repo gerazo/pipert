@@ -10,7 +10,7 @@ set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Endianness.cpp 
 set(BBTEST_SOURCES LogEventTest.cpp PacketTest.cpp PolledChannelTest.cpp SchedulerTest.cpp TimerTest.cpp ScheduledChannelTest.cpp)
 
 # Put those tests here which really, desperately need the implementation
-set(WBTEST_SOURCES AdaptiveSpinLockTest.cpp EndiannessTest.cpp LogAggregateTest.cpp ProfileDataTest.cpp SenderLoggerTest.cpp SteadyHeapTest.cpp ThreadIdTest.cpp)
+set(WBTEST_SOURCES AdaptiveSpinLockTest.cpp EndiannessTest.cpp LogAggregateTest.cpp ProfileDataTest.cpp ProfilerImplTest.cpp SenderLoggerTest.cpp SteadyHeapTest.cpp ThreadIdTest.cpp)
 
 
 # General settings

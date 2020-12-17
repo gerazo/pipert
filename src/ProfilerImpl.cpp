@@ -18,21 +18,17 @@ ProfilerImpl::ProfilerImpl(SenderCallback sender_callback, int buffer_size,
   assert(buffer_size_ >= 64);
   assert(aggregation_time_msec_ >= 0);
   buffer_ = new std::uint8_t[buffer_size_];
-  if (aggregation_time_msec_ != 0) {
-    worker_thread_ = std::thread(&ProfilerImpl::SleepNWork, this);
-  }
 }
 
 ProfilerImpl::~ProfilerImpl() {
-  worker_shutdown_.store(true, std::memory_order_release);
-  if (aggregation_time_msec_ != 0) {
-    worker_thread_.join();
-  }
+  if (aggregation_time_msec_ != 0 && worker_thread_.joinable())
+    Stop();
   delete[] buffer_;
 }
 
 void ProfilerImpl::AddProfileData(ProfileData* profile_data) {
   assert(profile_data != nullptr);
+  assert(!worker_thread_.joinable());
   int expected = -1;
   bool changed = next_profile_data_.compare_exchange_strong(expected, -2);
   if (!changed) {
@@ -47,6 +43,7 @@ void ProfilerImpl::AddProfileData(ProfileData* profile_data) {
 
 void ProfilerImpl::RemoveProfileData(ProfileData* profile_data) {
   assert(profile_data != nullptr);
+  assert(!worker_thread_.joinable());
   int expected = -1;
   bool changed = next_profile_data_.compare_exchange_strong(expected, -2);
   if (!changed) {
@@ -62,6 +59,23 @@ void ProfilerImpl::RemoveProfileData(ProfileData* profile_data) {
     assert(false);
   }
   next_profile_data_ = -1;
+}
+
+void ProfilerImpl::Start() {
+  assert(!worker_thread_.joinable());
+  worker_shutdown_.store(false, std::memory_order_release);
+  if (aggregation_time_msec_ != 0) {
+    worker_thread_ = std::thread(&ProfilerImpl::SleepNWork, this);
+  }
+}
+
+void ProfilerImpl::Stop() {
+  worker_shutdown_.store(true, std::memory_order_release);
+  if (aggregation_time_msec_ != 0) {
+    assert(worker_thread_.joinable());
+    worker_thread_.join();
+  }
+  assert(!worker_thread_.joinable());
 }
 
 void ProfilerImpl::GatherNSend() {
