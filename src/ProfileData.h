@@ -42,6 +42,9 @@ class ProfileData {
   ///                        Practically this will be the name of the Channel.
   ProfileData(const char* data_group_name);
 
+  ProfileData(const ProfileData&) = delete;
+  ProfileData& operator=(const ProfileData&) = delete;
+
   /// Get the name of the data group which this object represents.
   /// \return Pointer to the name string.
   const char* GetName() const;
