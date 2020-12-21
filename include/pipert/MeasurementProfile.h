@@ -4,18 +4,17 @@
 #include "pipert/PacketBase.h"
 #include "pipert/Timer.h"
 #include "pipert/MeasurementEvent.h"
+#include "string.h"
 namespace pipert {
 
-class MeasurementProfile : MeasurementProfileBase {
-
-
-
+class MeasurementProfile : public MeasurementProfileBase {
  public:
-  const char* MesurementProfileName;
+  std::string MesurementProfileName;
   std::vector<MeasurementEvent> MeasurementsEventsLog;
   MeasurementProfile() : MeasurementProfileBase(false) {
 
   }
+
 };
 }  // namespace pipert
   // namespace pipert
