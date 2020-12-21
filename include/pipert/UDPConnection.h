@@ -9,7 +9,9 @@
 
 #include <vector>
 
-#include "MeasurementProfileBase.h"
+#include "pipert/MeasurementProfile.h"
+#include "pipert/MeasurementProfileBase.h"
+#include "pipert/MeasurementEvent.h"
 using namespace std;
 using std::vector;
 
@@ -21,44 +23,65 @@ namespace pipert {
 
 class UDPConnection {
  private:
-  string Serialize(MeasurementProfileBase profileBase) {
-    switch (profileBase.IsOptionalUserProfile) {
-      case true:
-        return SerializeUserMeasurementProfile(profileBase);
-        break;
+  string Serialize(MeasurementProfileBase* profileBase) {
+    if (profileBase->IsOptionalUserProfile) {
 
-      case false:
+
+      return SerializeUserMeasurementProfile(profileBase);
+    }
+
+      else
+    {
         return SerializeGeneralMeasurementProfile(profileBase);
-        break;
+
     }
 
     return "";
   }
 
-  string SerializeUserMeasurementProfile(MeasurementProfileBase profileBase) {
+  string SerializeUserMeasurementProfile(pipert::MeasurementProfileBase* profileBase) {
     //  MeasurmentProfile profile = (MeasurmentProfile) profileBase;
     // tese serialization
+
+    //pipert::MeasurementProfile *measurement_profile_= (pipert::MeasurementProfile *)&profileBase;
     UNUSED(profileBase);
-    string serializedMessage = "1,start,";
-    serializedMessage.append("50,");
+    string serializedMessage = "start,1,";
+    //string s =measurement_profile_->MesurementProfileName;
     serializedMessage.append("end,");
     return serializedMessage;
   }
 
+
+
+
   string SerializeGeneralMeasurementProfile(
-      MeasurementProfileBase profileBase) {
-    // MeasurmentProfile profile = (MeasurmentProfile)profileBase;
-    // tese serialization
-    UNUSED(profileBase);
-    string serializedMessage = "0,start,";
-    serializedMessage.append("50,");
+      pipert::MeasurementProfileBase* profileBase) {
+    pipert::MeasurementProfile* measurement_profile_ = (pipert::MeasurementProfile*) (profileBase);
+    string serializedMessage = "start,0,";
+    serializedMessage.append(measurement_profile_->MesurementProfileName);
+    serializedMessage.append(",");
+    for(pipert::MeasurementEvent e : measurement_profile_->MeasurementsEventsLog){
+      serializedMessage.append("EventStart");
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(e.EventTime));
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(e.ProcessStatus));
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(*e.ThreadID));
+      serializedMessage.append(",");
+      serializedMessage.append(e.ChannelName);
+      serializedMessage.append(",");
+      serializedMessage.append("EventEnd");
+      serializedMessage.append(",");
+
+    }
     serializedMessage.append("end,");
     return serializedMessage;
   }
 
  public:
   UDPConnection() {}
-  void send(std::vector<pipert::MeasurementProfileBase> measurements) {
+  void send(std::vector<pipert::MeasurementProfileBase*> measurements) {
     UNUSED(measurements);
     int sockfd;
     //   char buffer[MAXLINE];
@@ -90,5 +113,5 @@ class UDPConnection {
     close(sockfd);
   }
 
-};  // namespace pipert
+}; 
 }  // namespace pipert
