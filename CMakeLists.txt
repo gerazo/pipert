@@ -7,7 +7,7 @@ enable_testing()
 set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Scheduler.cpp SchedulerImpl.cpp Timer.cpp ThreadId.cpp)
 
 # Put all test files here which can run using the library only through its public interface
-set(BBTEST_SOURCES PacketTest.cpp PolledChannelTest.cpp SchedulerTest.cpp TimerTest.cpp ScheduledChannelTest.cpp MeasurementEventTest.cpp MeasurementProfileTest.cpp)
+set(BBTEST_SOURCES PacketTest.cpp PolledChannelTest.cpp SchedulerTest.cpp TimerTest.cpp ScheduledChannelTest.cpp MeasurementEventTest.cpp MeasurementProfileTest.cpp MeasurementBufferTest.cpp)
 
 # Put those tests here which really, desperately need the implementation
 set(WBTEST_SOURCES AdaptiveSpinLockTest.cpp ThreadIdTest.cpp)
@@ -20,7 +20,7 @@ if(NOT CMAKE_BUILD_TYPE)
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
 endif()
 
-set(USE_ADDRESS_SANITIZER ON CACHE BOOL "Use -fsanitize=address for leak checking.")
+
 
 set(USE_COVERAGE_ANALYSIS ON CACHE BOOL "Use -fprofile-arcs -ftest-coverage for making a coverage analysis.")
 set_property(CACHE USE_COVERAGE_ANALYSIS PROPERTY STRINGS "ON" "HTML" "OFF")
@@ -41,10 +41,7 @@ endif()
 function(SetupTarget target_name)
   set_property(TARGET ${target_name} PROPERTY CXX_STANDARD 11)
   target_compile_options(${target_name} PRIVATE -Wall -pedantic -Wextra -Werror)
-  if(USE_ADDRESS_SANITIZER)
-    target_compile_options(${target_name} PRIVATE $<$<CONFIG:Debug>:-fsanitize=address>)
-    target_link_options(${target_name} PRIVATE $<$<CONFIG:Debug>:-fsanitize=address>)
-  endif()
+
   if(USE_COVERAGE_ANALYSIS)
     target_compile_options(${target_name} PRIVATE $<$<CONFIG:Debug>:-fprofile-arcs>)
     target_compile_options(${target_name} PRIVATE $<$<CONFIG:Debug>:-ftest-coverage>)
