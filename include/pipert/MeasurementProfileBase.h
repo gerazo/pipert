@@ -19,12 +19,9 @@ class MeasurementProfileBase {
  public:
   bool IsOptionalUserProfile;
   MeasurementProfileProcessStatus processState;
-
   MeasurementProfileBase(bool isOptionalUserProfile) {
     IsOptionalUserProfile = isOptionalUserProfile;
   }
-
-  // must
 };
 }  // namespace pipert
 #endif  //_PMeasurementProfileBase_H_
