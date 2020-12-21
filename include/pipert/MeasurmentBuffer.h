@@ -18,11 +18,12 @@ class MeasurmentBuffer {
  private:
   UDPConnection connection;
 
-  std::vector<MeasurementProfileBase> measuremensListList;
+  std::vector<MeasurementProfileBase*> measuremensListList;
 
   // this function will start sending the buffer via UDP connection each
   // timeInterval and clear measuremensListList
   void SendingJobCallBack() {
+
     while (enableSending) {
       if (measuremensListList.size() == BufferSize) {
         connection.send(measuremensListList);
@@ -35,7 +36,8 @@ class MeasurmentBuffer {
  public:
   void generateBufferJob() {
     std::thread t = std::thread(&MeasurmentBuffer::SendingJobCallBack, this);
-    t.detach();
+    t.join();
+
   }
 
   MeasurmentBuffer(UDPConnection udpConnection, uint16_t timeIntervals,
@@ -47,7 +49,7 @@ class MeasurmentBuffer {
     enableSending = true;
   }
 
-  void pushMeasurement(MeasurementProfileBase profile) {
+  void pushMeasurement(MeasurementProfileBase* profile) {
     if (measuremensListList.size() < BufferSize) {
       measuremensListList.push_back(profile);
     }
