@@ -9,7 +9,10 @@
 namespace pipert {
 
 SchedulerImpl::SchedulerImpl(int workers_number)
-    : keep_running_(false), running_(false), workers_number_(workers_number) {
+    : state_queue_(StateOrdering(&state2channel_queues_)),
+      keep_running_(false),
+      running_(false),
+      workers_number_(workers_number) {
   assert(workers_number > 0);
   workers_.reserve(workers_number);
 }
@@ -75,22 +78,16 @@ void SchedulerImpl::JobsArrived(ChannelImpl* channel) {
   // No locking as it is called from ChannelImpl or here
   void* state = channel->GetState();
   auto& chq = state2channel_queues_[state];
-  assert(std::count(chq.heap.begin(), chq.heap.end(), channel) == 0);
+  assert(chq.heap.count(channel) == 0);
   Timer::Time earliest =
       chq.heap.empty() ? Timer::kMaxTime : chq.heap.front()->PeekNext();
-  chq.heap.push_back(channel);
-  std::push_heap(chq.heap.begin(), chq.heap.end(), ChannelOrdering());
+  chq.heap.push_heap(channel);
   if (chq.enabled && chq.heap.front()->PeekNext() < earliest) {
     if (earliest != Timer::kMaxTime) {
-      MoveToTopInHeap(state_queue_, state);
-      std::pop_heap(state_queue_.begin(), state_queue_.end(),
-                    StateOrdering(&state2channel_queues_));
-      state_queue_.pop_back();
+      state_queue_.force_pop_heap(state);
     }
-    assert(std::count(state_queue_.begin(), state_queue_.end(), state) == 0);
-    state_queue_.push_back(state);
-    std::push_heap(state_queue_.begin(), state_queue_.end(),
-                   StateOrdering(&state2channel_queues_));
+    assert(state_queue_.count(state) == 0);
+    state_queue_.push_heap(state);
     global_covar_.notify_one();
   }
 }
@@ -100,23 +97,15 @@ void SchedulerImpl::JobsUpdated(ChannelImpl* channel, bool was_push) {
   void* state = channel->GetState();
   auto& chq = state2channel_queues_[state];
   assert(!chq.heap.empty());
-  assert(std::count(chq.heap.begin(), chq.heap.end(), channel) == 1);
+  assert(chq.heap.count(channel) == 1);
   bool was_top = (chq.heap.front() == channel);
   Timer::Time earliest = chq.heap.front()->PeekNext();
-  MoveToTopInHeap(chq.heap, channel);
-  std::pop_heap(chq.heap.begin(), chq.heap.end(), ChannelOrdering());
-  chq.heap.pop_back();
-  chq.heap.push_back(channel);
-  std::push_heap(chq.heap.begin(), chq.heap.end(), ChannelOrdering());
+  chq.heap.force_pop_heap(channel);
+  chq.heap.push_heap(channel);
   if (chq.enabled && (chq.heap.front()->PeekNext() != earliest || was_top)) {
-    MoveToTopInHeap(state_queue_, state);
-    std::pop_heap(state_queue_.begin(), state_queue_.end(),
-                  StateOrdering(&state2channel_queues_));
-    state_queue_.pop_back();
-    assert(std::count(state_queue_.begin(), state_queue_.end(), state) == 0);
-    state_queue_.push_back(state);
-    std::push_heap(state_queue_.begin(), state_queue_.end(),
-                   StateOrdering(&state2channel_queues_));
+    state_queue_.force_pop_heap(state);
+    assert(state_queue_.count(state) == 0);
+    state_queue_.push_heap(state);
     if (was_push) {
       global_covar_.notify_one();
     }
@@ -128,27 +117,20 @@ void SchedulerImpl::JobsDropped(ChannelImpl* channel) {
   void* state = channel->GetState();
   auto& chq = state2channel_queues_[state];
   assert(!chq.heap.empty());
-  assert(std::count(chq.heap.begin(), chq.heap.end(), channel) == 1);
+  assert(chq.heap.count(channel) == 1);
   bool was_top = (chq.heap.front() == channel);
-  MoveToTopInHeap(chq.heap, channel);
-  std::pop_heap(chq.heap.begin(), chq.heap.end(), ChannelOrdering());
-  chq.heap.pop_back();
+  chq.heap.force_pop_heap(channel);
   if (chq.enabled && was_top) {
-    MoveToTopInHeap(state_queue_, state);
-    std::pop_heap(state_queue_.begin(), state_queue_.end(),
-                  StateOrdering(&state2channel_queues_));
-    state_queue_.pop_back();
-    assert(std::count(state_queue_.begin(), state_queue_.end(), state) == 0);
+    state_queue_.force_pop_heap(state);
+    assert(state_queue_.count(state) == 0);
     if (!chq.heap.empty()) {
-      state_queue_.push_back(state);
-      std::push_heap(state_queue_.begin(), state_queue_.end(),
-                     StateOrdering(&state2channel_queues_));
+      state_queue_.push_heap(state);
     }
   }
 }
 
-bool SchedulerImpl::ChannelOrdering::operator()(ChannelImpl* a,
-                                                ChannelImpl* b) {
+bool SchedulerImpl::ChannelOrdering::operator()(const ChannelImpl* a,
+                                                const ChannelImpl* b) {
   return a->PeekNext() > b->PeekNext();
 }
 
@@ -188,9 +170,7 @@ void SchedulerImpl::RunTasks() {
         if (state != nullptr) {
           // set stateful channels for this state to disabled
           chq.enabled = false;
-          std::pop_heap(state_queue_.begin(), state_queue_.end(),
-                        StateOrdering(&state2channel_queues_));
-          state_queue_.pop_back();
+          state_queue_.pop_heap();
         }
         packet = channel->PopNext();
         assert(packet);
@@ -202,16 +182,13 @@ void SchedulerImpl::RunTasks() {
       if (state != nullptr) {
         // set stateful channels for this state to enabled again
         std::lock_guard<AdaptiveSpinLock> lock(global_mutex_);
-        assert(std::count(state_queue_.begin(), state_queue_.end(), state) ==
-               0);
+        assert(state_queue_.count(state) == 0);
         assert(state2channel_queues_.count(state) == 1);
         auto& chq = state2channel_queues_[state];
         assert(!chq.enabled);
         chq.enabled = true;
         if (!chq.heap.empty()) {
-          state_queue_.push_back(state);
-          std::push_heap(state_queue_.begin(), state_queue_.end(),
-                         StateOrdering(&state2channel_queues_));
+          state_queue_.push_heap(state);
           // we do not need global_covar_.notify_one() here as this thread goes
           // on by servicing this state
         }

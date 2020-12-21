@@ -14,6 +14,7 @@ ChannelImpl::ChannelImpl(const char* name, int capacity, int packet_size,
                          SchedulerImpl* scheduler)
     : single_thread_object_(single_thread_object),
       callback_(callback),
+      queued_packets_(PacketOrdering()),
       name_(name),
       capacity_(capacity),
       packet_size_(packet_size),
@@ -66,9 +67,7 @@ void ChannelImpl::Push(PacketBase* packet) {
   std::lock_guard<AdaptiveSpinLock> lock(GetQueuedMutex());
   assert((int)queued_packets_.size() < capacity_);
   Timer::Time earliest = queued_packets_.empty() ? Timer::kMaxTime : PeekNext();
-  queued_packets_.push_back(packet);
-  std::push_heap(queued_packets_.begin(), queued_packets_.end(),
-                 PacketOrdering());
+  queued_packets_.push_heap(packet);
   if (IsScheduled() && PeekNext() < earliest) {
     if (earliest == Timer::kMaxTime)
       scheduler_->JobsArrived(this);
@@ -104,9 +103,7 @@ PacketBase* ChannelImpl::PopNext() {
   assert((int)queued_packets_.size() <= capacity_);
   assert(!queued_packets_.empty());
   PacketBase* earliest = queued_packets_.front();
-  std::pop_heap(queued_packets_.begin(), queued_packets_.end(),
-                PacketOrdering());
-  queued_packets_.pop_back();
+  queued_packets_.pop_heap();
   if (IsScheduled()) {
     if (queued_packets_.empty())
       scheduler_->JobsDropped(this);
@@ -137,7 +134,7 @@ int ChannelImpl::GetDroppedPacketsNumber() {
   return dropped_packets_number_.load();
 }
 
-bool ChannelImpl::PacketOrdering::operator()(PacketBase* a, PacketBase* b) {
+bool ChannelImpl::PacketOrdering::operator()(const PacketBase* a, const PacketBase* b) {
   return a->timestamp() > b->timestamp();
 }
 
