@@ -21,6 +21,7 @@ ProfilerImpl::ProfilerImpl(SenderCallback sender_callback, int buffer_size,
 }
 
 ProfilerImpl::~ProfilerImpl() {
+  assert(profile_data_.size() == 0);
   if (aggregation_time_msec_ != 0 && worker_thread_.joinable())
     Stop();
   delete[] buffer_;

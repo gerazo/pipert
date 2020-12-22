@@ -1,6 +1,7 @@
 #ifndef _CHANNELBASE_H_
 #define _CHANNELBASE_H_
 
+#include "pipert/LogEventBase.h"
 #include "pipert/PacketBase.h"
 
 namespace pipert {
@@ -46,6 +47,11 @@ class ChannelBase {
 
   /// Returns how many packets are standing in the queue of the Channel.
   int GetQueuedBufferLength() const;
+
+  /// Logs an event connected to this Channel.
+  /// \param log_event The user created LogEvent object.
+  /// \note This function is thread-safe.
+  void Log(LogEventBase log_event);
 
  protected:
   /// Construct a ChannelBase using an implementation that must be provided.

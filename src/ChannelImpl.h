@@ -10,6 +10,7 @@
 
 namespace pipert {
 
+class ProfileData;
 class SchedulerImpl;
 
 /// (_Part of internal implementation._)
@@ -104,6 +105,15 @@ class ChannelImpl {
   /// It allows the interface to be moved.
   void SetBase(ChannelBase* base);
 
+  /// See ChannelBase::Log().
+  void Log(LogEventBase log_event);
+
+  /// Set ProfileData for this Channel.
+  void SetProfileData(ProfileData* profile_data);
+
+  /// Get ProfileData for this Channel.
+  ProfileData* GetProfileData();
+
  private:
   /// Ordering between packets based on timestamp.
   struct PacketOrdering {
@@ -151,11 +161,12 @@ class ChannelImpl {
              std::function<bool(const PacketBase*, const PacketBase*)>>
       queued_packets_;
 
-  const char* name_;          ///< See GetName().
-  int capacity_;              ///< See GetCapacity().
-  int packet_size_;           ///< See GetPacketSize().
-  SchedulerImpl* scheduler_;  ///< The connected Scheduler implementation.
-  ChannelBase* base_;         ///< See SetBase().
+  const char* name_;           ///< See GetName().
+  int capacity_;               ///< See GetCapacity().
+  int packet_size_;            ///< See GetPacketSize().
+  SchedulerImpl* scheduler_;   ///< The connected Scheduler implementation.
+  ChannelBase* base_;          ///< See SetBase().
+  ProfileData* profile_data_;  ///< ProfileData connected to this channel.
 };
 
 }  // namespace pipert

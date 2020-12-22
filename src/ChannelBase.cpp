@@ -38,6 +38,10 @@ int ChannelBase::GetQueuedBufferLength() const {
   return impl_->GetQueuedBufferLength();
 }
 
+void ChannelBase::Log(LogEventBase log_event) {
+  impl_->Log(log_event);
+}
+
 ChannelBase::ChannelBase(ChannelImpl* impl)
   : impl_(impl) {
   assert(impl);

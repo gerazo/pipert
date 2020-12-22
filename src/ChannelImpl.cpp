@@ -4,6 +4,7 @@
 #include <cassert>
 #include <mutex>
 
+#include "ProfileData.h"
 #include "SchedulerImpl.h"
 
 namespace pipert {
@@ -19,7 +20,8 @@ ChannelImpl::ChannelImpl(const char* name, int capacity, int packet_size,
       capacity_(capacity),
       packet_size_(packet_size),
       scheduler_(scheduler),
-      base_(nullptr) {
+      base_(nullptr),
+      profile_data_(nullptr) {
   pool_ = new int8_t[capacity_ * packet_size_];
   assert(pool_);
   free_packets_.reserve(capacity_);
@@ -134,6 +136,20 @@ bool ChannelImpl::PacketOrdering::operator()(const PacketBase* a, const PacketBa
 }
 
 void ChannelImpl::SetBase(ChannelBase* base) { base_ = base; }
+
+void ChannelImpl::Log(LogEventBase log_event) {
+  if (profile_data_) {
+    profile_data_->Log(log_event);
+  }
+}
+
+void ChannelImpl::SetProfileData(ProfileData* profile_data) {
+  profile_data_ = profile_data;
+}
+
+ProfileData* ChannelImpl::GetProfileData() {
+  return profile_data_;
+}
 
 AdaptiveSpinLock& ChannelImpl::GetQueuedMutex() {
   return IsScheduled() ? scheduler_->GetMutex() : queued_mutex_;

@@ -7,6 +7,7 @@
 namespace pipert {
 
 class ProfilerImpl;
+class Scheduler;
 
 /// Controlling object of all profiling and monitoring functionality.
 ///
@@ -79,6 +80,7 @@ class Profiler {
   void SendToUDP(std::uint8_t* buffer, int buffer_size);
   void SendToFile(std::uint8_t* buffer, int buffer_size);
 
+  friend Scheduler;
   ProfilerImpl* impl_;
   std::FILE* destination_file_;
   // TODO Add UDP connection objects
