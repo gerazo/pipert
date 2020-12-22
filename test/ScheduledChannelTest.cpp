@@ -103,6 +103,6 @@ TEST_F(ScheduledChannelTest, ScheduledChannelCallbackTranslatorTest) {
     ::pipert::PacketToFill<int> packet = channel.Acquire("TestChannel", default_time_, 10);
     // When
     channel.CallbackTranslator(&channel, packet.GetPacket());
-    // Given
+    // Then
     EXPECT_EQ(packet.data(), 11);
 }
