@@ -31,24 +31,24 @@ Profiler::Profiler(const char* destination_uri, int aggregation_time_msec,
     impl_ = new ProfilerImpl(
         std::bind(&Profiler::SendToUDP, this, std::placeholders::_1,
                   std::placeholders::_2),
-        aggregation_time_msec, buffer_size);
+        buffer_size, aggregation_time_msec);
   } else if (strstr(destination_uri, kDestinationFileScheme) ==
              destination_uri) {
     const char* filename = destination_uri + strlen(kDestinationFileScheme);
     assert(strlen(filename) > 0);
-    destination_file_ = fopen(filename, "wb");
+    destination_file_ = std::fopen(filename, "wb");
     assert(destination_file_);
     if (buffer_size == 0) buffer_size = 4096;  // optimal buffer for disk write
     impl_ = new ProfilerImpl(
         std::bind(&Profiler::SendToFile, this, std::placeholders::_1,
                   std::placeholders::_2),
-        aggregation_time_msec, buffer_size);
+        buffer_size, aggregation_time_msec);
   }
 }
 
 Profiler::~Profiler() {
   if (destination_file_) {
-    fclose(destination_file_);
+    std::fclose(destination_file_);
     destination_file_ = nullptr;
   }
   // TODO destroy UDP connection if needed
@@ -92,7 +92,7 @@ void Profiler::SendToUDP(std::uint8_t* /*buffer*/, int /*buffer_size*/) {
 void Profiler::SendToFile(std::uint8_t* buffer, int buffer_size) {
   assert(destination_file_);
   assert(buffer_size > 0);
-  auto written = fwrite(buffer, 1, buffer_size, destination_file_);
+  auto written = std::fwrite(buffer, 1, buffer_size, destination_file_);
   assert((int)written == buffer_size);
   (void)written;
 }
