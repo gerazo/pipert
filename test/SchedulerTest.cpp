@@ -28,7 +28,7 @@ class HumanReverser {
                 p.data().GetAge() <= 37);
     std::string name(p.data().GetName());
     std::reverse(name.begin(), name.end());
-    pc_to_write_->Acquire("OutChannel", p.timestamp() + 10, name, p.data().GetAge());
+    pc_to_write_->Acquire(p.timestamp() + 10, name, p.data().GetAge());
   }
 
  private:
@@ -44,7 +44,7 @@ class HumanPrinter {
     EXPECT_TRUE(p.data().GetAge() >= 28 &&
                 p.data().GetAge() <= 37);
     // std::cout << packet.data().GetName() << std::endl;
-    ch_to_write_->Acquire("Other", p.timestamp() + 5, p.data());
+    ch_to_write_->Acquire(p.timestamp() + 5, p.data());
   }
 
  private:
@@ -129,7 +129,7 @@ TEST(Scheduler, SchedulerPipeLineTest) {
 
   pipert::Timer::Time time = pipert::Timer::time();
   for(int i = 0; i < 10; i++) {
-    pipert::PacketToFill<Human> packet_to_fill = sc1.Acquire("Reverser", time, "Jimi Hendrix", 28 + i);
+    pipert::PacketToFill<Human> packet_to_fill = sc1.Acquire(time, "Jimi Hendrix", 28 + i);
   }
 
   while(pc.GetQueuedBufferLength() != channel_capacity)

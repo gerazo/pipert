@@ -4,6 +4,9 @@
 #include <cassert>
 #include <mutex>
 
+#include "pipert/LogEvent.h"
+#include "pipert/Timer.h"
+
 #include "ProfileData.h"
 #include "SchedulerImpl.h"
 
@@ -44,9 +47,7 @@ ChannelImpl::~ChannelImpl() {
   pool_ = nullptr;
 }
 
-PacketBase* ChannelImpl::Acquire(const char* client_name) {
-  (void)client_name;
-  // TODO: Record acquirer and time in packet
+PacketBase* ChannelImpl::Acquire() {
   PacketBase* packet = nullptr;
   for (int i = 0; !packet && i < 2 && (i == 0 || TryDroppingPacket()); i++) {
     std::lock_guard<AdaptiveSpinLock> lock(free_mutex_);
@@ -60,11 +61,16 @@ PacketBase* ChannelImpl::Acquire(const char* client_name) {
          reinterpret_cast<int8_t*>(packet) < pool_ + packet_size_ * capacity_);
   assert(!packet ||
          (reinterpret_cast<int8_t*>(packet) - pool_) % packet_size_ == 0);
+  if (packet) packet->op_timestamp_ = Timer::time();
   return packet;
 }
 
 void ChannelImpl::Push(PacketBase* packet) {
-  // TODO: Record time in packet
+  Timer::Time t = Timer::time();
+  assert(t - packet->timestamp_ >= 0);  // bad packet timestamp?
+  assert(t - packet->op_timestamp_ >= 0);  // bad operation timestamp?
+  Log(LogEvent<ProfileData::kEventPushed>(t - packet->timestamp_));
+  Log(LogEvent<ProfileData::kEventFillTime>(t - packet->op_timestamp_));
   std::lock_guard<AdaptiveSpinLock> lock(GetQueuedMutex());
   assert((int)queued_packets_.size() < capacity_);
   Timer::Time earliest = queued_packets_.empty() ? Timer::kMaxTime : PeekNext();
@@ -77,13 +83,17 @@ void ChannelImpl::Push(PacketBase* packet) {
   }
 }
 
-PacketBase* ChannelImpl::GetNext() {
+PacketBase* ChannelImpl::GetNext(bool dropping_packet) {
   std::lock_guard<AdaptiveSpinLock> lock(GetQueuedMutex());
-  return !queued_packets_.empty() ? PopNext() : nullptr;
+  return !queued_packets_.empty() ? PopNext(dropping_packet) : nullptr;
 }
 
-void ChannelImpl::Release(PacketBase* packet) {
-  // TODO: Record this time and all data from packet
+void ChannelImpl::Release(PacketBase* packet, bool dropping_packet) {
+  if (!dropping_packet) {
+    Timer::Time t = Timer::time();
+    assert(t - packet->op_timestamp_ >= 0);  // bad operation timestamp?
+    Log(LogEvent<ProfileData::kEventReadTime>(t - packet->op_timestamp_));
+  }
   assert(reinterpret_cast<int8_t*>(packet) >= pool_);
   assert(reinterpret_cast<int8_t*>(packet) < pool_ + packet_size_ * capacity_);
   assert((reinterpret_cast<int8_t*>(packet) - pool_) % packet_size_ == 0);
@@ -98,9 +108,8 @@ Timer::Time ChannelImpl::PeekNext() const {
   return queued_packets_.front()->timestamp();
 }
 
-PacketBase* ChannelImpl::PopNext() {
+PacketBase* ChannelImpl::PopNext(bool dropping_packet) {
   // No locking as it is called from Scheduler or here
-  // TODO: Record time in packet
   assert((int)queued_packets_.size() <= capacity_);
   assert(!queued_packets_.empty());
   PacketBase* earliest = queued_packets_.front();
@@ -111,14 +120,23 @@ PacketBase* ChannelImpl::PopNext() {
     else if (earliest != queued_packets_.front())
       scheduler_->JobsUpdated(this, false);
   }
+  if (!dropping_packet) {
+    // TODO do it outside the lock (called from 2 places)
+    Timer::Time t = Timer::time();
+    earliest->op_timestamp_ = t;
+    assert(t - earliest->timestamp_ >= 0);  // bad packet timestamp?
+    Log(LogEvent<ProfileData::kEventRetrieved>(t - earliest->timestamp_));
+  }
   return earliest;
 }
 
 void ChannelImpl::Execute(PacketBase* packet) {
-  // TODO: Record time
   assert(base_);
   assert(packet);
+  Timer::Time t1 = Timer::time();
   callback_(base_, packet);
+  Timer::Time t2 = Timer::time();
+  Log(LogEvent<ProfileData::kEventExecuteTime>(t2 - t1));
 }
 
 int ChannelImpl::GetFreeBufferLength() {
@@ -157,9 +175,10 @@ AdaptiveSpinLock& ChannelImpl::GetQueuedMutex() {
 
 bool ChannelImpl::TryDroppingPacket() {
   // Dropping earliest policy is executed
-  // TODO: Signal dropped packet correctly with times
-  PacketBase* packet = GetNext();
-  if (packet) Release(packet);
+  // TODO implement other policies
+  PacketBase* packet = GetNext(true);
+  if (packet) Release(packet, true);
+  Log(LogEvent<ProfileData::kEventDroppedPacket>(1.0));
   return packet;
 }
 

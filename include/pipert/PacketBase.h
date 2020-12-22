@@ -5,6 +5,8 @@
 
 namespace pipert {
 
+class ChannelImpl;
+
 /// Template free base of Packet to contain all metadata about the data
 /// being carried.
 ///
@@ -30,6 +32,8 @@ class PacketBase {
 
  private:
   Timer::Time timestamp_;  ///< Time when data was recorded.
+  Timer::Time op_timestamp_;  ///< Time when operation started on data.
+  friend ChannelImpl;
 };
 
 }  // namespace pipert

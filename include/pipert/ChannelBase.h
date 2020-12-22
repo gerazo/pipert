@@ -63,10 +63,8 @@ class ChannelBase {
 
   /// Call into the implementation to ask for a memory location for a packet
   /// that is available for filling.
-  /// \param client_name Name of the _Node_ where data is coming from
-  ///                    (name of the filler object).
   /// \return Pointer to Packet or `nullptr` on no available packets.
-  PacketBase* AcquireBase(const char* client_name);
+  PacketBase* AcquireBase();
 
   /// Call into the implementation of enqueing Packet in the Channel
   /// for processing.

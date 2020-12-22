@@ -55,9 +55,9 @@ ChannelBase::~ChannelBase() {
   }
 }
 
-PacketBase* ChannelBase::AcquireBase(const char* client_name) {
+PacketBase* ChannelBase::AcquireBase() {
   assert(impl_);
-  return impl_->Acquire(client_name);
+  return impl_->Acquire();
 }
 
 void ChannelBase::PushBase(PacketBase* packet) {

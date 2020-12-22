@@ -71,26 +71,30 @@ class ChannelImpl {
 
   /// Acquire a raw packet.
   /// See Channel::Acquire().
-  PacketBase* Acquire(const char* client_name);
+  PacketBase* Acquire();
 
   /// Push a packet to be queued for processing.
   /// See Channel::Push().
   void Push(PacketBase* packet);
 
   /// Get the next packet queued for processing.
+  /// \param dropping_packet Only true if this is called because the
+  ///                        buffer is full.
   /// \return Pointer the Packet or `nullptr` on empty queue.
   /// See PolledChannel::Poll().
-  PacketBase* GetNext();
+  PacketBase* GetNext(bool dropping_packet = false);
 
   /// Release a packet after processing.
   /// See Channel::Release().
-  void Release(PacketBase* packet);
+  void Release(PacketBase* packet, bool dropping_packet = false);
 
   /// Gets timestamp of next packet in job queue.
   Timer::Time PeekNext() const;
 
   /// Gets and removes next packet from job queue.
-  PacketBase* PopNext();
+  /// \param dropping_packet Only true if this is called because the
+  ///                        buffer is full.
+  PacketBase* PopNext(bool dropping_packet = false);
 
   /// Sends the packet for execution.
   void Execute(PacketBase* packet);

@@ -33,6 +33,8 @@ class ProfileData {
   static const char kEventFillTime[];
   /// Time spent between retrieving a Packet and releasing it by the retriever.
   static const char kEventReadTime[];
+  /// Packet was dropped because new arrived and the buffer became full.
+  static const char kEventDroppedPacket[];
 
   /// Maximum length of all names (group and event) that will be serialized.
   static const int kMaxNameLength = 27;

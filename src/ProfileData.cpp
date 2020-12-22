@@ -12,6 +12,7 @@ const char ProfileData::kEventRetrieved[] = "Packet Retrieved";
 const char ProfileData::kEventExecuteTime[] = "Execution Time";
 const char ProfileData::kEventFillTime[] = "Fill Time";
 const char ProfileData::kEventReadTime[] = "Read Time";
+const char ProfileData::kEventDroppedPacket[] = "Packet Dropped";
 
 ProfileData::ProfileData(const char* data_group_name)
     : data_group_name_(data_group_name), sender_logger_(kEventPushed) {
