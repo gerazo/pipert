@@ -1,5 +1,5 @@
-SETLOCAL EnableDelayedExpansion
 @echo OFF
+SETLOCAL EnableDelayedExpansion
 
 set GENERATOR=Ninja
 set NINJAFLAGS=
