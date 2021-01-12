@@ -22,11 +22,12 @@ class MeasurmentBuffer {
 
   // this function will start sending the buffer via UDP connection each
   // timeInterval and clear measuremensListList
+  template <class  T>
   void SendingJobCallBack() {
 
     while (enableSending) {
       if (measuremensListList.size() == BufferSize) {
-        connection.send(measuremensListList);
+        connection.send<T>(measuremensListList);
         measuremensListList.clear();
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(TimeIntervals));
@@ -34,8 +35,9 @@ class MeasurmentBuffer {
   }
 
  public:
+  template <class  T>
   void generateBufferJob() {
-    std::thread t = std::thread(&MeasurmentBuffer::SendingJobCallBack, this);
+    std::thread t = std::thread(&MeasurmentBuffer::SendingJobCallBack<T>, this);
     t.join();
 
   }

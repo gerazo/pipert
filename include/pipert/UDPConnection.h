@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "pipert/MeasurementProfile.h"
+#include "pipert/UserMeasurementProfile.h"
 #include "pipert/MeasurementProfileBase.h"
 #include "pipert/MeasurementEvent.h"
 using namespace std;
@@ -23,11 +24,12 @@ namespace pipert {
 
 class UDPConnection {
  private:
-  string Serialize(MeasurementProfileBase* profileBase) {
+      template <class  T>
+      string Serialize(MeasurementProfileBase* profileBase) {
     if (profileBase->IsOptionalUserProfile) {
 
 
-      return SerializeUserMeasurementProfile(profileBase);
+      return SerializeUserMeasurementProfile<T>(profileBase);
     }
 
       else
@@ -39,15 +41,39 @@ class UDPConnection {
     return "";
   }
 
+  template <class  T>
   string SerializeUserMeasurementProfile(pipert::MeasurementProfileBase* profileBase) {
-    //  MeasurmentProfile profile = (MeasurmentProfile) profileBase;
-    // tese serialization
 
-    //pipert::MeasurementProfile *measurement_profile_= (pipert::MeasurementProfile *)&profileBase;
-    UNUSED(profileBase);
+    pipert::UserMeasurementProfile<T>* measurement_profile_ = (pipert::UserMeasurementProfile<T>*) (profileBase);
     string serializedMessage = "start,1,";
-    //string s =measurement_profile_->MesurementProfileName;
-    serializedMessage.append("end,");
+    serializedMessage.append(measurement_profile_->MesurementProfileName);
+    serializedMessage.append(",");
+    for(pipert::MeasurementEvent e : measurement_profile_->MeasurementsEventsLog){
+      serializedMessage.append("EventStart");
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(e.EventTime));
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(e.ProcessStatus));
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(*e.ThreadID));
+      serializedMessage.append(",");
+      serializedMessage.append(e.ChannelName);
+      serializedMessage.append(",");
+      serializedMessage.append("EventEnd");
+      serializedMessage.append(",");
+
+    }
+    serializedMessage.append("ResultStart,");
+    for(auto elem : measurement_profile_->getResult())
+    {
+
+      serializedMessage.append(elem.first );
+      serializedMessage.append(",");
+      serializedMessage.append(elem.second);
+      serializedMessage.append(",");
+    }
+    serializedMessage.append("ResultStart,");
+    serializedMessage.append("end");
     return serializedMessage;
   }
 
@@ -75,12 +101,13 @@ class UDPConnection {
       serializedMessage.append(",");
 
     }
-    serializedMessage.append("end,");
+    serializedMessage.append("end");
     return serializedMessage;
   }
 
  public:
   UDPConnection() {}
+  template <class  T>
   void send(std::vector<pipert::MeasurementProfileBase*> measurements) {
     UNUSED(measurements);
     int sockfd;
@@ -105,7 +132,7 @@ class UDPConnection {
     // socklen_t len;
     int measurementsSize = measurements.size();
     for (int i = 0; i < measurementsSize; i++) {
-      message = Serialize(measurements.at(i));
+      message = Serialize<T>(measurements.at(i));
       sendto(sockfd, (const char *)message.c_str(), message.length(),
              MSG_CONFIRM, (struct sockaddr *)&servaddr, sizeof(servaddr));
     }

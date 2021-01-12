@@ -8,10 +8,11 @@
 #include "pipert/Timer.h"
 #include "pipert/UserMeasurementProfile.h"
 #include <iostream>
+using namespace std;
 
 namespace pipert {
 template <class T>
-class UserMeasurementProfile : pipert::MeasurementProfileBase {
+class UserMeasurementProfile : public pipert::MeasurementProfileBase {
   typedef std::map<std::string, std::string> (*FuncPtrStringInt)(
       T packet_data_);
 
@@ -20,18 +21,19 @@ class UserMeasurementProfile : pipert::MeasurementProfileBase {
   std::vector<MeasurementEvent> MeasurementsEventsLog;
   std::map<std::string, std::string> userCallBackFunctionResult;
   FuncPtrStringInt MeasurementProcessingFunction;
-  T packet_data_;
+
 
   std::map<std::string, string> getResult() {
-    return MeasurementProcessingFunction(packet_data_);
+    return userCallBackFunctionResult;
   }
 
-  UserMeasurementProfile<T>(T packetData,
-                            FuncPtrStringInt measurementProcessingFunction)
+  UserMeasurementProfile<T>(FuncPtrStringInt measurementProcessingFunction,T data)
       : MeasurementProfileBase(true) {
     MeasurementProcessingFunction = measurementProcessingFunction;
-    packet_data_ = packetData;
+    userCallBackFunctionResult=measurementProcessingFunction(data);
+
   }
+
 };
 } // namespace pipert
 

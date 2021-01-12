@@ -49,7 +49,7 @@ TEST(userProfileTest, HandlingOfRValues) {
 
 
  Human h=packet_.data();
- pipert::UserMeasurementProfile<Human> UMP(h,getHumanNameAndAge);
+ pipert::UserMeasurementProfile<Human> UMP(getHumanNameAndAge,h);
   UMP.MeasurementsEventsLog.push_back(event);
 
   std::map<std::string, std::string> userCallBackFunctionResult = UMP.getResult();
