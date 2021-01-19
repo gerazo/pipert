@@ -11,8 +11,9 @@
 using namespace std;
 
 namespace pipert {
-template <class T>
+template<class T>
 class UserMeasurementProfile : public pipert::MeasurementProfileBase {
+
   typedef std::map<std::string, std::string> (*FuncPtrStringInt)(
       T packet_data_);
 
@@ -26,6 +27,10 @@ class UserMeasurementProfile : public pipert::MeasurementProfileBase {
   std::map<std::string, string> getResult() {
     return userCallBackFunctionResult;
   }
+  std::map<std::string, string> calculate(T data) {
+    return measurementProcessingFunction(data);
+  }
+
 
   UserMeasurementProfile<T>(FuncPtrStringInt measurementProcessingFunction,T data)
       : MeasurementProfileBase(true) {

@@ -7,6 +7,11 @@
 
 namespace pipert {
 
+struct MeasurementType{
+
+
+};
+
 class MeasurmentBuffer {
  private:
   uint16_t BufferSize;
@@ -18,27 +23,87 @@ class MeasurmentBuffer {
  private:
   UDPConnection connection;
 
-  std::vector<MeasurementProfileBase*> measuremensListList;
+  std::vector<std::string> measuremensListList;
 
   // this function will start sending the buffer via UDP connection each
   // timeInterval and clear measuremensListList
-  template <class  T>
   void SendingJobCallBack() {
 
     while (enableSending) {
       if (measuremensListList.size() == BufferSize) {
-        connection.send<T>(measuremensListList);
+        connection.send(measuremensListList);
         measuremensListList.clear();
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(TimeIntervals));
     }
   }
 
+  template <class T>
+  std::string SerializeUserMeasurementProfile(pipert::MeasurementProfileBase* profileBase) {
+
+    pipert::UserMeasurementProfile<T>* measurement_profile_ = (pipert::UserMeasurementProfile<T>*) (profileBase);
+    string serializedMessage = "start,1,";
+    serializedMessage.append(measurement_profile_->MesurementProfileName);
+    serializedMessage.append(",");
+    for(pipert::MeasurementEvent e : measurement_profile_->MeasurementsEventsLog){
+      serializedMessage.append("EventStart");
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(e.EventTime));
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(e.ProcessStatus));
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(*e.ThreadID));
+      serializedMessage.append(",");
+      serializedMessage.append(e.ChannelName);
+      serializedMessage.append(",");
+      serializedMessage.append("EventEnd");
+      serializedMessage.append(",");
+
+    }
+    serializedMessage.append("ResultStart,");
+    for(auto elem : measurement_profile_->getResult())
+    {
+
+      serializedMessage.append(elem.first );
+      serializedMessage.append(",");
+      serializedMessage.append(elem.second);
+      serializedMessage.append(",");
+    }
+    serializedMessage.append("ResultStart,");
+    serializedMessage.append("end");
+    return serializedMessage;
+  }
+
+  string SerializeGeneralMeasurementProfile(
+      pipert::MeasurementProfileBase* profileBase) {
+    pipert::MeasurementProfile* measurement_profile_ = (pipert::MeasurementProfile*) (profileBase);
+    string serializedMessage = "start,0,";
+    serializedMessage.append(measurement_profile_->MesurementProfileName);
+    serializedMessage.append(",");
+    for(pipert::MeasurementEvent e : measurement_profile_->MeasurementsEventsLog){
+      serializedMessage.append("EventStart");
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(e.EventTime));
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(e.ProcessStatus));
+      serializedMessage.append(",");
+      serializedMessage.append(std::to_string(*e.ThreadID));
+      serializedMessage.append(",");
+      serializedMessage.append(e.ChannelName);
+      serializedMessage.append(",");
+      serializedMessage.append("EventEnd");
+      serializedMessage.append(",");
+
+    }
+    serializedMessage.append("end");
+    return serializedMessage;
+  }
  public:
-  template <class  T>
+  
   void generateBufferJob() {
-    std::thread t = std::thread(&MeasurmentBuffer::SendingJobCallBack<T>, this);
+    std::thread t = std::thread(&MeasurmentBuffer::SendingJobCallBack, this);
     t.join();
+
 
   }
 
@@ -53,7 +118,14 @@ class MeasurmentBuffer {
 
   void pushMeasurement(MeasurementProfileBase* profile) {
     if (measuremensListList.size() < BufferSize) {
-      measuremensListList.push_back(profile);
+      measuremensListList.push_back(SerializeGeneralMeasurementProfile(profile));
+    }
+  }
+
+  template <class T>
+  void pushUserMeasurement(MeasurementProfileBase* profile) {
+    if (measuremensListList.size() < BufferSize) {
+      measuremensListList.push_back(SerializeUserMeasurementProfile<T>(profile));
     }
   }
 };

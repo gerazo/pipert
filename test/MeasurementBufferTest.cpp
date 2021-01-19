@@ -41,13 +41,13 @@ TEST(MesurementProfile,DISABLED_SendingMesurement) {
   pipert::MeasurementProfileBase* mesurement1_p_base_= dynamic_cast<pipert::MeasurementProfileBase*> (&mesurement1_p_);
 
 
-  pipert::MeasurmentBuffer buffer(connection,1000,3);
+  pipert::MeasurmentBuffer buffer(connection,10,3);
   buffer.pushMeasurement(mesurement1_p_base_);
   buffer.pushMeasurement(mesurement1_p_base_);
   buffer.pushMeasurement(mesurement1_p_base_);
 
 
-  buffer.generateBufferJob<Human>();
+  buffer.generateBufferJob();
   int i=0;
   int j=i+1;
   EXPECT_EQ(j,1);
@@ -76,36 +76,19 @@ TEST(MesurementProfile, SendingUserMesurement) {
   int threadID=15;
   int* threadidp=&threadID;
   event.ThreadID=threadidp;
-
   auto now = pipert::Timer::time();
   pipert::Packet<Human> packet_(now, "Jimi Hendrix", 28);
-
-
   Human h=packet_.data();
   pipert::UserMeasurementProfile<Human> UMP(getHumanNameAndAge,h);
   UMP.MeasurementsEventsLog.push_back(event);
   UMP.MesurementProfileName="userProfile1";
-
-
-
-
-
-
-
-
-
-
   pipert::MeasurementProfileBase* mesurement1_p_base_= dynamic_cast<pipert::MeasurementProfileBase*> (&UMP);
-
-
   pipert::MeasurmentBuffer buffer(connection,1000,3);
-  buffer.pushMeasurement(mesurement1_p_base_);
-  buffer.pushMeasurement(mesurement1_p_base_);
-  buffer.pushMeasurement(mesurement1_p_base_);
-
-
-  buffer.generateBufferJob<Human>();
-
+  buffer.pushUserMeasurement<Human>(mesurement1_p_base_);
+  buffer.pushUserMeasurement<Human>(mesurement1_p_base_);
+  buffer.pushUserMeasurement<Human>(mesurement1_p_base_);
+  buffer.pushUserMeasurement<Human>(mesurement1_p_base_);
+  buffer.generateBufferJob();
   int i=0;
   int j=i+1;
   EXPECT_EQ(j,1);
