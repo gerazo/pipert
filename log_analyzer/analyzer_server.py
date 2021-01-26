@@ -6,7 +6,6 @@ class AnalyzerServer(object):
         self.__ip = ip
         self.__port = port
         self.__output = ""
-        self.__close = False
 
     def __configure_server(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
