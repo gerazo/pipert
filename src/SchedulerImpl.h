@@ -12,9 +12,12 @@
 #include <vector>
 
 #include "AdaptiveSpinLock.h"
-#include "ChannelImpl.h"
+#include "SteadyHeap.h"
 
 namespace pipert {
+
+class ChannelImpl;
+class ProfilerImpl;
 
 /// (_Part of internal implementation._)
 ///
@@ -25,7 +28,9 @@ class SchedulerImpl {
   /// Constructor.
   ///
   /// \param workers_number See Scheduler::Scheduler().
-  SchedulerImpl(int workers_number);
+  /// \param profiler Profiler instance of the functioning implementation,
+  ///                 or null if there is no logging going on.
+  SchedulerImpl(int workers_number, ProfilerImpl* profiler);
 
   /// Destructor.
   ///
@@ -121,6 +126,7 @@ class SchedulerImpl {
   std::atomic_bool keep_running_;           ///< Tells threads to run or not.
   std::atomic_bool running_;  ///< Tells what state was reached by all threads.
   int workers_number_;        ///< Real number of worker threads.
+  ProfilerImpl* profiler_;  ///< Implementation of the profiler if there is any.
 };
 
 }  // namespace pipert

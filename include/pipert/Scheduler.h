@@ -2,6 +2,7 @@
 #define _SCHEDULER_H_
 
 #include "pipert/PolledChannel.h"
+#include "pipert/Profiler.h"
 #include "pipert/ScheduledChannel.h"
 
 namespace pipert {
@@ -69,7 +70,9 @@ class Scheduler {
   /// \param workers Number of worker threads to be used for scheduling.
   ///                By default or for non-positive numbers, it detects the
   ///                number of CPUs in the system and starts that many threads.
-  Scheduler(int workers = 0);
+  /// \param profiler Profiler object created to send logs to destination.
+  ///                 The default is a null object doing nothing.
+  Scheduler(int workers = 0, Profiler&& profiler = Profiler());
 
   /// Destroys the object.
   ///
@@ -172,6 +175,9 @@ class Scheduler {
   /// Tells the number of worker threads allocated to Scheduler.
   int GetWorkerNumber();
 
+  /// Returns the Profiler of this Scheduler.
+  Profiler& GetProfiler();
+
  private:
   /// Part of internal implementation where a raw channel implementation is
   /// created from generic parameters that cover both types of channels.
@@ -181,6 +187,7 @@ class Scheduler {
 
   /// Pointer to internal implementation where this object calls through to.
   SchedulerImpl* impl_;
+  Profiler profiler_;
 };
 
 template <class T>
