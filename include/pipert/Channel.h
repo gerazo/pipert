@@ -56,8 +56,6 @@ class Channel : public ChannelBase {
   /// See PacketToFill<T>::Push() for forcing early queueing of packets before
   /// the destruction of the PacketStub.
   ///
-  /// \param client_name Name of _Node_, sender object or data source for
-  ///                    identification purposes in logs and monitoring.
   /// \param timestamp The exact time when the PacketToFill was requested to be
   ///                  acquired. See PacketBase::timestamp() for details.
   /// \param args Constructor parameters of type T which will be
@@ -67,7 +65,7 @@ class Channel : public ChannelBase {
   ///         no free space available for a Packet in the buffer.
   ///         The latter case refers to a scaling problem.
   template <class... Args>
-  PacketToFill<T> Acquire(const char* client_name, Timer::Time timestamp,
+  PacketToFill<T> Acquire(Timer::Time timestamp,
                           Args&&... args);
 
   /// Push a filled packet to be queued for processing in this Channel.
@@ -107,9 +105,9 @@ template <class T>
 Channel<T>::Channel(ChannelImpl* impl) : ChannelBase(impl) {}
 
 template <class T> template <class... Args>
-PacketToFill<T> Channel<T>::Acquire(const char* client_name, Timer::Time timestamp,
+PacketToFill<T> Channel<T>::Acquire(Timer::Time timestamp,
                                     Args&&... args) {
-  Packet<T>* new_packet = reinterpret_cast<Packet<T>*>(AcquireBase(client_name));
+  Packet<T>* new_packet = reinterpret_cast<Packet<T>*>(AcquireBase());
   if (new_packet) {
     new(new_packet) Packet<T>(timestamp, std::forward<Args>(args)...);
   }
