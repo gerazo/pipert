@@ -2,6 +2,7 @@
 #include "pipert/Packet.h"
 #include "pipert/Scheduler.h"
 #include "pipert/Timer.h"
+#include "pipert/Profiler.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -82,6 +83,7 @@ class Yolo
     }
   private:
     pipert::PolledChannel<std::vector<cv::Rect>>* pc_to_write_;
+    pipert::Profiler("file:output.txt", 100)* prof;
 };
 
 

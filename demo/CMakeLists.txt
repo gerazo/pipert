@@ -11,12 +11,6 @@ include_directories(../include; ./yolo)
 
 find_package(OpenCV REQUIRED)
 
-add_executable(simple main2.cpp)
-target_link_libraries(simple ${PROJECT_LINK_LIBS})
-
-target_compile_options(simple PRIVATE $<$<CONFIG:Debug>:-fsanitize=address>)
-set_target_properties(simple PROPERTIES LINK_FLAGS_DEBUG "-fsanitize=address")
-
 add_executable(main_yolo main_yolo.cpp)
 target_link_libraries(main_yolo ${PROJECT_LINK_LIBS} ${OpenCV_LIBS})
 
