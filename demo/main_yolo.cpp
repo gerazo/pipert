@@ -77,17 +77,17 @@ class Yolo
       net.forward(outs,getOutputsNames(net));
 
       std::vector<cv::Rect> g_boxes = remove_box(frame, outs, &net);
-      pipert::PacketToFill<std::vector<cv::Rect>> packet_to_fill = pc_to_write_->Acquire("OutChannel", p.timestamp(), g_boxes);
+      pipert::PacketToFill<std::vector<cv::Rect>> packet_to_fill = pc_to_write_->Acquire(p.timestamp(), g_boxes);
       
       packet_to_fill.Push();
     }
   private:
     pipert::PolledChannel<std::vector<cv::Rect>>* pc_to_write_;
-    pipert::Profiler("file:output.txt", 100)* prof;
 };
 
 
 int main(int argc, char** argv){
+  pipert::Profiler profiler("file:emptylog.txt", 100);
 
   pipert::Scheduler sch;
   const int channel_capacity = 10;
@@ -151,7 +151,7 @@ int main(int argc, char** argv){
       }
 
     pipert::Timer::Time time = pipert::Timer::time();
-    pipert::PacketToFill<cv::Mat> packet_to_fill = sc1.Acquire("Yolo", time, frame);
+    pipert::PacketToFill<cv::Mat> packet_to_fill = sc1.Acquire(time, frame);
 
     // packet_to_fill.Push();
 
