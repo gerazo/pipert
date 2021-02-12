@@ -1,4 +1,5 @@
 #include "pipert/Scheduler.h"
+#include "pipert/Profiler.h"
 #include "gtest/gtest.h"
 
 #include <thread>
@@ -109,9 +110,8 @@ TYPED_TEST(SchedulerTest, ScheduledChannelCreationWithTypes) {
 }
 
 TEST(Scheduler, SchedulerPipeLineTest) {
-  pipert::Scheduler sch;
+  pipert::Scheduler sch(0, pipert::Profiler("file:profilerlog.txt"));
   int channel_capacity = 10;
-
   pipert::PolledChannel<Human> pc =
       sch.CreatePolledChannel<Human>("OutChannel", channel_capacity);
 
@@ -135,6 +135,9 @@ TEST(Scheduler, SchedulerPipeLineTest) {
   while(pc.GetQueuedBufferLength() != channel_capacity)
     std::this_thread::yield();
 
+  sch.GetProfiler().GatherNSend();
+  EXPECT_EQ(sch.GetProfiler().GetAggregationTime(), 0);
+  EXPECT_EQ(sch.GetProfiler().GetBufferSize(), 4096);
   sch.Stop();
 
   for(pipert::PacketToProcess<Human> packet_to_process = pc.Poll();
