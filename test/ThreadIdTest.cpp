@@ -21,6 +21,22 @@ void AutoTaggedThread() {
   EXPECT_TRUE(id.IsAutoTagged());
 }
 
+void NamedThread() {
+  EXPECT_TRUE(pipert::ThreadId::IsCurrentThreadUntagged());
+  pipert::ThreadId::TagCurrentThread();
+  EXPECT_FALSE(pipert::ThreadId::IsCurrentThreadUntagged());
+  const char* thread_name = "doing-this";
+  pipert::ThreadId::SetNameOfCurrentThread(thread_name);
+  pipert::ThreadId id = pipert::ThreadId::GetCurrentThread();
+  EXPECT_FALSE(pipert::ThreadId::IsCurrentThreadUntagged());
+  EXPECT_TRUE(id.IsHandTagged());
+  EXPECT_STREQ(id.GetName(), thread_name);
+  const char* thread_name2 = "doing-that";
+  pipert::ThreadId::SetNameOfCurrentThread(thread_name2);
+  id = pipert::ThreadId::GetCurrentThread();
+  EXPECT_STREQ(id.GetName(), thread_name2);
+}
+
 const int thread_num = 4;
 int_least32_t tags[thread_num];
 
@@ -57,6 +73,11 @@ TEST(ThreadIdTest, CreateHandTaggedThread) {
 
 TEST(ThreadIdTest, CreateAutoTaggedThread) {
   std::thread t(AutoTaggedThread);
+  t.join();
+}
+
+TEST(ThreadIdTest, CreateNamedThread) {
+  std::thread t(NamedThread);
   t.join();
 }
 

@@ -36,6 +36,12 @@ class ThreadId {
   ///      It would lead to errors if retagging was possible.
   static void TagCurrentThread();
 
+  /// We can set the current thread to be identified temporarily,
+  /// while it is working on something.
+  /// \pre The current thread needs to be already manually _tagged_.
+  /// \param thread_name Pointer to name to be set (only pointer is stored).
+  static void SetNameOfCurrentThread(const char* thread_name);
+
   /// Returns true if the current thread was not tagged or autotagged before.
   /// See GetCurrentThread() for details on autotagging.
   static bool IsCurrentThreadUntagged();
@@ -53,7 +59,11 @@ class ThreadId {
 
   /// Get ID value for serialization purposes.
   /// \return A value which is at least 32-bits (safe to convert to 32-bit).
-  int_least32_t GetIdForSerialization();
+  int_least32_t GetIdForSerialization() const;
+
+  /// Get the set name of the thread.
+  /// \return Pointer to the name of the thread.
+  const char* GetName() const;
 
  private:
   /// Above this, we have tagged IDs, below we have autotagged ones.
@@ -62,12 +72,16 @@ class ThreadId {
   /// This is the ID of the currently running thread.
   thread_local static int current_thread_id_;
 
+  /// This is the name of the currently running thread which can be changed.
+  thread_local static const char* current_thread_name_;
+
   static std::atomic<int> hand_tag_next_;
   static std::atomic<int> auto_tag_next_;
 
-  ThreadId(int thread_id);
+  ThreadId(int thread_id, const char* thread_name);
 
-  int thread_id_;  ///< ID of a thread which this object represents.
+  int thread_id_;            ///< ID of a thread which this object represents.
+  const char* thread_name_;  ///< The changeable name of the thread.
 };
 
 }  // namespace pipert

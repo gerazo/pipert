@@ -1,6 +1,7 @@
 #ifndef _CHANNELBASE_H_
 #define _CHANNELBASE_H_
 
+#include "pipert/LogEventBase.h"
 #include "pipert/PacketBase.h"
 
 namespace pipert {
@@ -47,6 +48,11 @@ class ChannelBase {
   /// Returns how many packets are standing in the queue of the Channel.
   int GetQueuedBufferLength() const;
 
+  /// Logs an event connected to this Channel.
+  /// \param log_event The user created LogEvent object.
+  /// \note This function is thread-safe.
+  void Log(LogEventBase log_event);
+
  protected:
   /// Construct a ChannelBase using an implementation that must be provided.
   /// Calls to ChannelBase will be delegated to this implementation.
@@ -57,10 +63,8 @@ class ChannelBase {
 
   /// Call into the implementation to ask for a memory location for a packet
   /// that is available for filling.
-  /// \param client_name Name of the _Node_ where data is coming from
-  ///                    (name of the filler object).
   /// \return Pointer to Packet or `nullptr` on no available packets.
-  PacketBase* AcquireBase(const char* client_name);
+  PacketBase* AcquireBase();
 
   /// Call into the implementation of enqueing Packet in the Channel
   /// for processing.
