@@ -43,6 +43,7 @@ void SchedulerImpl::RegisterChannel(ChannelImpl* channel) {
   if (profiler_) {
     ProfileData* data = new ProfileData(channel->GetName());
     channel->SetProfileData(data);
+    profiler_->AddProfileData(data);
   }
 }
 
@@ -52,6 +53,7 @@ void SchedulerImpl::UnregisterChannel(ChannelImpl* channel) {
   assert(it != channels_.end());
   if (profiler_) {
     assert(channel->GetProfileData());
+    profiler_->RemoveProfileData(channel->GetProfileData());
     delete channel->GetProfileData();
     channel->SetProfileData(nullptr);
   }
