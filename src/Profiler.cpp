@@ -29,7 +29,7 @@ Profiler::Profiler(const char* destination_uri, int aggregation_time_msec,
     // TODO Make sure it is handled in destructor and move operations
     if (buffer_size == 0) buffer_size = 508;  // UDP max packet size
     impl_ = new ProfilerImpl(
-        std::bind(&Profiler::SendToUDP, this, std::placeholders::_1,
+        std::bind(&Profiler::SendToUDP, 0, std::placeholders::_1,
                   std::placeholders::_2),
         buffer_size, aggregation_time_msec);
   } else if (strstr(destination_uri, kDestinationFileScheme) ==
@@ -40,8 +40,8 @@ Profiler::Profiler(const char* destination_uri, int aggregation_time_msec,
     assert(destination_file_);
     if (buffer_size == 0) buffer_size = 4096;  // optimal buffer for disk write
     impl_ = new ProfilerImpl(
-        std::bind(&Profiler::SendToFile, this, std::placeholders::_1,
-                  std::placeholders::_2),
+        std::bind(&Profiler::SendToFile, destination_file_,
+                  std::placeholders::_1, std::placeholders::_2),
         buffer_size, aggregation_time_msec);
   }
 }
@@ -85,14 +85,16 @@ void Profiler::Move(Profiler&& o) {
   // TODO Move UDP connection correctly
 }
 
-void Profiler::SendToUDP(std::uint8_t* /*buffer*/, int /*buffer_size*/) {
-  // TODO Send data through UDP
+void Profiler::SendToUDP(int /*socket*/,
+                         std::uint8_t* /*buffer*/, int /*buffer_size*/) {
+  // TODO Send data through void
 }
 
-void Profiler::SendToFile(std::uint8_t* buffer, int buffer_size) {
-  assert(destination_file_);
+void Profiler::SendToFile(std::FILE* destination_file,
+                         std::uint8_t* buffer, int buffer_size) {
+  assert(destination_file);
   assert(buffer_size > 0);
-  auto written = std::fwrite(buffer, 1, buffer_size, destination_file_);
+  auto written = std::fwrite(buffer, 1, buffer_size, destination_file);
   assert((int)written == buffer_size);
   (void)written;
 }
