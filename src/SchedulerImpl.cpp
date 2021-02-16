@@ -9,7 +9,7 @@
 namespace pipert {
 
 SchedulerImpl::SchedulerImpl(int workers_number)
-    : keep_running_(false), running_(false), workers_number_(workers_number) {
+    : keep_running_(false), running_(false), workers_number_(workers_number),measurement_buffer_() {
   assert(workers_number > 0);
   workers_.reserve(workers_number);
 }

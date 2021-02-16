@@ -1,10 +1,13 @@
 #ifndef _MeasurementProfile_H_
 #define _MeasurementProfile_H_
+#include <string>
+#include <vector>
+
+#include "MeasurementEvent.h"
 #include "pipert/MeasurementProfileBase.h"
 #include "pipert/PacketBase.h"
 #include "pipert/Timer.h"
-#include "pipert/MeasurementEvent.h"
-#include "string.h"
+
 namespace pipert {
 
 class MeasurementProfile : public MeasurementProfileBase {

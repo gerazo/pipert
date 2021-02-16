@@ -1,7 +1,9 @@
 #ifndef _MeasurementEvent_H_
 #define _MeasurementEvent_H_
 #include "pipert/PacketBase.h"
-#include "string.h"
+#include "MeasurementProfileBase.h"
+#include<string>
+
 
 namespace pipert {
 

@@ -2,7 +2,11 @@
 #define _PACKET_H_
 
 #include <utility>
+
+#include "UserMeasurementProfile.h"
+#include "pipert/MeasurementProfile.h"
 #include "pipert/PacketBase.h"
+#include "pipert/UserMeasurementProfile.h"
 
 namespace pipert {
 
@@ -59,13 +63,18 @@ class Packet : public PacketBase {
   T& data();
 
  private:
+  MeasurementProfile measurement_profile_;
+  UserMeasurementProfile<T> user_measurement_profile_;
   T data_;  ///< Data stored in this package
+
+
+
 };
 
 template <class T>
 template <class... Args>
 Packet<T>::Packet(Timer::Time timestamp, Args&&... args)
-    : PacketBase(timestamp), data_(std::forward<Args>(args)...) {}
+    : PacketBase(timestamp),measurement_profile_(),user_measurement_profile_(), data_(std::forward<Args>(args)...) {}
 
 template <class T>
 const T& Packet<T>::data() const {
@@ -76,6 +85,10 @@ template <class T>
 T& Packet<T>::data() {
   return data_;
 }
+
+
+
+
 
 }  // namespace pipert
 

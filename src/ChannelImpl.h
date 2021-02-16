@@ -5,6 +5,9 @@
 #include <vector>
 #include "AdaptiveSpinLock.h"
 #include "pipert/ChannelBase.h"
+#include "pipert/MeasurmentBuffer.h"
+#include "pipert/MeasurementProfile.h"
+#include "pipert/UserMeasurementProfile.h"
 
 namespace pipert {
 
@@ -152,6 +155,8 @@ class ChannelImpl {
   int packet_size_;           ///< See GetPacketSize().
   SchedulerImpl* scheduler_;  ///< The connected Scheduler implementation.
   ChannelBase* base_;         ///< See SetBase().
+
+
 };
 
 }  // namespace pipert

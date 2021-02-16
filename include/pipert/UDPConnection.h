@@ -1,3 +1,6 @@
+#ifndef _UDPConnection_H_
+#define _UDPConnection_H_
+
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -65,3 +68,4 @@ class UDPConnection {
 
 }; 
 }  // namespace pipert
+#endif

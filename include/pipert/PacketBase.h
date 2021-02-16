@@ -10,6 +10,7 @@ namespace pipert {
 ///
 /// This is basically a raw Packet without information on the contained data.
 /// See Packet for more detail.
+
 class PacketBase {
  public:
   PacketBase(const PacketBase&) = delete;

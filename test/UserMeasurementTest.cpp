@@ -4,6 +4,7 @@
 #include "pipert/MeasurmentBuffer.h"
 #include "pipert/MeasurementProfile.h"
 #include "pipert/UserMeasurementProfile.h"
+#include "pipert/Packet.h"
 
 #include "string.h"
 #define UNUSED(x) (void)(x)

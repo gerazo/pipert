@@ -1,5 +1,7 @@
 #include "ChannelImpl.h"
 
+#include <pipert/Packet.h>
+
 #include <algorithm>
 #include <cassert>
 #include <mutex>
@@ -44,6 +46,7 @@ ChannelImpl::~ChannelImpl() {
 PacketBase* ChannelImpl::Acquire(const char* client_name) {
   (void)client_name;
   // TODO: Record acquirer and time in packet
+
   PacketBase* packet = nullptr;
   for (int i = 0; !packet && i < 2 && (i == 0 || TryDroppingPacket()); i++) {
     std::lock_guard<AdaptiveSpinLock> lock(free_mutex_);

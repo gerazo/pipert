@@ -12,6 +12,9 @@
 
 #include "AdaptiveSpinLock.h"
 #include "ChannelImpl.h"
+#include "pipert/MeasurmentBuffer.h"
+#include "pipert/UDPConnection.h"
+
 
 namespace pipert {
 
@@ -59,6 +62,42 @@ class SchedulerImpl {
   /// Returns the number of worker threads.
   /// See Scheduler::GetWorkerNumber().
   int GetWorkerNumber() { return workers_number_; }
+
+  ///Retuns Measurement Buffer
+  pipert::MeasurmentBuffer GetMeasurementBuffer(){
+    return measurement_buffer_;
+  }
+
+  ///set MeasurementBuffer
+  void SetMeasurementsBuffer(pipert::MeasurmentBuffer measurment_buffer_to_be_set_){
+    measurement_buffer_=measurment_buffer_to_be_set_;
+    buffer_is_set=true;
+  }
+
+
+
+///Reutun if current MeasurementProfile is running or not
+ bool IsMeasurementProfileBufferRunning(){return !buffering_is_stopped;}
+
+  /// Start measurements buffering
+ void StartMeasurementBuffering() {
+   if (buffer_is_set && buffering_is_stopped) {
+     measurement_buffer_.enableSending = true;
+     measurement_buffer_.generateBufferJob();
+   }
+ }
+
+
+ /// Stop measurements buffering
+ void StopMeasurementBuffering(){
+   if (buffer_is_set && !buffering_is_stopped){
+     measurement_buffer_.enableSending=false;
+     buffering_is_stopped=true;
+   }
+ }
+
+
+
 
   /// Return the Scheduler-level mutex for job queues.
   /// This is also used by all ScheduledChannel objects connected.
@@ -128,6 +167,9 @@ class SchedulerImpl {
   std::atomic_bool keep_running_;           ///< Tells threads to run or not.
   std::atomic_bool running_;  ///< Tells what state was reached by all threads.
   int workers_number_;        ///< Real number of wroker threads.
+  pipert::MeasurmentBuffer measurement_buffer_;  ///< measurements buffer
+  bool buffering_is_stopped; ///<buffering is stopped
+  bool buffer_is_set; ///<buffer is set
 };
 
 template <class T>

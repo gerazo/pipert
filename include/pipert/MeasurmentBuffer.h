@@ -4,6 +4,7 @@
 #include <thread>
 
 #include "pipert/PacketBase.h"
+#include "pipert/UDPConnection.h"
 
 namespace pipert {
 
@@ -21,7 +22,7 @@ class MeasurmentBuffer {
   bool enableSending;
 
  private:
-  UDPConnection connection;
+  pipert::UDPConnection connection;
 
   std::vector<std::string> measuremensListList;
 
@@ -115,6 +116,8 @@ class MeasurmentBuffer {
     measuremensListList = {};
     enableSending = true;
   }
+
+  MeasurmentBuffer(){}
 
   void pushMeasurement(MeasurementProfileBase* profile) {
     if (measuremensListList.size() < BufferSize) {

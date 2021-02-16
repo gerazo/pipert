@@ -12,6 +12,7 @@ class ChannelImpl;
 ///
 /// All operations are done without templates, so the implementation can be
 /// called easily.
+
 class ChannelBase {
  public:
   /// (_Internal implementation_) C-style callback to be able to
