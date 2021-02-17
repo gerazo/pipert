@@ -9,7 +9,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <unistd.h>
-using namespace std;
+#include <cstdint>
+
 
 namespace pipert {
 
@@ -28,7 +29,7 @@ private:
     ///UDP Connection Port number
     std::uint16_t  port_;
     ///UDP Connection address
-    char* ip_address_;
+    char* const ip_address_;
 
 
 
@@ -38,6 +39,10 @@ public:
     /// \param port_ UDP connection port
     /// \param ip_address_ UDP connection ip address
     UDPConnection(std::uint16_t port_,char* ip_address_);
+
+    ///destructor of UDPConnection
+    ~UDPConnection();
+
     /// open UDP connection
     void openCoccection();
     ///send the data throughout UDP connection
