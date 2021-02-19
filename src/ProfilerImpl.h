@@ -6,6 +6,7 @@
 #include <functional>
 #include <thread>
 #include <vector>
+#include "UDPConnection.h"
 
 namespace pipert {
 
@@ -81,6 +82,7 @@ class ProfilerImpl {
   /// is switched off by setting `aggregation_time_msec_` to 0.
   void GatherNSend();
 
+
  private:
   void SleepNWork();
 
@@ -92,6 +94,7 @@ class ProfilerImpl {
   std::uint8_t* buffer_;
   std::vector<ProfileData*> profile_data_;
   std::atomic<int> next_profile_data_;
+  UDPConnection connection_;
 };
 
 }  // namespace pipert
