@@ -5,12 +5,15 @@
 #include <utility>
 
 #include "ProfilerImpl.h"
+#include "UDPConnection.h"
 
 namespace pipert {
 
 const char Profiler::kNoDestination[] = "";
 const char Profiler::kDestinationUDPScheme[] = "udp:";
 const char Profiler::kDestinationFileScheme[] = "file:";
+
+
 
 Profiler::Profiler(const char* destination_uri, int aggregation_time_msec,
                    int buffer_size) {
@@ -21,8 +24,16 @@ Profiler::Profiler(const char* destination_uri, int aggregation_time_msec,
     assert(strlen(address) > 0);
     assert(strstr(address, ":"));
     const char* port = strstr(address, ":") + 1;
+    std::string port_str=std::string(port);
     assert(strlen(port) > 0);
-    (void)port;
+    std::string adress_str_= std::string(address);
+    std::size_t pos_ = adress_str_.find(":");
+    std::string ip_=adress_str_.substr(0,pos_);
+    assert(strlen(ip_.c_str()) > 0);
+    char *ip_char_ = new char[ip_.length() + 1];
+    strcpy(ip_char_, ip_.c_str());
+    connection_=UDPConnection(static_cast<std::uint16_t>(std::stoi(port_str)),ip_char_);
+    delete [] ip_char_;
     // TODO Remove trailing :portnumber from address
     // TODO Convert port to number
     // TODO Init UDP communication here
@@ -83,11 +94,21 @@ void Profiler::Move(Profiler&& o) {
   destination_file_ = o.destination_file_;
   o.destination_file_ = nullptr;
   // TODO Move UDP connection correctly
+  o.connection_=connection_;
 }
 
+<<<<<<< HEAD
 void Profiler::SendToUDP(int /*socket*/,
                          std::uint8_t* /*buffer*/, int /*buffer_size*/) {
   // TODO Send data through void
+=======
+void Profiler::SendToUDP(std::uint8_t* buffer, int buffer_size) {
+  // TODO Send data through UDP
+  assert(buffer_size> 0);
+  connection_.openCoccection();
+  connection_.send(buffer,buffer_size);
+  connection_.closeConnection();
+>>>>>>> origin/master_udpConnection
 }
 
 void Profiler::SendToFile(std::FILE* destination_file,
