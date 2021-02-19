@@ -97,18 +97,13 @@ void Profiler::Move(Profiler&& o) {
   o.connection_=connection_;
 }
 
-<<<<<<< HEAD
 void Profiler::SendToUDP(int /*socket*/,
                          std::uint8_t* /*buffer*/, int /*buffer_size*/) {
   // TODO Send data through void
-=======
-void Profiler::SendToUDP(std::uint8_t* buffer, int buffer_size) {
-  // TODO Send data through UDP
   assert(buffer_size> 0);
   connection_.openCoccection();
   connection_.send(buffer,buffer_size);
   connection_.closeConnection();
->>>>>>> origin/master_udpConnection
 }
 
 void Profiler::SendToFile(std::FILE* destination_file,
