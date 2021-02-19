@@ -44,9 +44,7 @@ TEST(ProfilerTest, CreateForUDP) {
     EXPECT_LE(profiler.GetBufferSize(), 508);
     profiler.GatherNSend();  // data sent
   }
-  // Check receiveed data
-
-  
+  // Check received data
 }
 
 // TODO Tests using Scheduler

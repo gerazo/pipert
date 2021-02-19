@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <cstdio>
-#include "../../src/UDPConnection.h"
 
 namespace pipert {
 
@@ -85,7 +84,6 @@ class Profiler {
   friend Scheduler;
   ProfilerImpl* impl_;
   std::FILE* destination_file_;
-    UDPConnection connection_;
 };
 
 }  // namespace pipert
