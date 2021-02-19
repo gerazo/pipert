@@ -18,10 +18,18 @@ namespace pipert {
         servaddr_.sin_addr.s_addr =inet_addr(ip_address_);
     }
 
-    void UDPConnection::send(std::uint8_t * buffer) {
+    void UDPConnection::send(std::uint8_t * buffer_) {
         if(opened_) {
             ///send the buffer to the UDP connection
-            sendto(sockfd, buffer, sizeof(*buffer) / sizeof(buffer[0]), MSG_CONFIRM,
+            sendto(sockfd, buffer_, sizeof(*buffer_) / sizeof(buffer_[0]), MSG_CONFIRM,
+                   (struct sockaddr *)&servaddr_, sizeof(servaddr_));
+        }
+    }
+
+    void UDPConnection::send(std::uint8_t * buffer_,std::uint8_t size_) {
+        if(opened_) {
+            ///send the buffer to the UDP connection
+            sendto(sockfd, buffer_, size_, MSG_CONFIRM,
                    (struct sockaddr *)&servaddr_, sizeof(servaddr_));
         }
     }

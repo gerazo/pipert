@@ -29,7 +29,7 @@ private:
     ///UDP Connection Port number
     std::uint16_t  port_;
     ///UDP Connection address
-    char* const ip_address_;
+    char*  ip_address_;
 
 
 
@@ -39,6 +39,7 @@ public:
     /// \param port_ UDP connection port
     /// \param ip_address_ UDP connection ip address
     UDPConnection(std::uint16_t port_,char* ip_address_);
+    UDPConnection(){}
 
     ///destructor of UDPConnection
     ~UDPConnection();
@@ -48,9 +49,15 @@ public:
     ///send the data throughout UDP connection
     ///
     /// \param message hold the byte buffer that needs to be sent
-    void send(std::uint8_t* buffer);
+    void send(std::uint8_t* buffer_);
     ///close UDP connection
     void closeConnection();
+
+    //send the data throughout UDP connection
+    ///
+    /// \param message hold the byte buffer that needs to be sent
+    ///\param  size hold the value of the buffer size
+    void send(uint8_t *buffer_, uint8_t size_);
 };
 
 }
