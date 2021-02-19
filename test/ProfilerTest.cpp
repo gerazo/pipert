@@ -36,15 +36,14 @@ TEST(ProfilerTest, CreateForFile) {
 }
 
 TEST(ProfilerTest, CreateForUDP) {
-  // TODO Prepare UDP dummy receiver
   {
-    pipert::Profiler profiler("udp:localhost:8080");
+    pipert::Profiler profiler("udp:127.0.0.1:8888");
     EXPECT_EQ(profiler.GetAggregationTime(), 0);
     EXPECT_GT(profiler.GetBufferSize(), 0);
     EXPECT_LE(profiler.GetBufferSize(), 508);
     profiler.GatherNSend();  // data sent
   }
-  // Check received data
+  // We could check sent data here...
 }
 
 // TODO Tests using Scheduler

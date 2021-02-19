@@ -1,42 +1,44 @@
 #include "UDPConnection.h"
 
+#include <cassert>
+#include <cstdint>
+#include <cstring>
+
+#include <arpa/inet.h>
+#include <sys/types.h>
+#include <unistd.h>
+
 namespace pipert {
 
-    UDPConnection::UDPConnection(std::uint16_t port_, char *ip_address_) :port_(port_),ip_address_(ip_address_){}
-    UDPConnection::~UDPConnection() {}
-    void UDPConnection::openCoccection() {
-        opened_=true;
-        if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0) {
-            perror("socket creation failed");
-            opened_=false;
+UDPConnection::UDPConnection(int port, const char* address) {
+  socket_filedesc_ = socket(AF_INET, SOCK_DGRAM, 0);
+  if (socket_filedesc_ != -1) {
+    memset(&server_address_, 0, sizeof(server_address_));
+    /// Filling server information
+    server_address_.sin_family = AF_INET;
+    server_address_.sin_port = htons((std::uint16_t)port);
+    int ok = inet_aton(address, &server_address_.sin_addr);
+    if (!ok) {
+      assert(ok == 1);  // getting address failed
+      socket_filedesc_ = -1;
+      return;
     }
-        memset(&servaddr_, 0, sizeof(servaddr_));
+  }
+  assert(socket_filedesc_ != -1);  // opening socket failed
+}
 
-        /// Filling server information
-        servaddr_.sin_family = AF_INET;
-        servaddr_.sin_port = htons(port_);
-        servaddr_.sin_addr.s_addr =inet_addr(ip_address_);
-    }
+UDPConnection::~UDPConnection() {
+  if (IsConnected()) {
+    close(socket_filedesc_);
+  }
+}
 
-    void UDPConnection::send(std::uint8_t * buffer_) {
-        if(opened_) {
-            ///send the buffer to the UDP connection
-            sendto(sockfd, buffer_, sizeof(*buffer_) / sizeof(buffer_[0]), MSG_CONFIRM,
-                   (struct sockaddr *)&servaddr_, sizeof(servaddr_));
-        }
-    }
+void UDPConnection::Send(void* buffer, int size) {
+  assert(size > 0 && size <= 508);
+  if (IsConnected()) {
+    sendto(socket_filedesc_, buffer, size, 0,
+           (struct sockaddr*)&server_address_, sizeof(server_address_));
+  }
+}
 
-    void UDPConnection::send(std::uint8_t * buffer_,std::uint8_t size_) {
-        if(opened_) {
-            ///send the buffer to the UDP connection
-            sendto(sockfd, buffer_, size_, MSG_CONFIRM,
-                   (struct sockaddr *)&servaddr_, sizeof(servaddr_));
-        }
-    }
-
-    void UDPConnection::closeConnection() {
-        /// close connection
-        close(sockfd);
-        opened_=false;
-    }
 }  // namespace pipert

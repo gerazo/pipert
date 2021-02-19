@@ -94,7 +94,6 @@ class ProfilerImpl {
   std::uint8_t* buffer_;
   std::vector<ProfileData*> profile_data_;
   std::atomic<int> next_profile_data_;
-  UDPConnection connection_;
 };
 
 }  // namespace pipert
