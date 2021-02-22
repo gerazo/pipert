@@ -1,5 +1,4 @@
 #include "LogAggregate.h"
-#include <stdio.h>
 #include <cassert>
 #include <limits>
 #include <mutex>
