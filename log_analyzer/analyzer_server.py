@@ -1,5 +1,7 @@
 import socket
 
+from packet_decoder import PacketDecoder
+
 
 class AnalyzerServer(object):
     def __init__(self, ip, port):
@@ -15,8 +17,9 @@ class AnalyzerServer(object):
     def __start_server(self):
         s = self.__configure_server()
         while True:
-            data, address = s.recvfrom(1024)
-            self.__output += data.decode()
+            data, address = s.recvfrom(4096)
+            self.__output = data
+            print(PacketDecoder(self.__output).decode_packet(0))
 
     def run(self):
         self.__configure_server()
