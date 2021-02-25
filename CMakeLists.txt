@@ -11,9 +11,9 @@ set(BBTEST_SOURCES LogEventTest.cpp PacketTest.cpp PolledChannelTest.cpp Profile
 
 # Put those tests here which really, desperately need the implementation
 set(WBTEST_SOURCES AdaptiveSpinLockTest.cpp EndiannessTest.cpp LogAggregateTest.cpp ProfileDataTest.cpp ProfilerImplTest.cpp SenderLoggerTest.cpp SteadyHeapTest.cpp ThreadIdTest.cpp UDPConnectionTest.cpp)
+set(MEASUREMENTS_SOURCES profiler_measurements/MeasurementsRunner.cpp)
 
-
-# General settings
+        # General settings
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Using default build type Release as none was specified with -DCMAKE_BUILD_TYPE=<mode>")
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Type of build." FORCE)
@@ -98,6 +98,16 @@ if(Threads_FOUND)
   target_link_libraries(${PROJECT_NAME}_bbtest ${CMAKE_THREAD_LIBS_INIT})
 endif()
 add_test(NAME ${PROJECT_NAME}_bbtest COMMAND ${PROJECT_NAME}_bbtest)
+
+# Target: measurements
+add_executable(${PROJECT_NAME}_measurements ${MEASUREMENTS_SOURCES})
+SetupTarget(${PROJECT_NAME}_measurements)
+target_link_libraries(${PROJECT_NAME}_measurements "src")
+target_link_libraries(${PROJECT_NAME}_measurements  "include")
+if(Threads_FOUND)
+  target_link_libraries(${PROJECT_NAME}_measurements ${CMAKE_THREAD_LIBS_INIT})
+endif()
+
 
 # Target: all tests (whitebox+blackbox) link to static library
 add_executable(${PROJECT_NAME}_wbtest ${REAL_WBTEST_SOURCES})
