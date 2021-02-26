@@ -13,6 +13,9 @@ class Packet(object):
     def get_events(self):
         return self.__events
 
+    def add_events(self, events):
+        self.__events += events
+
     def __str__(self):
         return "Receiver: {}\nSender: {}\nEvents: {}".format(self.get_receiver(), self.get_sender(), self.get_events())
 
