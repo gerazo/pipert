@@ -1,6 +1,7 @@
 import socket
 
-from packet_decoder import PacketDecoder
+import requests
+
 from packets_manager import PacketsManager
 
 
@@ -22,7 +23,7 @@ class AnalyzerServer(object):
             data, address = s.recvfrom(512)
             self.__output = data
             pm.add(data)
-            print(pm.get_packets())
+            requests.post("http://127.0.0.1:5000", json={"name": pm.get_latest_packet().get_receiver()})
 
     def run(self):
         self.__configure_server()
