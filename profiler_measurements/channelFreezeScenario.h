@@ -12,6 +12,7 @@
 
 #include "pipert/Profiler.h"
 #include "pipert/Scheduler.h"
+#include "utils.h"
 
 /// Measurement Title : drop rate
 /// in this measurement we will generate three channels one of them will
