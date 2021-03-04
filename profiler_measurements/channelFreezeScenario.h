@@ -1,11 +1,8 @@
 #ifndef PIPERT_CHANNELFREEZE_SCENARIO_H
 #define PIPERT_CHANNELFREEZE_SCENARIO_H
-#include <fcntl.h>
-#include <termio.h>
-#include <unistd.h>
 
-#include <algorithm>
-#include <iostream>
+
+
 #include <string>
 #include <thread>
 #include <math.h>

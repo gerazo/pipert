@@ -1,11 +1,27 @@
+#include "utils.h"
+#include "channelFreezeScenario.h"
 #include "longDelayChannelScenario.h"
-namespace measurements {
+#include "highDroppingRateScenario.h"
 
-int main() {
-  longDelayChannelScenario long_delay_scenario;
-  // press any key while running to stop streaming
-  long_delay_scenario.run("UDP:127.0.0.1:888");
 
-  return 0;
+void generateChannelFreezeScenario( ){
+    /// press any key to abort
+    measurements::channelFreezeScenario channel_freeze_scenario_;
+    channel_freeze_scenario_.run("udp:127.0.0.1:8888");
 }
-}  // namespace measurements
+
+void generateLongDelayScenario( ){
+    /// press any key to abort
+    measurements::longDelayChannelScenario long_delay_scenario_;
+    long_delay_scenario_.run("udp:127.0.0.1:8888");
+}
+
+void generateDroppingRateScenario( ){
+    /// press any key to abort
+    measurements::droppingRateScenario dropping_rate_scenatios ;
+    dropping_rate_scenatios.run("udp:127.0.0.1:8888");
+}
+
+int main(){
+    generateDroppingRateScenario();
+}

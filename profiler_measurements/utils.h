@@ -1,9 +1,16 @@
+
 #ifndef TESTLIBRARY_UTILS_H
 #define TESTLIBRARY_UTILS_H
 
-///measurements scenario generation shared utils
-namespace measurements {
+#include <termios.h>
+#include <termio.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <algorithm>
+#include <iostream>
 
+namespace measurements {
+    ///keyboard hit generated
     int kbhit(void) {
         struct termios oldt, newt;
         int ch;
