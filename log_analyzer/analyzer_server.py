@@ -23,7 +23,7 @@ class AnalyzerServer(object):
             data, address = s.recvfrom(512)
             self.__output = data
             pm.add(data)
-            requests.post("http://127.0.0.1:5000", json={"name": pm.get_latest_packet().get_receiver()})
+            requests.post("http://127.0.0.1:5000", json=pm.get_latest_packet().get_dict())
 
     def run(self):
         self.__configure_server()

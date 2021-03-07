@@ -17,9 +17,12 @@ def index():
 def get_packet():
     packet = request.json
     print(packet)
-    socketio.emit("packet_name", packet, json=True)
+    socketio.emit("packet", packet, json=True)
     return jsonify({"ok": True})
 
+
+def run():
+    socketio.run(app)
 
 # @socketio.on('message')
 # def receive_message(message):

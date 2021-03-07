@@ -1,3 +1,35 @@
+var channels = []
+
+function does_exist(channel_name){
+    const channel = channels.find(channel => channel.name == channel_name)
+    if (channel === undefined){
+        return false
+    }
+
+    return true
+}
+
+function parse_channel(packet){
+    if (!(does_exist(packet.receiver_channel))){
+        var channel_1 = {
+            "name": packet.receiver_channel,
+            "events": packet.events
+        };
+
+        channels.push(channel_1);
+    }
+
+   if (!(does_exist(packet.sender_channel))){
+        var channel_1 = {
+            "name": packet.sender_channel,
+            "events": []
+        };
+
+        channels.push(channel_1);
+    }
+
+}
+
 $(document).ready(function(){
 
     var socket = io.connect('http://' + document.domain + ':' + location.port);
@@ -12,7 +44,18 @@ $(document).ready(function(){
 //        alert(msg)
 //    })
 
-    socket.on('packet_name', function(packet){
-        alert(packet.name)
+    socket.on('packet', function(packet){
+        parse_channel(packet);
+        $(".channels-container").empty();
+        $.each(channels, function(i, channel){
+            $(".channels-container").append("<h1>"+channel.name+"</h1");
+        });
+//        console.log(packet);
+//        $("body").append("<h1>Packet:-<h1>");
+//        $("body").append("<h2>"+packet.receiver_channel+"<h2>");
+//        $("body").append("<h2>"+packet.sender_channel+"<h2>");
+//        $.each(packet.events, function(i, event){
+//            $("body").append("<h3>"+event.type   +"<h3>");
+//        });
     });
 });
