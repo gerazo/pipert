@@ -7,7 +7,7 @@ from packet import Packet
 
 class PacketDecoder(object):
     def __init__(self, packet):
-        print(packet)
+      #  print(packet)
         self.__packet = [bytes([b]) for b in packet]
 
     # def decode_packets(self):
@@ -27,7 +27,7 @@ class PacketDecoder(object):
             while not self.__check_for_correct_packet(self.__packet[pos:pos+4]) and pos < len(self.__packet):
                 event, pos = self.__get_event(pos)
                 events.append(event)
-            print(pos, len(self.__packet))
+         #   print(pos, len(self.__packet))
             return Packet(receiver_channel_name, sender_channel_name, events), pos
         else:
             raise ValueError
