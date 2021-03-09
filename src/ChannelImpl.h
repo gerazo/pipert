@@ -105,9 +105,6 @@ class ChannelImpl {
   /// See ChannelBase::GetQueuedBufferLength()
   int GetQueuedBufferLength();
 
-  /// See ChannelBase::GetDroppedPacketsNumber()
-  int GetDroppedPacketsNumber();
-
   /// Sets the public interface objects.
   /// It allows the interface to be moved.
   void SetBase(ChannelBase* base);

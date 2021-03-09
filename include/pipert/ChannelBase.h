@@ -48,9 +48,6 @@ class ChannelBase {
   /// Returns how many packets are standing in the queue of the Channel.
   int GetQueuedBufferLength() const;
 
-  /// Returns how many packets have been already dropped in the Channel.
-  int GetDroppedPacketsNumber() const;
-
   /// Logs an event connected to this Channel.
   /// \param log_event The user created LogEvent object.
   /// \note This function is thread-safe.

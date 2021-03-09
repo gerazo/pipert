@@ -37,9 +37,6 @@ int ChannelBase::GetFreeBufferLength() const {
 int ChannelBase::GetQueuedBufferLength() const {
   return impl_->GetQueuedBufferLength();
 }
-int ChannelBase::GetDroppedPacketsNumber() const {
-  return impl_->GetDroppedPacketsNumber();
-}
 
 void ChannelBase::Log(LogEventBase log_event) {
   impl_->Log(log_event);

@@ -22,7 +22,6 @@ ChannelImpl::ChannelImpl(const char* name, int capacity, int packet_size,
       name_(name),
       capacity_(capacity),
       packet_size_(packet_size),
-      dropped_packets_number_(0),
       scheduler_(scheduler),
       base_(nullptr),
       profile_data_(nullptr) {
@@ -148,10 +147,6 @@ int ChannelImpl::GetFreeBufferLength() {
 int ChannelImpl::GetQueuedBufferLength() {
   std::lock_guard<AdaptiveSpinLock> lock(GetQueuedMutex());
   return queued_packets_.size();
-}
-
-int ChannelImpl::GetDroppedPacketsNumber() {
-  return dropped_packets_number_.load();
 }
 
 bool ChannelImpl::PacketOrdering::operator()(const PacketBase* a, const PacketBase* b) {
