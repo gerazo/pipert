@@ -53,7 +53,7 @@ class HumanPrinter {
 };
 }  // namespace
 
-TEST(Scheduler, SchedulerProfilerPipeLineTest) {
+TEST(Scheduler, SchedulerProfilerPipeLineWithFileTest) {
   pipert::Scheduler sch(0, pipert::Profiler("file:profilerlog.txt"));
   int channel_capacity = 10;
   pipert::PolledChannel<Human> pc =
@@ -83,6 +83,47 @@ TEST(Scheduler, SchedulerProfilerPipeLineTest) {
   EXPECT_EQ(sch.GetProfiler().GetAggregationTime(), 0);
   EXPECT_EQ(sch.GetProfiler().GetBufferSize(), 4096);
   EXPECT_EQ(std::remove("profilerlog.txt"), 0);
+  sch.Stop();
+
+  for(pipert::PacketToProcess<Human> packet_to_process = pc.Poll();
+      !packet_to_process.IsEmpty();
+      packet_to_process = pc.Poll()) {
+    EXPECT_EQ(packet_to_process.data().GetName(), "xirdneH imiJ");
+    EXPECT_TRUE(packet_to_process.data().GetAge() >= 28 &&
+                packet_to_process.data().GetAge() <= 37);
+    EXPECT_EQ(packet_to_process.timestamp(), time + 15);
+  }
+}
+
+TEST(Scheduler, SchedulerProfilerPipeLineWithUDPTest) {
+  pipert::Scheduler sch(0, pipert::Profiler("udp:127.0.0.1:8000"));
+  int channel_capacity = 10;
+  pipert::PolledChannel<Human> pc =
+      sch.CreatePolledChannel<Human>("OutChannel", channel_capacity);
+
+  HumanReverser hr(&pc);
+  pipert::ScheduledChannel<Human> sc2 =
+      sch.CreateScheduledChannel<Human>("ReverserChannel", channel_capacity, nullptr,
+                                        std::bind(&HumanReverser::ReverseName, &hr, std::placeholders::_1));
+
+  HumanPrinter hp(&sc2);
+  pipert::ScheduledChannel<Human> sc1 =
+      sch.CreateScheduledChannel<Human>("PrinterChannel", channel_capacity, nullptr,
+                                        std::bind(&HumanPrinter::PrintName, &hp, std::placeholders::_1));
+
+  sch.Start();
+
+  pipert::Timer::Time time = pipert::Timer::time();
+  for(int i = 0; i < 10; i++) {
+    pipert::PacketToFill<Human> packet_to_fill = sc1.Acquire(time, "Jimi Hendrix", 28 + i);
+  }
+
+  while(pc.GetQueuedBufferLength() != channel_capacity)
+    std::this_thread::yield();
+
+  sch.GetProfiler().GatherNSend();
+  EXPECT_EQ(sch.GetProfiler().GetAggregationTime(), 0);
+  // EXPECT_EQ(sch.GetProfiler().GetBufferSize(), 4096);
   sch.Stop();
 
   for(pipert::PacketToProcess<Human> packet_to_process = pc.Poll();

@@ -6,6 +6,7 @@
 #include <functional>
 #include <thread>
 #include <vector>
+#include "UDPConnection.h"
 
 namespace pipert {
 
@@ -80,6 +81,7 @@ class ProfilerImpl {
   /// Calling this manually makes sense when automatic background aggregation
   /// is switched off by setting `aggregation_time_msec_` to 0.
   void GatherNSend();
+
 
  private:
   void SleepNWork();
