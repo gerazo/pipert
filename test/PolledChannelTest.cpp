@@ -38,7 +38,7 @@ TEST_F(PolledChannelTest, PolledChannelAcquireTest) {
   EXPECT_EQ(polled_channel.GetQueuedBufferLength(), 0);
   int value = 42;
   ::pipert::PacketToFill<int> packet =
-      polled_channel.Acquire("TestChannel", default_time_, value);
+      polled_channel.Acquire(default_time_, value);
   EXPECT_EQ(polled_channel.GetFreeBufferLength(), channel_capacity - 1);
   EXPECT_EQ(polled_channel.GetQueuedBufferLength(), 0);
   EXPECT_EQ(packet.data(), value);
@@ -50,7 +50,7 @@ TEST_F(PolledChannelTest, PolledChannelPushPacketToFillTest) {
   ::pipert::PolledChannel<int> polled_channel =
       scheduler_.CreatePolledChannel<int>("TestChannel", channel_capacity);
   ::pipert::PacketToFill<int> packet_to_fill =
-      polled_channel.Acquire("TestChannel", default_time_, 42);
+      polled_channel.Acquire(default_time_, 42);
   EXPECT_EQ(polled_channel.GetFreeBufferLength(), channel_capacity - 1);
   EXPECT_EQ(polled_channel.GetQueuedBufferLength(), 0);
   packet_to_fill.Push();
@@ -65,7 +65,7 @@ TEST_F(PolledChannelTest, PolledChannelAutoPushPacketToFillTest) {
       scheduler_.CreatePolledChannel<int>("TestChannel", channel_capacity);
   {
     ::pipert::PacketToFill<int> packet_to_fill =
-        polled_channel.Acquire("TestChannel", default_time_, 42);
+        polled_channel.Acquire(default_time_, 42);
     EXPECT_EQ(polled_channel.GetFreeBufferLength(), channel_capacity - 1);
     EXPECT_EQ(polled_channel.GetQueuedBufferLength(), 0);
   }
@@ -88,7 +88,7 @@ TEST_F(PolledChannelTest, PolledChannelPollPacketToProcessTest) {
   ::pipert::PolledChannel<int> polled_channel =
       scheduler_.CreatePolledChannel<int>("TestChannel", channel_capacity);
   ::pipert::PacketToFill<int> packet_to_fill =
-      polled_channel.Acquire("TestChannel", default_time_, 42);
+      polled_channel.Acquire(default_time_, 42);
   packet_to_fill.Push();
   EXPECT_EQ(polled_channel.GetFreeBufferLength(), channel_capacity - 1);
   EXPECT_EQ(polled_channel.GetQueuedBufferLength(), 1);
@@ -104,7 +104,7 @@ TEST_F(PolledChannelTest, PolledChannelPollPacketToProcessWithReleaseTest) {
   ::pipert::PolledChannel<int> polled_channel =
       scheduler_.CreatePolledChannel<int>("TestChannel", channel_capacity);
   ::pipert::PacketToFill<int> packet_to_fill =
-      polled_channel.Acquire("TestChannel", default_time_, 42);
+      polled_channel.Acquire(default_time_, 42);
   packet_to_fill.Push();
   ::pipert::PacketToProcess<int> packet_to_process = polled_channel.Poll();
   EXPECT_EQ(polled_channel.GetFreeBufferLength(), channel_capacity - 1);
@@ -120,7 +120,7 @@ TEST_F(PolledChannelTest, PolledChannelPollPacketToProcessWithAutoReleaseTest) {
   ::pipert::PolledChannel<int> polled_channel =
       scheduler_.CreatePolledChannel<int>("TestChannel", channel_capacity);
   ::pipert::PacketToFill<int> packet_to_fill =
-      polled_channel.Acquire("TestChannel", default_time_, 42);
+      polled_channel.Acquire(default_time_, 42);
   packet_to_fill.Push();
   {
     ::pipert::PacketToProcess<int> packet_to_process = polled_channel.Poll();
@@ -136,9 +136,9 @@ TEST_F(PolledChannelTest, PolledChannelDropPacketAfterPushTest) {
   ::pipert::PolledChannel<int> polled_channel =
       scheduler_.CreatePolledChannel<int>("TestChannel", channel_capacity);
   ::pipert::PacketToFill<int> packet_to_fill =
-      polled_channel.Acquire("TestChannel", old_time_, 32);
+      polled_channel.Acquire(old_time_, 32);
   packet_to_fill.Push();
-  packet_to_fill = polled_channel.Acquire("TestChannel", new_time_, 42);
+  packet_to_fill = polled_channel.Acquire(new_time_, 42);
   packet_to_fill.Push();
   ::pipert::PacketToProcess<int> packet_to_process = polled_channel.Poll();
   EXPECT_EQ(polled_channel.GetDroppedPacketsNumber(), 1);
@@ -156,9 +156,9 @@ TEST_F(PolledChannelTest, PolledChannelDropPacketBeforePushTest) {
   ::pipert::PolledChannel<int> polled_channel =
       scheduler_.CreatePolledChannel<int>("TestChannel", channel_capacity);
   ::pipert::PacketToFill<int> packet_to_fill_old =
-      polled_channel.Acquire("TestChannel", old_time_, 32);
+      polled_channel.Acquire(old_time_, 32);
   ::pipert::PacketToFill<int> packet_to_fill_new =
-      polled_channel.Acquire("TestChannel", new_time_, 42);
+      polled_channel.Acquire(new_time_, 42);
   EXPECT_TRUE(packet_to_fill_new.IsEmpty());
   EXPECT_EQ(polled_channel.GetDroppedPacketsNumber(), 0);
   packet_to_fill_old.Push();

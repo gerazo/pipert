@@ -41,6 +41,10 @@ int ChannelBase::GetDroppedPacketsNumber() const {
   return impl_->GetDroppedPacketsNumber();
 }
 
+void ChannelBase::Log(LogEventBase log_event) {
+  impl_->Log(log_event);
+}
+
 ChannelBase::ChannelBase(ChannelImpl* impl)
   : impl_(impl) {
   assert(impl);
@@ -54,9 +58,9 @@ ChannelBase::~ChannelBase() {
   }
 }
 
-PacketBase* ChannelBase::AcquireBase(const char* client_name) {
+PacketBase* ChannelBase::AcquireBase() {
   assert(impl_);
-  return impl_->Acquire(client_name);
+  return impl_->Acquire();
 }
 
 void ChannelBase::PushBase(PacketBase* packet) {

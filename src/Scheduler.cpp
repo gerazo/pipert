@@ -2,15 +2,20 @@
 
 #include <cassert>
 #include <thread>
+#include <utility>
+
 #include "ChannelImpl.h"
 #include "SchedulerImpl.h"
 #include "pipert/PacketStub.h"
 
 namespace pipert {
 
-Scheduler::Scheduler(int workers)
-    : impl_(new SchedulerImpl(workers <= 0 ? std::thread::hardware_concurrency()
-                                           : workers)) {}
+Scheduler::Scheduler(int workers, Profiler&& profiler)
+    : profiler_(std::move(profiler)) {
+  impl_ = new SchedulerImpl(
+      workers <= 0 ? std::thread::hardware_concurrency() : workers,
+      profiler_.impl_);
+}
 
 Scheduler::~Scheduler() {
   assert(impl_);
@@ -36,6 +41,10 @@ bool Scheduler::IsRunning() {
 int Scheduler::GetWorkerNumber() {
   assert(impl_);
   return impl_->GetWorkerNumber();
+}
+
+Profiler& Scheduler::GetProfiler() {
+  return profiler_;
 }
 
 ChannelImpl* Scheduler::CreateChannelImpl(

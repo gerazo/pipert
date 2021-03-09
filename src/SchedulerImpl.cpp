@@ -5,14 +5,18 @@
 #include <mutex>
 
 #include "ChannelImpl.h"
+#include "ProfileData.h"
+#include "ProfilerImpl.h"
+#include "ThreadId.h"
 
 namespace pipert {
 
-SchedulerImpl::SchedulerImpl(int workers_number)
+SchedulerImpl::SchedulerImpl(int workers_number, ProfilerImpl* profiler)
     : state_queue_(StateOrdering(&state2channel_queues_)),
       keep_running_(false),
       running_(false),
-      workers_number_(workers_number) {
+      workers_number_(workers_number),
+      profiler_(profiler) {
   assert(workers_number > 0);
   workers_.reserve(workers_number);
 }
@@ -36,12 +40,23 @@ void SchedulerImpl::RegisterChannel(ChannelImpl* channel) {
     state_queue_.reserve(state_queue_.capacity() + 1);
     state2channel_queues_[state].heap.reserve(1);
   }
+  if (profiler_) {
+    ProfileData* data = new ProfileData(channel->GetName());
+    channel->SetProfileData(data);
+    profiler_->AddProfileData(data);
+  }
 }
 
 void SchedulerImpl::UnregisterChannel(ChannelImpl* channel) {
   assert(!running_.load(std::memory_order_acquire));
   auto it = std::find(channels_.begin(), channels_.end(), channel);
   assert(it != channels_.end());
+  if (profiler_) {
+    assert(channel->GetProfileData());
+    profiler_->RemoveProfileData(channel->GetProfileData());
+    delete channel->GetProfileData();
+    channel->SetProfileData(nullptr);
+  }
   *it = channels_.back();
   channels_.pop_back();
 }
@@ -56,6 +71,7 @@ void SchedulerImpl::Start() {
   while (i-- > 0) {
     workers_.emplace_back(&SchedulerImpl::RunTasks, this);
   }
+  if (profiler_) profiler_->Start();
 }
 
 void SchedulerImpl::Stop() {
@@ -72,6 +88,7 @@ void SchedulerImpl::Stop() {
   }
   running_.store(false, std::memory_order_release);
   workers_.clear();
+  if (profiler_) profiler_->Stop();
 }
 
 void SchedulerImpl::JobsArrived(ChannelImpl* channel) {
@@ -148,6 +165,7 @@ bool SchedulerImpl::StateOrdering::operator()(void* a, void* b) {
 }
 
 void SchedulerImpl::RunTasks() {
+  ThreadId::TagCurrentThread();
   while (keep_running_.load(std::memory_order_acquire)) {
     void* state = nullptr;
     ChannelImpl* channel = nullptr;
@@ -178,6 +196,7 @@ void SchedulerImpl::RunTasks() {
     }
     if (packet) {
       assert(channel);
+      ThreadId::SetNameOfCurrentThread(channel->GetName());
       channel->Execute(packet);
       if (state != nullptr) {
         // set stateful channels for this state to enabled again

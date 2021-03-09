@@ -10,6 +10,7 @@
 
 namespace pipert {
 
+class ProfileData;
 class SchedulerImpl;
 
 /// (_Part of internal implementation._)
@@ -70,26 +71,30 @@ class ChannelImpl {
 
   /// Acquire a raw packet.
   /// See Channel::Acquire().
-  PacketBase* Acquire(const char* client_name);
+  PacketBase* Acquire();
 
   /// Push a packet to be queued for processing.
   /// See Channel::Push().
   void Push(PacketBase* packet);
 
   /// Get the next packet queued for processing.
+  /// \param dropping_packet Only true if this is called because the
+  ///                        buffer is full.
   /// \return Pointer the Packet or `nullptr` on empty queue.
   /// See PolledChannel::Poll().
-  PacketBase* GetNext();
+  PacketBase* GetNext(bool dropping_packet = false);
 
   /// Release a packet after processing.
   /// See Channel::Release().
-  void Release(PacketBase* packet);
+  void Release(PacketBase* packet, bool dropping_packet = false);
 
   /// Gets timestamp of next packet in job queue.
   Timer::Time PeekNext() const;
 
   /// Gets and removes next packet from job queue.
-  PacketBase* PopNext();
+  /// \param dropping_packet Only true if this is called because the
+  ///                        buffer is full.
+  PacketBase* PopNext(bool dropping_packet = false);
 
   /// Sends the packet for execution.
   void Execute(PacketBase* packet);
@@ -106,6 +111,15 @@ class ChannelImpl {
   /// Sets the public interface objects.
   /// It allows the interface to be moved.
   void SetBase(ChannelBase* base);
+
+  /// See ChannelBase::Log().
+  void Log(LogEventBase log_event);
+
+  /// Set ProfileData for this Channel.
+  void SetProfileData(ProfileData* profile_data);
+
+  /// Get ProfileData for this Channel.
+  ProfileData* GetProfileData();
 
  private:
   /// Ordering between packets based on timestamp.
@@ -154,12 +168,12 @@ class ChannelImpl {
              std::function<bool(const PacketBase*, const PacketBase*)>>
       queued_packets_;
 
-  const char* name_;          ///< See GetName().
-  int capacity_;              ///< See GetCapacity().
-  int packet_size_;           ///< See GetPacketSize().
-  std::atomic_int dropped_packets_number_; ///< See GetDroppedPacketsNumber().
-  SchedulerImpl* scheduler_;  ///< The connected Scheduler implementation.
-  ChannelBase* base_;         ///< See SetBase().
+  const char* name_;           ///< See GetName().
+  int capacity_;               ///< See GetCapacity().
+  int packet_size_;            ///< See GetPacketSize().
+  SchedulerImpl* scheduler_;   ///< The connected Scheduler implementation.
+  ChannelBase* base_;          ///< See SetBase().
+  ProfileData* profile_data_;  ///< ProfileData connected to this channel.
 };
 
 }  // namespace pipert

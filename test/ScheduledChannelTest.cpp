@@ -61,7 +61,7 @@ TEST_F(ScheduledChannelTest, ScheduledChannelAcquireTest) {
     const int value = 42;
     ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
     // When
-    ::pipert::PacketToFill<int> packet = channel.Acquire("DataSupplier", default_time_, value);
+    ::pipert::PacketToFill<int> packet = channel.Acquire(default_time_, value);
     // Then
     EXPECT_EQ(channel.GetFreeBufferLength(), 1);
     EXPECT_EQ(channel.GetQueuedBufferLength(), 0);
@@ -73,7 +73,7 @@ TEST_F(ScheduledChannelTest, ScheduledChannelPushPacketToFillTest) {
     // Given
     const int value = 42;
     ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
-    ::pipert::PacketToFill<int> packet_to_fill = channel.Acquire("TestChannel", default_time_, value);
+    ::pipert::PacketToFill<int> packet_to_fill = channel.Acquire(default_time_, value);
     // When
     packet_to_fill.Push(); 
     // Then
@@ -88,7 +88,7 @@ TEST_F(ScheduledChannelTest, ScheduledChannelAutoPushPacketToFillTest) {
     ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
     // When
     {
-        ::pipert::PacketToFill<int> packet_to_fill = channel.Acquire("TestChannel", default_time_, 42);
+        ::pipert::PacketToFill<int> packet_to_fill = channel.Acquire(default_time_, 42);
         EXPECT_EQ(channel.GetFreeBufferLength(), channel_capacity - 1);
         EXPECT_EQ(channel.GetQueuedBufferLength(), 0);
     }
@@ -100,7 +100,7 @@ TEST_F(ScheduledChannelTest, ScheduledChannelAutoPushPacketToFillTest) {
 TEST_F(ScheduledChannelTest, ScheduledChannelCallbackTranslatorTest) {
     // Given
     ::pipert::ScheduledChannel<int> channel = scheduler_.CreateScheduledChannel<int>("TestChannel", 2, nullptr, std::bind(&PacketDateSetter::Set, &pds_, std::placeholders::_1));
-    ::pipert::PacketToFill<int> packet = channel.Acquire("TestChannel", default_time_, 10);
+    ::pipert::PacketToFill<int> packet = channel.Acquire(default_time_, 10);
     // When
     channel.CallbackTranslator(&channel, packet.GetPacket());
     // Then
