@@ -105,7 +105,8 @@ TEST(StateScheduling, SchedulingDropCheckTest) {
   Merger incrementor;
   char file_URI[L_tmpnam + 8] = "file:";
   char* temp_file = file_URI + strlen(file_URI);
-  std::tmpnam(temp_file);
+  char* tmpret = std::tmpnam(temp_file);
+  ASSERT_EQ(tmpret, temp_file);
   {
     ::pipert::Scheduler sch(4, ::pipert::Profiler(file_URI));
     ::pipert::ScheduledChannel<int> incChannel =
@@ -140,7 +141,8 @@ TEST(StateScheduling, MergeSchedulingTest) {
   Merger merger;
   char file_URI[L_tmpnam + 8] = "file:";
   char* temp_file = file_URI + strlen(file_URI);
-  std::tmpnam(temp_file);
+  char* tmpret = std::tmpnam(temp_file);
+  ASSERT_EQ(tmpret, temp_file);
   {
     ::pipert::Scheduler sch(4, ::pipert::Profiler(file_URI));
     ::pipert::ScheduledChannel<int> incChannel =
