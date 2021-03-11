@@ -6,6 +6,7 @@
 #include <functional>
 #include <thread>
 #include <vector>
+#include "UDPConnection.h"
 
 namespace pipert {
 
