@@ -2,6 +2,7 @@
 #define _PACKET_H_
 
 #include <utility>
+#include <type_traits>
 #include "pipert/PacketBase.h"
 
 namespace pipert {
@@ -65,7 +66,9 @@ class Packet : public PacketBase {
 template <class T>
 template <class... Args>
 Packet<T>::Packet(Timer::Time timestamp, Args&&... args)
-    : PacketBase(timestamp), data_(std::forward<Args>(args)...) {}
+    : PacketBase(timestamp), data_(std::forward<Args>(args)...) {
+  static_assert(std::is_standard_layout<T>::value, "Packet has to provide standard layout");
+}
 
 template <class T>
 const T& Packet<T>::data() const {
