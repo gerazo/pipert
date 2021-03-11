@@ -3,11 +3,14 @@
 
 #include "pipert/PolledChannel.h"
 #include "pipert/Profiler.h"
+#include "pipert/ReceiverChannel.h"
 #include "pipert/ScheduledChannel.h"
+#include "pipert/SenderChannel.h"
 
 namespace pipert {
 
 class SchedulerImpl;
+class UDPConnection;
 
 /// A Scheduler is the main object of a pipeline that owns all Channel objects
 /// and is responsible for the scheduling of processing tasks.
@@ -101,6 +104,10 @@ class Scheduler {
   template <class T>
   PolledChannel<T> CreatePolledChannel(const char* name, int capacity);
 
+  template <class T>
+  ReceiverChannel<T> CreateReceiverChannel(
+      const char* name, int capacity, const UDPConnection& connection);
+
   /// Create a ScheduledChannel.
   ///
   /// This is the function you should use to create a ScheduledChannel.
@@ -147,6 +154,10 @@ class Scheduler {
   ScheduledChannel<T> CreateScheduledChannel(
       const char* name, int capacity, void* single_thread_object,
       typename ScheduledChannel<T>::Callback callback);
+
+  template <class T>
+  SenderChannel<T> CreateSenderChannel(
+      const char* name, int capacity, const UDPConnection& connection);
 
   /// Start all worker threads by entering _running state_.
   ///
@@ -199,6 +210,14 @@ PolledChannel<T> Scheduler::CreatePolledChannel(const char* name,
 }
 
 template <class T>
+ReceiverChannel<T> Scheduler::CreateReceiverChannel(
+    const char* name, int capacity, const UDPConnection& connection) {
+  ChannelImpl* chimpl =
+      CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
+  return ReceiverChannel<T>(chimpl, connection);
+}
+
+template <class T>
 ScheduledChannel<T> Scheduler::CreateScheduledChannel(
     const char* name, int capacity, void* single_thread_object,
     typename ScheduledChannel<T>::Callback callback) {
@@ -206,6 +225,14 @@ ScheduledChannel<T> Scheduler::CreateScheduledChannel(
       CreateChannelImpl(name, capacity, sizeof(Packet<T>), single_thread_object,
                         &ScheduledChannel<T>::CallbackTranslator);
   return ScheduledChannel<T>(chimpl, callback);
+}
+
+template <class T>
+SenderChannel<T> Scheduler::CreateSenderChannel(
+    const char* name, int capacity, const UDPConnection& connection) {
+  ChannelImpl* chimpl =
+      CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
+  return SenderChannel<T>(chimpl, connection);
 }
 
 }  // namespace pipert
