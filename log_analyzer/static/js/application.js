@@ -1,7 +1,7 @@
-var channels = []
+let channels = [];
 
 function does_exist(channel_name){
-    const channel = channels.find(channel => channel.name == channel_name)
+    const channel = channels.find(channel => channel.name === channel_name)
     if (channel === undefined){
         return false
     }
