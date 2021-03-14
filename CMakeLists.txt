@@ -98,14 +98,6 @@ if(Threads_FOUND)
 endif()
 add_test(NAME ${PROJECT_NAME}_bbtest COMMAND ${PROJECT_NAME}_bbtest)
 
-# Target: measurements
-add_executable(${PROJECT_NAME}_measurements ${MEASUREMENTS_SOURCES})
-SetupTarget(${PROJECT_NAME}_measurements)
-target_link_libraries(${PROJECT_NAME}_measurements "src")
-target_link_libraries(${PROJECT_NAME}_measurements  "include")
-if(Threads_FOUND)
-  target_link_libraries(${PROJECT_NAME}_measurements ${CMAKE_THREAD_LIBS_INIT})
-endif()
 
 
 # Target: all tests (whitebox+blackbox) link to static library
