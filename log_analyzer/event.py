@@ -25,6 +25,16 @@ class Event(object):
     def get_avg(self):
         return self.__avg_val
 
+    def get_dict(self):
+        dict = {"type": self.get_type(),
+                "log_count": self.get_log_count(),
+                "passed_time": self.get_passed_time(),
+                "max": self.get_max(),
+                "min": self.get_min(),
+                "avg": self.get_avg()}
+
+        return dict
+
     def __str__(self):
         return "type: {}, log count: {}, time passed: {}, min: {}, max: {}, avg: {}".format(self.get_type(),
                                                                                             self.get_log_count(),

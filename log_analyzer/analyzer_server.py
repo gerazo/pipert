@@ -1,7 +1,8 @@
 import socket
-import measurements_checker
-from packet_decoder import PacketDecoder
-
+import requests
+from channel_manager import ChannelManager
+from packets_manager import PacketsManager
+from frozen_checker import FrozenChecker
 
 
 class AnalyzerServer(object):
@@ -37,24 +38,15 @@ class AnalyzerServer(object):
 
     def __start_server(self):
         s = self.__configure_server()
+        pm = PacketsManager()
+        cm = ChannelManager()
         while True:
-            data, address = s.recvfrom(4096)
+            data, address = s.recvfrom(512)
             self.__output = data
-#            print(PacketDecoder(self.__output).decode_packet(0))
-            packet,po=PacketDecoder(self.__output).decode_packet(0);
-            if packet.get_receiver() not in self.channels_history:
-                self.channels_history[packet.get_receiver()]=[packet]
-            else:
-                self.channels_history[packet.get_receiver()].append(packet)
-                self.channels_history.update({packet.get_receiver():self.channels_history[packet.get_receiver()]})
-            self.updateFlags()
-
-            self.flags=measurements_checker.MeasurementsAnalyzer.analyze_channal_freeze_scenario(self.channels_history,self.flags)
-            print(self.flags)
-
-
-
-
+            pm.add(data)
+            cm.add_packet(pm.get_latest_packet())
+            FrozenChecker().run()
+            requests.post("http://127.0.0.1:5000", json=cm.get_channels_dict())
 
     def run(self):
         self.__configure_server()

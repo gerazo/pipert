@@ -13,6 +13,15 @@ class Packet(object):
     def get_events(self):
         return self.__events
 
+    def add_events(self, events):
+        self.__events += events
+
+    def get_dict(self):
+        dict = {"receiver_channel": self.get_receiver(),
+                "sender_channel": self.get_sender(),
+                "events": [event.get_dict() for event in self.get_events()]}
+        return dict
+
     def __str__(self):
         return "Receiver: {}\nSender: {}\nEvents: {}".format(self.get_receiver(), self.get_sender(), self.get_events())
 
