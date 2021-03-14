@@ -49,7 +49,7 @@ bool Receive() {
   return true;
 }
 
-}  // namespace
+
 
 TEST(UDPConnectionTest, TestSending) {
   PrepareToReceive();
@@ -65,3 +65,4 @@ TEST(UDPConnectionTest, TestSending) {
   }
   EXPECT_TRUE(Receive());
 }
+}  // namespace
