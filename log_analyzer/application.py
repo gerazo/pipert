@@ -15,9 +15,9 @@ def index():
 
 @app.route('/', methods=['POST'])
 def get_packet():
-    packet = request.json
-    print(packet)
-    socketio.emit("packet", packet, json=True)
+    channels = request.json
+    # print(channels)
+    socketio.emit("update_channels", channels, json=True)
     return jsonify({"ok": True})
 
 
