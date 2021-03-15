@@ -2,7 +2,7 @@ import socket
 import requests
 from channel_manager import ChannelManager
 from packets_manager import PacketsManager
-from frozen_checker import FrozenChecker
+from checkers_manager import CheckersManager
 
 
 class AnalyzerServer(object):
@@ -40,12 +40,13 @@ class AnalyzerServer(object):
         s = self.__configure_server()
         pm = PacketsManager()
         cm = ChannelManager()
+        checkers_manager = CheckersManager()
         while True:
             data, address = s.recvfrom(512)
             self.__output = data
             pm.add(data)
             cm.add_packet(pm.get_latest_packet())
-            FrozenChecker().run()
+            checkers_manager.run()
             requests.post("http://127.0.0.1:5000", json=cm.get_channels_dict())
 
     def run(self):
