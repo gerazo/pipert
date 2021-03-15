@@ -1,10 +1,6 @@
-from checkers.frozen_checker import FrozenChecker
-
-CHECKERS = [
-    FrozenChecker()
-]
+from checkers_getter import CheckersGetter
 
 class CheckersManager(object):
     def run(self):
-        for checker in CHECKERS:
+        for checker in CheckersGetter().get_enabled_checkers():
             checker.run()
