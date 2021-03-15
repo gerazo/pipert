@@ -3,11 +3,12 @@ PACKETS_THRESHOULD = 20
 
 
 class Channel(object):
-    def __init__(self, name, events):
+    def __init__(self, name, events, latest_packet_id):
         self.__name = name
         self.__events = events
         self.__flags = {FROZEN: False}
         self.__packet_count = 1
+        self.__latest_packet_id = latest_packet_id
 
     def add_events(self, events):
         if self.__packet_count % PACKETS_THRESHOULD == 0:
@@ -32,6 +33,12 @@ class Channel(object):
 
     def get_packet_count(self):
         return self.__packet_count
+
+    def get_latest_packt_id(self):
+        return self.__latest_packet_id
+
+    def set_latest_packet_id(self, latest_packet_id):
+        self.__latest_packet_id = latest_packet_id
 
     def get_dict(self):
         dict = {

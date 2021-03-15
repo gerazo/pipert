@@ -3,6 +3,7 @@ class Packet(object):
         self.__receiver = receiver
         self.__sender = sender
         self.__events = events
+        self.__id = None
 
     def get_receiver(self):
         return self.__receiver
@@ -15,6 +16,12 @@ class Packet(object):
 
     def add_events(self, events):
         self.__events += events
+
+    def set_id(self, id):
+        self.__id = id
+
+    def get_id(self):
+        return self.__id
 
     def get_dict(self):
         dict = {"receiver_channel": self.get_receiver(),
