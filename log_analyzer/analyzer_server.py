@@ -11,30 +11,11 @@ class AnalyzerServer(object):
         self.__ip = ip
         self.__port = port
         self.__output = ""
-#channels history dictionar will hold historical data of last n cycle
-#events time and numbers per cycle (Ex : how many drops and execution)
-        self.channels_history={}
-
-#events statistics are stored here for each channel's event
-
-        self.channels_statistics={}
-
-#this dictionary with hold the calculated flags for each channal
-        self.flags={}
 
     def __configure_server(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind((self.__ip, self.__port))
         return sock
-
-    def updateFlags(self):
-        channelsNames= self.channels_history.keys()
-        for channel in channelsNames:
-            if channel not in self.flags:
-                #another flags to be added here
-                value={channel: {"Frozen":False}}
-                self.flags.update(value)
-
 
     def __start_server(self):
         s = self.__configure_server()
