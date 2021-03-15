@@ -10,10 +10,11 @@ class ChannelManager(object):
             for channel in self.__channels:
                 if channel.get_name() == packet.get_receiver():
                     channel.add_events(packet.get_events())
+                    channel.set_latest_packet_id(packet.get_id())
                     should_add_reciever = False
             
             if should_add_reciever:
-                self.__channels.append(Channel(packet.get_receiver(), packet.get_events()))
+                self.__channels.append(Channel(packet.get_receiver(), packet.get_events(), packet.get_id()))
 
             should_add_sender = True
             for channel in self.__channels:
@@ -21,7 +22,7 @@ class ChannelManager(object):
                     should_add_sender = False
             
             if should_add_sender:
-                self.__channels.append(Channel(packet.get_sender(), []))
+                self.__channels.append(Channel(packet.get_sender(), [], -1))
 
         def get_channels(self):
             return self.__channels
