@@ -1,0 +1,8 @@
+{
+    "checkers": [
+        {
+            "name": "frozen_checker",
+            "enabled": true
+        }
+    ]
+}
