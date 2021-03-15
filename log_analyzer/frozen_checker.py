@@ -6,7 +6,11 @@ FROZEN_LIMITS = 20
 class FrozenChecker(object):
     def run(self):
         for channel in ChannelManager().get_channels():
-            if (channel.get_latest_packt_id() - PacketsManager().get_packet_count() > FROZEN_LIMITS) or channel.get_latest_packt_id() < 0 :
-                channel.update_flag("FROZEN", True)
+            flatten_list = self.__flatten_list(channel.get_events())
+            if flatten_list:
+                channel.update_flag("FROZEN", False)
             else:
-                 channel.update_flag("FROZEN", False)
+                channel.update_flag("FROZEN", True)
+
+    def __flatten_list(self, channels_list):
+        return [item for sublist in channels_list for item in sublist]

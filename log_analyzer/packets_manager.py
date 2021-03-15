@@ -4,7 +4,7 @@ class PacketsManager(object):
     class __PacketsManager(object):
         def __init__(self):
             self.__latest_packet = None
-            self.__packets_count = 0
+            self.__packets_count = 1
 
         def add(self, packet):
             packet = PacketDecoder(packet).decode_packet()

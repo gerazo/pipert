@@ -5,7 +5,7 @@ PACKETS_THRESHOULD = 20
 class Channel(object):
     def __init__(self, name, events, latest_packet_id):
         self.__name = name
-        self.__events = events
+        self.__events = [events]
         self.__flags = {FROZEN: False}
         self.__packet_count = 1
         self.__latest_packet_id = latest_packet_id
@@ -19,11 +19,14 @@ class Channel(object):
         self.__events.append(events)
 
     def update_flag(self, flag, value):
-        flag = self.__flags[flag]
-        if flag is None:
+        val = self.__flags.get(flag)
+        if val is None:
             raise ValueError("Not a correct flag")
 
-        flag = value
+        self.__flags[flag] = value
+
+    def get_flag(self, flag):
+        return self.__flags[flag]
 
     def get_name(self):
         return self.__name
