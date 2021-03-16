@@ -43,6 +43,7 @@ class Channel(object):
     def set_latest_packet_id(self, latest_packet_id):
         self.__latest_packet_id = latest_packet_id
 
+
     def get_dict(self):
         dict = {
                 "name": self.__name,

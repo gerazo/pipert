@@ -37,4 +37,3 @@ class ChannelManager(object):
             ChannelManager.__instance = ChannelManager.__ChannelManager()
 
         return ChannelManager.__instance  
-
