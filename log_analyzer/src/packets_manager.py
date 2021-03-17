@@ -1,5 +1,6 @@
 from packet_decoder import PacketDecoder
 
+
 class PacketsManager(object):
     class __PacketsManager(object):
         def __init__(self):
@@ -23,5 +24,5 @@ class PacketsManager(object):
     def __new__(cls):
         if PacketsManager.__instance is None:
             PacketsManager.__instance = PacketsManager.__PacketsManager()
-        
+
         return PacketsManager.__instance

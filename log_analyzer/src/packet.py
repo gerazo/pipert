@@ -30,7 +30,10 @@ class Packet(object):
         return dict
 
     def __str__(self):
-        return "Receiver: {}\nSender: {}\nEvents: {}".format(self.get_receiver(), self.get_sender(), self.get_events())
+        return "Receiver: {}\nSender: " \
+               "{}\nEvents: {}".format(self.get_receiver(),
+                                       self.get_sender(),
+                                       self.get_events())
 
     def __repr__(self):
         return "\n" + str(self) + "\n"

@@ -1,5 +1,6 @@
 from config_reader import ConfigReader
 
+
 class CheckersGetter(object):
     def __init__(self):
         self.config_reader = ConfigReader()

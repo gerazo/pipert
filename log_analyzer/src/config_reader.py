@@ -1,9 +1,10 @@
 import json
 
+
 class ConfigReader(object):
     def __init__(self):
         self.__data = None
-    
+
     def read(self):
         file = open("config.json")
         data = json.load(file)

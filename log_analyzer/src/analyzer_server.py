@@ -4,6 +4,7 @@ from channel_manager import ChannelManager
 from packets_manager import PacketsManager
 from checkers_manager import CheckersManager
 
+
 class AnalyzerServer(object):
 
     def __init__(self, ip, port):
@@ -35,5 +36,3 @@ class AnalyzerServer(object):
 
     def get_output(self):
         return self.__output
-
-

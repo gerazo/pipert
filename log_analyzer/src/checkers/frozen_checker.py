@@ -3,6 +3,7 @@ from packets_manager import PacketsManager
 
 FROZEN_LIMITS = 20
 
+
 class FrozenChecker(object):
     def run(self):
         for channel in ChannelManager().get_channels():

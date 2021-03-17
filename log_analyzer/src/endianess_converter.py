@@ -14,7 +14,9 @@ class EndianessConverter(object):
         right_middle_byte <<= 8
         rightmost_byte <<= 0
 
-        result = (leftmost_byte | left_middle_byte
-                  | right_middle_byte | rightmost_byte)
+        result = (
+            leftmost_byte | left_middle_byte |
+            right_middle_byte | rightmost_byte
+            )
 
         return result
