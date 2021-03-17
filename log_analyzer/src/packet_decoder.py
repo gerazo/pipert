@@ -1,8 +1,8 @@
 import struct
 from sys import byteorder
 
-from src.event import Event
-from src.packet import Packet
+from event import Event
+from packet import Packet
 
 
 class PacketDecoder(object):
