@@ -3,6 +3,10 @@
         {
             "name": "frozen_checker",
             "enabled": true
+        },
+        {
+            "name": "drop_rate_checker",
+            "enabled": true
         }
     ]
 }
