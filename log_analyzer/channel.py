@@ -64,7 +64,7 @@ class Channel(object):
 
         return result
 
-    # it will return -1 if the channel if both read of executed and dropped events are 0
+    # it will return -1 if the channel if both read of read and dropped events are 0
     # if there is no read only dropping it will return 1
     def drop_ratio_calculator(self):
         result=-2
