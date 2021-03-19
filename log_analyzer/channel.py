@@ -1,5 +1,6 @@
 FROZEN = "FROZEN"
 HIGHDROPRATE="HIGHDROPRATE"
+HIGHDROPRATIO="HIGHDROPRATIO"
 PACKETS_THRESHOULD = 20
 
 
@@ -7,7 +8,7 @@ class Channel(object):
     def __init__(self, name, events, latest_packet_id):
         self.__name = name
         self.__events = [events]
-        self.__flags = {FROZEN: False,HIGHDROPRATE:False}
+        self.__flags = {FROZEN: False,HIGHDROPRATE:False,HIGHDROPRATIO:False}
         self.__packet_count = 1
         self.__latest_packet_id = latest_packet_id
 
@@ -43,7 +44,7 @@ class Channel(object):
 
     def set_latest_packet_id(self, latest_packet_id):
         self.__latest_packet_id = latest_packet_id
-    # return the flag if the dropping rate is high
+
     # it will return -1 if the channel if both number of executed and dropped events are 0
     # if there is no execution only dropping it will return 1
     def drop_rate_calculator(self):
@@ -60,6 +61,25 @@ class Channel(object):
                     result=0
                 else:
                     result=number_of_dropped_events/number_of_executed_events
+
+        return result
+
+    # it will return -1 if the channel if both read of executed and dropped events are 0
+    # if there is no read only dropping it will return 1
+    def drop_ratio_calculator(self):
+        result=-2
+        number_of_dropped_events=len(self.get_drop_events())
+        number_of_read_events=len(self.get_read_events())
+        if(number_of_dropped_events==0 and number_of_read_events==0):
+            result=-1
+        else:
+            if(number_of_read_events==0):
+                result=1
+            else:
+                if(number_of_dropped_events==0):
+                    result=0
+                else:
+                    result=number_of_dropped_events/number_of_read_events
 
         return result
     def get_fill_events(self):
