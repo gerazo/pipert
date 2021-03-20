@@ -51,6 +51,7 @@ bool Receive() {
 
 
 
+
 TEST(UDPConnectionTest, TestSending) {
   PrepareToReceive();
   for (int i = 0; i < buffer_size; i++) {
@@ -66,3 +67,4 @@ TEST(UDPConnectionTest, TestSending) {
   EXPECT_TRUE(Receive());
 }
 }  // namespace
+

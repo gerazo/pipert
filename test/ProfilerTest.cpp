@@ -126,6 +126,7 @@ TEST(ProfilerTest, CreateForFile) {
 }
 
 TEST(ProfilerTest, CreateForUDP) {
+
   pipert::Profiler profiler("udp:127.0.0.1:8888");
   EXPECT_EQ(profiler.GetAggregationTime(), 0);
   EXPECT_GT(profiler.GetBufferSize(), 0);
