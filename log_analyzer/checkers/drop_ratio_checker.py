@@ -8,6 +8,9 @@ class DropRatioChecker(object):
         for channel in ChannelManager().get_channels():
             if(channel.drop_ratio_calculator()>threshold):
                 channel.update_flag("HIGHDROPRATIO", True)
+            else:
+                channel.update_flag("HIGHDROPRATIO", False)
+
 
 
 

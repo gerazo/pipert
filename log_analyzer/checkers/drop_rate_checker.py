@@ -8,6 +8,8 @@ class DropRateChecker(object):
         for channel in ChannelManager().get_channels():
             if(channel.drop_rate_calculator()>threshold):
                 channel.update_flag("HIGHDROPRATE", True)
+            else :
+                channel.update_flag("HIGHDROPRATE", False)
 
 
 
