@@ -1,12 +1,14 @@
-FROZEN = "FROZEN"
-PACKETS_THRESHOULD = 20
-
+from utils import flatten_list
+from constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
+                      PACKETS_THRESHOULD, PACKET_DROPPED, EXECTION_TIME,
+                      READ_TIME) 
 
 class Channel(object):
     def __init__(self, name, events, latest_packet_id):
         self.__name = name
         self.__events = [events]
-        self.__flags = {FROZEN: False}
+        self.__flags = {FROZEN: False, HIGH_DROP_RATE: False,
+                        HIGH_DROP_RATIO: False}
         self.__packet_count = 1
         self.__latest_packet_id = latest_packet_id
 
@@ -24,6 +26,39 @@ class Channel(object):
             raise ValueError("Not a correct flag")
 
         self.__flags[flag] = value
+
+    def calculate_drop_rate(self):
+        nr_dropped_event = len(self.get_event(PACKET_DROPPED))
+        nr_executed_event = len(self.get_event(EXECTION_TIME))
+        
+        if nr_dropped_event and nr_executed_event:
+            return -1
+
+        if not nr_executed_event:
+            return 1
+
+        if not nr_dropped_event:
+            return 0
+
+        return nr_dropped_event/nr_executed_event
+
+    def calculate_drop_ratio(self):
+        nr_dropped_event = len(self.get_event(PACKET_DROPPED))
+        nr_read_event = len(self.get_event(READ_TIME))
+        
+        if nr_dropped_event and nr_read_event:
+            return -1
+
+        if not nr_read_event:
+            return 1
+
+        if not nr_dropped_event:
+            return 0
+
+        return nr_dropped_event/nr_read_event
+
+    def get_event(self, event_type):
+        return list(filter(lambda x: x.get_type() == event_type, flatten_list(self.get_events())))
 
     def get_flag(self, flag):
         return self.__flags[flag]
