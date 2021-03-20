@@ -10,3 +10,5 @@ class DropRateChecker(BaseChecker):
             if(channel.drop_rate_calculator() >
                self._config[DROP_RATE_THRESHOLD]):
                 channel.update_flag(HIGH_DROP_RATE, True)
+            else:
+                channel.update_flag(HIGH_DROP_RATE, False)

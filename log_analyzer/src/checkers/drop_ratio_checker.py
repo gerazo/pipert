@@ -10,3 +10,5 @@ class DropRatioChecker(BaseChecker):
             if(channel.drop_ratio_calculator() >
                self._config[DROP_RATIO_THRESHOLD]):
                 channel.update_flag(HIGH_DROP_RATIO, True)
+            else:
+                channel.update_flag(HIGH_DROP_RATIO, False)
