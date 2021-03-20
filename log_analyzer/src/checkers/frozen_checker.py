@@ -1,9 +1,11 @@
+from .base_checker import BaseChecker
 from utils import flatten_list
 from channel_manager import ChannelManager
 from packets_manager import PacketsManager
-from constants import FROZEN_LIMITS, FROZEN
+from constants import FROZEN
 
-class FrozenChecker(object):
+
+class FrozenChecker(BaseChecker):
     def run(self):
         for channel in ChannelManager().get_channels():
             flatten_list = flatten_list(channel.get_events())

@@ -9,7 +9,9 @@ class CheckersGetter(object):
     def get_enabled_checkers(self):
         enabled_checkers = []
         for checker in self.config_reader.read_enabled_checkers():
-            enabled_checkers.append(self.__import_checker(checker))
+            c = self.__import_checker(checker[0])
+            c.set_config(checker[1])
+            enabled_checkers.append(c)
 
         return enabled_checkers
 

@@ -15,6 +15,7 @@ class ConfigReader(object):
         enabled_checkers = []
         for checker in checkers:
             if checker["enabled"]:
-                enabled_checkers.append(checker["name"])
+                enabled_checkers.append((checker["name"],
+                                         checker["configuration"]))
 
         return enabled_checkers

@@ -1,7 +1,8 @@
 from utils import flatten_list
 from constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
-                      PACKETS_THRESHOULD, PACKET_DROPPED, EXECTION_TIME,
-                      READ_TIME) 
+                       PACKETS_THRESHOULD, PACKET_DROPPED, EXECTION_TIME,
+                       READ_TIME)
+
 
 class Channel(object):
     def __init__(self, name, events, latest_packet_id):
@@ -30,7 +31,7 @@ class Channel(object):
     def calculate_drop_rate(self):
         nr_dropped_event = len(self.get_event(PACKET_DROPPED))
         nr_executed_event = len(self.get_event(EXECTION_TIME))
-        
+
         if nr_dropped_event and nr_executed_event:
             return -1
 
@@ -45,7 +46,7 @@ class Channel(object):
     def calculate_drop_ratio(self):
         nr_dropped_event = len(self.get_event(PACKET_DROPPED))
         nr_read_event = len(self.get_event(READ_TIME))
-        
+
         if nr_dropped_event and nr_read_event:
             return -1
 
@@ -58,7 +59,8 @@ class Channel(object):
         return nr_dropped_event/nr_read_event
 
     def get_event(self, event_type):
-        return list(filter(lambda x: x.get_type() == event_type, flatten_list(self.get_events())))
+        return list(filter(lambda x: x.get_type() == event_type,
+                           flatten_list(self.get_events())))
 
     def get_flag(self, flag):
         return self.__flags[flag]
