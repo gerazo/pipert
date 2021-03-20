@@ -70,7 +70,7 @@ class Profiler {
   /// is switched off by setting `aggregation_time_msec_` to 0.
   void GatherNSend();
 
-  /// Returns time in milliseconds between log collections.
+  /// Returns time in milliseconds between log collections.P
   int GetAggregationTime() const;
 
   /// Returns buffer size used for collecting log data.
@@ -78,8 +78,10 @@ class Profiler {
 
  private:
   void Move(Profiler&& o);
-  static void SendToUDP(UDPConnection* udp_connection, std::uint8_t* buffer,int buffer_size);
-  static void SendToFile(std::FILE* destination_file, std::uint8_t* buffer,int buffer_size);
+  static void SendToUDP(UDPConnection* udp_connection, std::uint8_t* buffer,
+                        int buffer_size);
+  static void SendToFile(std::FILE* destination_file, std::uint8_t* buffer,
+                        int buffer_size);
 
   friend Scheduler;
   ProfilerImpl* impl_;
