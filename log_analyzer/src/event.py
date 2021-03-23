@@ -1,5 +1,6 @@
 class Event(object):
-    def __init__(self, type, log_count, passed_time, min_val, max_val, avg_val):
+    def __init__(self, type, log_count, passed_time,
+                 min_val, max_val, avg_val):
         self.__type = type
         self.__log_count = log_count
         self.__passed_time = passed_time
@@ -36,12 +37,14 @@ class Event(object):
         return dict
 
     def __str__(self):
-        return "type: {}, log count: {}, time passed: {}, min: {}, max: {}, avg: {}".format(self.get_type(),
-                                                                                            self.get_log_count(),
-                                                                                            self.get_passed_time(),
-                                                                                            self.get_min(),
-                                                                                            self.get_max(),
-                                                                                            self.get_avg())
+        return "type: {}, log count: {}, " \
+               "time passed: {}, min: {}, " \
+               "max: {}, avg: {}".format(self.get_type(),
+                                         self.get_log_count(),
+                                         self.get_passed_time(),
+                                         self.get_min(),
+                                         self.get_max(),
+                                         self.get_avg())
 
     def __repr__(self):
         return "\n" + str(self) + "\n"

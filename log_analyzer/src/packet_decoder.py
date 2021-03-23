@@ -16,7 +16,9 @@ class PacketDecoder(object):
             receiver_channel_name, pos = self.__get_keyword(pos)
             sender_channel_name, pos = self.__get_keyword(pos)
             events = []
-            while not self.__check_for_correct_packet(self.__packet[pos:pos+4]) and pos < len(self.__packet):
+            correct_packet = \
+                self.__check_for_correct_packet(self.__packet[pos:pos+4])
+            while not correct_packet and pos < len(self.__packet):
                 event, pos = self.__get_event(pos)
                 events.append(event)
             return Packet(receiver_channel_name, sender_channel_name, events)
@@ -38,7 +40,8 @@ class PacketDecoder(object):
         max_val, pos = self.__get_float_val(pos)
         avg_val, pos = self.__get_float_val(pos)
 
-        return Event(event_type, log_count, time_passed, min_val, max_val, avg_val), pos
+        return Event(event_type, log_count,
+                     time_passed, min_val, max_val, avg_val), pos
 
     def __get_int_val(self, pos):
         ret = b""
@@ -68,4 +71,3 @@ class PacketDecoder(object):
         if actual != "DGRP":
             return False
         return True
-

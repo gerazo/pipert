@@ -1,0 +1,25 @@
+{
+    "checkers": [
+        {
+            "name": "frozen_checker",
+            "enabled": true,
+            "configuration": {
+                "FROZEN_LIMITS": 20
+            }
+        },
+        {
+            "name": "drop_rate_checker",
+            "enabled": true,
+            "configuration": {
+                "DROP_RATE_THRESHOLD": 0.5
+            }
+        },
+        {
+            "name": "drop_ratio_checker",
+            "enabled": true,
+            "configuration": {
+                "DROP_RATIO_THRESHOLD": 0.75
+            }
+        }
+    ]
+}
