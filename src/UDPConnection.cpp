@@ -42,4 +42,3 @@ void UDPConnection::Send(void* buffer, int size) {
 }
 
 }  // namespace pipert
-

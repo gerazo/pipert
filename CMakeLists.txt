@@ -12,6 +12,7 @@ set(BBTEST_SOURCES LogEventTest.cpp PacketTest.cpp PolledChannelTest.cpp Profile
 # Put those tests here which really, desperately need the implementation
 set(WBTEST_SOURCES AdaptiveSpinLockTest.cpp EndiannessTest.cpp LogAggregateTest.cpp ProfileDataTest.cpp ProfilerImplTest.cpp SenderLoggerTest.cpp SteadyHeapTest.cpp ThreadIdTest.cpp UDPConnectionTest.cpp)
 
+
 # General settings
 if(NOT CMAKE_BUILD_TYPE)
   message(STATUS "Using default build type Release as none was specified with -DCMAKE_BUILD_TYPE=<mode>")

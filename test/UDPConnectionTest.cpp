@@ -65,4 +65,3 @@ TEST(UDPConnectionTest, TestSending) {
   }
   EXPECT_TRUE(Receive());
 }
-
