@@ -15,7 +15,7 @@ namespace {
 const int kMaxUDPSize = 508;
 const int kOneSecond = 1000;
 const int kOneMilliSecond = 1;
-const int kOneTimeSlice = 100;
+const int kOneTimeSlice = 10;
 const char kDataName[] = "MyData";
 const char kDataNameAlt[] = "MyOtherData";
 
@@ -62,7 +62,11 @@ TEST(ProfilerImplTest, RunEmpty) {
   call_number = 0;
   pipert::ProfilerImpl profiler(&SenderFunc, kMaxUDPSize, kOneMilliSecond);
   profiler.Start();
-  std::this_thread::sleep_for(std::chrono::milliseconds(kOneTimeSlice));
+  int i = 0;
+  while (i < 99 && !call_number) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(kOneTimeSlice));
+    i++;
+  }
   profiler.Stop();
   EXPECT_EQ(call_number, 0);
 }
@@ -73,7 +77,11 @@ TEST(ProfilerImplTest, RunWithEmptyData) {
   pipert::ProfilerImpl profiler(&SenderFunc, kMaxUDPSize, kOneMilliSecond);
   profiler.AddProfileData(&prof_data);
   profiler.Start();
-  std::this_thread::sleep_for(std::chrono::milliseconds(kOneTimeSlice));
+  int i = 0;
+  while (i < 99 && !call_number) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(kOneTimeSlice));
+    i++;
+  }
   profiler.Stop();
   profiler.RemoveProfileData(&prof_data);
   EXPECT_GT(call_number, 0);
@@ -89,7 +97,11 @@ TEST(ProfilerImplTest, RunWithDataBeingFilled) {
     prof_data.Log(pipert::LogEvent<pipert::ProfileData::kEventPushed>(1.0));
     std::this_thread::sleep_for(std::chrono::milliseconds(kOneMilliSecond));
   }
-  std::this_thread::sleep_for(std::chrono::milliseconds(kOneTimeSlice));
+  int i = 0;
+  while (i < 99 && !call_number) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(kOneTimeSlice));
+    i++;
+  }
   profiler.Stop();
   profiler.RemoveProfileData(&prof_data);
   EXPECT_GT(call_number, 0);
@@ -108,7 +120,11 @@ TEST(ProfilerImplTest, RunWithMultipleDataBeingFilled) {
     prof_data2.Log(pipert::LogEvent<pipert::ProfileData::kEventRetrieved>(1.0));
     std::this_thread::sleep_for(std::chrono::milliseconds(kOneMilliSecond));
   }
-  std::this_thread::sleep_for(std::chrono::milliseconds(kOneTimeSlice));
+  int i = 0;
+  while (i < 99 && !call_number) {
+    std::this_thread::sleep_for(std::chrono::milliseconds(kOneTimeSlice));
+    i++;
+  }
   profiler.Stop();
   profiler.RemoveProfileData(&prof_data1);
   profiler.RemoveProfileData(&prof_data2);
