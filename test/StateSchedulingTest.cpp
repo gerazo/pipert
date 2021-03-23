@@ -9,7 +9,7 @@
 
 namespace {
 
-const int kBigTimeSlice = 500;
+const int kBigTimeSlice = 30;
 const int kBufferSize = 1024;
 
 class Base {
@@ -116,7 +116,11 @@ TEST(StateScheduling, SchedulingDropCheckTest) {
     sch.Start();
     std::thread incThread(GenerateDataToChannel, &incChannel);
     incThread.join();
-    std::this_thread::sleep_for(std::chrono::milliseconds(kBigTimeSlice));
+    int i = 0;
+    while (i < 99 && incChannel.GetQueuedBufferLength()) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(kBigTimeSlice));
+      i++;
+    }
     sch.Stop();
     sch.GetProfiler().GatherNSend();
   }
@@ -158,7 +162,12 @@ TEST(StateScheduling, MergeSchedulingTest) {
     std::thread decThread(GenerateDataToChannel, &decChannel);
     incThread.join();
     decThread.join();
-    std::this_thread::sleep_for(std::chrono::milliseconds(kBigTimeSlice));
+    int i = 0;
+    while (i < 99 && (incChannel.GetQueuedBufferLength() ||
+                      decChannel.GetQueuedBufferLength())) {
+      std::this_thread::sleep_for(std::chrono::milliseconds(kBigTimeSlice));
+      i++;
+    }
     sch.Stop();
     sch.GetProfiler().GatherNSend();
   }
