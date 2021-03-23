@@ -70,7 +70,7 @@ class Profiler {
   /// is switched off by setting `aggregation_time_msec_` to 0.
   void GatherNSend();
 
-  /// Returns time in milliseconds between log collections.P
+  /// Returns time in milliseconds between log collections.
   int GetAggregationTime() const;
 
   /// Returns buffer size used for collecting log data.
