@@ -1,20 +1,22 @@
 body {
-    padding-top: 70px;
+  padding-top: 70px;
 }
 
 .navbar-nav.navbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translatex(-50%);
-    border: 2px solid #993300;
-    border-radius: 5px;
+  position: absolute;
+  left: 50%;
+  transform: translatex(-50%);
+  border: 2px solid #993300;
+  border-radius: 5px;
 }
 
-/* On Tabs & Desktops
-@media screen and (min-width: 768px) {
-  .navbar-left {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-} */
+.channels-container {
+width: 70%;
+}
+
+.channel {
+border: 2px solid black;
+border-radius: 5px;
+background-color: #e2e3e1;    
+text-align: center;
+}
