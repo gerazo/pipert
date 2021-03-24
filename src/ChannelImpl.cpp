@@ -177,8 +177,10 @@ bool ChannelImpl::TryDroppingPacket() {
   // Dropping earliest policy is executed
   // TODO implement other policies
   PacketBase* packet = GetNext(true);
-  if (packet) Release(packet, true);
-  Log(LogEvent<ProfileData::kEventDroppedPacket>(1.0));
+  if (packet) {
+    Release(packet, true);
+    Log(LogEvent<ProfileData::kEventDroppedPacket>(1.0));
+  }
   return packet;
 }
 
