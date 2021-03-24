@@ -11,6 +11,7 @@ namespace {
 
 const int kBigTimeSlice = 30;
 const int kBufferSize = 1024;
+const int kIterations = 1000;
 
 class Base {
  public:
@@ -44,7 +45,7 @@ class Merger : public Base {
 };
 
 void GenerateDataToChannel(::pipert::ScheduledChannel<int>* channel) {
-  for (int i = 0; i < 100; ++i) {
+  for (int i = 0; i < kIterations; ++i) {
     ::pipert::PacketToFill<int> packet =
         channel->Acquire(::pipert::Timer::time(), 1);
     while (packet.IsEmpty()) {
@@ -75,13 +76,11 @@ TEST(StateScheduling, SchedulingWithoutStateTest) {
 
   sch.Start();
   // This intentionally creates data race, so a checker could be angry...
-  for (int i = 0; i < 100; ++i) {
-    ::pipert::PacketToFill<int> packet =
-        incrementer.Acquire(::pipert::Timer::time(), 1);
-  }
+  GenerateDataToChannel(&incrementer);
 
   sch.Stop();
-  EXPECT_TRUE(-1000 <= processor.GetValue() && processor.GetValue() <= 1000);
+  EXPECT_TRUE(-kIterations * 10 <= processor.GetValue() &&
+              processor.GetValue() <= kIterations * 10);
 }
 
 TEST(StateScheduling, SchedulingWithStateTest) {
@@ -92,10 +91,7 @@ TEST(StateScheduling, SchedulingWithStateTest) {
       std::bind(&Processor::Process, &processor, std::placeholders::_1));
 
   sch.Start();
-  for (int i = 0; i < 100; ++i) {
-    ::pipert::PacketToFill<int> packet =
-        incrementer.Acquire(::pipert::Timer::time(), 1);
-  }
+  GenerateDataToChannel(&incrementer);
 
   sch.Stop();
   EXPECT_EQ(processor.GetValue(), 0);
@@ -135,10 +131,11 @@ TEST(StateScheduling, SchedulingDropCheckTest) {
   do {
     p = p + strlen(p) + 1;
   } while (p - buf < len && !strstr(p, "LOGAPacket Dropped"));
-  int dropped_packets = (p - buf < len) ? *(int*)(p + strlen(p) + 1) : 0;
+  int dropped_packets =
+      (p - buf < len) ? *(std::int32_t*)(p + strlen(p) + 1) : 0;
   dropped_packets = ConvertNetworkToHostByteOrder(dropped_packets);
 
-  EXPECT_EQ(incrementor.GetValue() + dropped_packets, 100);
+  EXPECT_EQ(incrementor.GetValue() + dropped_packets, kIterations);
 }
 
 TEST(StateScheduling, MergeSchedulingTest) {
@@ -183,22 +180,47 @@ TEST(StateScheduling, MergeSchedulingTest) {
     p = p + strlen(p) + 1;
   }
   ASSERT_TRUE(p - buf < len);
+  char* incp = p;
+
   do {
     p = p + strlen(p) + 1;
   } while (p - buf < len && !strstr(p, "LOGAPacket Dropped"));
-  int dropped_packets1 = (p - buf < len) ? *(int*)(p + strlen(p) + 1) : 0;
+  int dropped_packets1 =
+      (p - buf < len) ? *(std::int32_t*)(p + strlen(p) + 1) : 0;
   dropped_packets1 = ConvertNetworkToHostByteOrder(dropped_packets1);
+
+  p = incp;
+  do {
+    p = p + strlen(p) + 1;
+  } while (p - buf < len && !strstr(p, "LOGAPacket Retrieved"));
+  int got_packets1 = (p - buf < len) ? *(std::int32_t*)(p + strlen(p) + 1) : 0;
+  got_packets1 = ConvertNetworkToHostByteOrder(got_packets1);
 
   p = buf;
   while (p - buf < len && !strstr(p, "DGRPDecrementor")) {
     p = p + strlen(p) + 1;
   }
   ASSERT_TRUE(p - buf < len);
+  char* decp = p;
+
   do {
     p = p + strlen(p) + 1;
   } while (p - buf < len && !strstr(p, "LOGAPacket Dropped"));
-  int dropped_packets2 = (p - buf < len) ? *(int*)(p + strlen(p) + 1) : 0;
+  int dropped_packets2 =
+      (p - buf < len) ? *(std::int32_t*)(p + strlen(p) + 1) : 0;
   dropped_packets2 = ConvertNetworkToHostByteOrder(dropped_packets2);
 
+  p = decp;
+  do {
+    p = p + strlen(p) + 1;
+  } while (p - buf < len && !strstr(p, "LOGAPacket Retrieved"));
+  int got_packets2 = (p - buf < len) ? *(std::int32_t*)(p + strlen(p) + 1) : 0;
+  got_packets2 = ConvertNetworkToHostByteOrder(got_packets2);
+
+  EXPECT_EQ(dropped_packets1 + got_packets1, kIterations);
+  EXPECT_EQ(dropped_packets2 + got_packets2, kIterations);
   EXPECT_EQ(merger.GetValue() + dropped_packets1 - dropped_packets2, 0);
+  //printf("value %d  dropped1 %d  dropped2 %d  retrieved1 %d  retrieved2 %d\n",
+  //       merger.GetValue(), dropped_packets1, dropped_packets2, got_packets1,
+  //       got_packets2);
 }
