@@ -13,7 +13,7 @@
 namespace {
 
 const int kMaxUDPSize = 508;
-const int kOneSecond = 1000;
+const int kTenthSecond = 100;
 const int kOneMilliSecond = 1;
 const int kOneTimeSlice = 10;
 const char kDataName[] = "MyData";
@@ -30,23 +30,23 @@ void SenderFunc(std::uint8_t* buffer, int size) {
 }  // namespace
 
 TEST(ProfilerImplTest, CreateNDestroy) {
-  pipert::ProfilerImpl profiler(&SenderFunc, kMaxUDPSize, kOneSecond);
-  EXPECT_EQ(profiler.GetAggregationTime(), kOneSecond);
+  pipert::ProfilerImpl profiler(&SenderFunc, kMaxUDPSize, kTenthSecond);
+  EXPECT_EQ(profiler.GetAggregationTime(), kTenthSecond);
   EXPECT_EQ(profiler.GetBufferSize(), kMaxUDPSize);
 }
 
 TEST(ProfilerImplTest, StartNStop) {
-  pipert::ProfilerImpl profiler(&SenderFunc, kMaxUDPSize, kOneSecond);
+  pipert::ProfilerImpl profiler(&SenderFunc, kMaxUDPSize, kTenthSecond);
   profiler.Start();
-  EXPECT_EQ(profiler.GetAggregationTime(), kOneSecond);
+  EXPECT_EQ(profiler.GetAggregationTime(), kTenthSecond);
   EXPECT_EQ(profiler.GetBufferSize(), kMaxUDPSize);
   profiler.Stop();
 }
 
 TEST(ProfilerImplTest, StartWithoutStop) {
-  pipert::ProfilerImpl profiler(&SenderFunc, kMaxUDPSize, kOneSecond);
+  pipert::ProfilerImpl profiler(&SenderFunc, kMaxUDPSize, kTenthSecond);
   profiler.Start();
-  EXPECT_EQ(profiler.GetAggregationTime(), kOneSecond);
+  EXPECT_EQ(profiler.GetAggregationTime(), kTenthSecond);
   EXPECT_EQ(profiler.GetBufferSize(), kMaxUDPSize);
 }
 
@@ -63,7 +63,7 @@ TEST(ProfilerImplTest, RunEmpty) {
   pipert::ProfilerImpl profiler(&SenderFunc, kMaxUDPSize, kOneMilliSecond);
   profiler.Start();
   int i = 0;
-  while (i < 99 && !call_number) {
+  while (i < 9 && !call_number) {
     std::this_thread::sleep_for(std::chrono::milliseconds(kOneTimeSlice));
     i++;
   }
