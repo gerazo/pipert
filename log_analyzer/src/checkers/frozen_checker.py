@@ -1,8 +1,7 @@
-from .base_checker import BaseChecker
-from utils import flatten_list
-from channel_manager import ChannelManager
-from packets_manager import PacketsManager
-from constants import FROZEN
+from src.checkers.base_checker import BaseChecker
+from src.utils import flatten_list
+from src.channel_manager import ChannelManager
+from src.constants import FROZEN
 
 
 class FrozenChecker(BaseChecker):

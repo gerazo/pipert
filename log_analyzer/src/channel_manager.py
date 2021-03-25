@@ -1,4 +1,4 @@
-from channel import Channel
+from src.channel import Channel
 
 
 class ChannelManager(object):

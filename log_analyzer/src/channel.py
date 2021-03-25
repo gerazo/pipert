@@ -1,7 +1,7 @@
-from utils import flatten_list
-from constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
-                       PACKETS_THRESHOULD, PACKET_DROPPED, EXECTION_TIME,
-                       READ_TIME)
+from src.utils import flatten_list
+from src.constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
+                           PACKETS_THRESHOULD, PACKET_DROPPED, EXECTION_TIME,
+                           READ_TIME)
 
 
 class Channel(object):
