@@ -1,4 +1,4 @@
-from checkers_getter import CheckersGetter
+from src.checkers_getter import CheckersGetter
 
 
 class CheckersManager(object):

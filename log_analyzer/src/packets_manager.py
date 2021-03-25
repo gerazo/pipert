@@ -1,4 +1,4 @@
-from packet_decoder import PacketDecoder
+from src.packet_decoder import PacketDecoder
 
 
 class PacketsManager(object):

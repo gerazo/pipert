@@ -1,8 +1,8 @@
 import socket
 import requests
-from channel_manager import ChannelManager
-from packets_manager import PacketsManager
-from checkers_manager import CheckersManager
+from src.channel_manager import ChannelManager
+from src.packets_manager import PacketsManager
+from src.checkers_manager import CheckersManager
 
 
 class AnalyzerServer(object):

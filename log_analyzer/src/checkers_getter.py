@@ -1,4 +1,4 @@
-from config_reader import ConfigReader
+from src.config_reader import ConfigReader
 
 
 class CheckersGetter(object):
@@ -17,7 +17,7 @@ class CheckersGetter(object):
 
     def __import_checker(self, checker_name):
         class_name = self.__get_class_name(checker_name)
-        mod = __import__("checkers."+checker_name, fromlist=[class_name])
+        mod = __import__("src.checkers."+checker_name, fromlist=[class_name])
         checker = getattr(mod, class_name)
 
         return checker()

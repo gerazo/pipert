@@ -6,7 +6,7 @@ class ConfigReader(object):
         self.__data = None
 
     def read(self):
-        file = open("../config.json")
+        file = open("config.json")
         data = json.load(file)
         self.__data = data
 
