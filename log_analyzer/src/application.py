@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 from flask_socketio import SocketIO, send, emit
+from src.config_reader import ConfigReader
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
@@ -11,6 +12,13 @@ socketio = SocketIO(app)
 @app.route('/')
 def index():
     return render_template('index.html')
+
+
+@app.route('/settings')
+def settings():
+    cr = ConfigReader()
+    cr.read()
+    return render_template('settings.html', checkers=cr.get_checkers())
 
 
 @app.route('/', methods=['POST'])

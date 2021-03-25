@@ -2,7 +2,6 @@ $(document).ready(function(){
     var socket = io.connect('http://' + document.domain + ':' + location.port);
 
     socket.on('update_channels', function(channels){
-        // parse_channel(packet);
         $(".channels-container").empty();
         $.each(channels, function(i, channel){
             const channel_div = create_channel(channel);
@@ -16,7 +15,7 @@ function create_channel(channel){
     const name = create_element_with_text("H2", channel.name);
     channel_div.appendChild(name);
     create_flags(channel, channel_div);
-    channel_div.className = "channel col-3";
+    channel_div.className = "channel";
 
     return channel_div
 }
