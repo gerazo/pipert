@@ -1,7 +1,6 @@
-from .base_checker import BaseChecker
-from channel_manager import ChannelManager
-from packets_manager import PacketsManager
-from constants import DROP_RATE_THRESHOLD, HIGH_DROP_RATE
+from src.checkers.base_checker import BaseChecker
+from src.channel_manager import ChannelManager
+from src.constants import DROP_RATE_THRESHOLD, HIGH_DROP_RATE
 
 
 class DropRateChecker(BaseChecker):
