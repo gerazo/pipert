@@ -2,10 +2,10 @@
 #define _SENDERCHANNEL_H_
 
 #include "pipert/Channel.h"
+#include "pipert/UDPConnection.h"
+
 
 namespace pipert {
-
-class UDPConnection;
 
 template <class T>
 class SenderChannel : public Channel<T> {

@@ -6,11 +6,11 @@
 #include "pipert/ReceiverChannel.h"
 #include "pipert/ScheduledChannel.h"
 #include "pipert/SenderChannel.h"
+#include "pipert/UDPConnection.h"
 
 namespace pipert {
 
 class SchedulerImpl;
-class UDPConnection;
 
 /// A Scheduler is the main object of a pipeline that owns all Channel objects
 /// and is responsible for the scheduling of processing tasks.
