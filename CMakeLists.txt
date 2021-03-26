@@ -4,7 +4,7 @@ enable_testing()
 
 
 # All source files compiled into the library
-set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Endianness.cpp LogAggregate.cpp LogEventTypeRegistrar.cpp ProfileData.cpp Profiler.cpp ProfilerImpl.cpp Scheduler.cpp SchedulerImpl.cpp SenderLogger.cpp Timer.cpp ThreadId.cpp UDPConnection.cpp)
+set(SOURCES AdaptiveSpinLock.cpp ChannelBase.cpp ChannelImpl.cpp Endianness.cpp LogAggregate.cpp LogEventTypeRegistrar.cpp ProfileData.cpp Profiler.cpp ProfilerImpl.cpp Protocol.cpp Scheduler.cpp SchedulerImpl.cpp SenderLogger.cpp Timer.cpp ThreadId.cpp UDPConnection.cpp)
 
 # Put all test files here which can run using the library only through its public interface
 set(BBTEST_SOURCES LogEventTest.cpp PacketTest.cpp PolledChannelTest.cpp ProfilerTest.cpp SchedulerTest.cpp TimerTest.cpp ScheduledChannelTest.cpp SchedulerNProfilerTest.cpp StateSchedulingTest.cpp UDPConnectionTest.cpp)

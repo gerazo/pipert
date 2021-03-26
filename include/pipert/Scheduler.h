@@ -3,6 +3,7 @@
 
 #include "pipert/PolledChannel.h"
 #include "pipert/Profiler.h"
+#include "pipert/Protocol.h"
 #include "pipert/ReceiverChannel.h"
 #include "pipert/ScheduledChannel.h"
 #include "pipert/SenderChannel.h"
@@ -212,6 +213,8 @@ PolledChannel<T> Scheduler::CreatePolledChannel(const char* name,
 template <class T>
 ReceiverChannel<T> Scheduler::CreateReceiverChannel(
     const char* name, int capacity, const UDPConnection& connection) {
+  Protocol<T> protocol(connection);
+  protocol.ReceiverSideHandshake();
   ChannelImpl* chimpl =
       CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
   return ReceiverChannel<T>(chimpl, connection);
@@ -230,6 +233,8 @@ ScheduledChannel<T> Scheduler::CreateScheduledChannel(
 template <class T>
 SenderChannel<T> Scheduler::CreateSenderChannel(
     const char* name, int capacity, const UDPConnection& connection) {
+  Protocol<T> protocol(connection);
+  protocol.SenderSideHandshake();
   ChannelImpl* chimpl =
       CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
   return SenderChannel<T>(chimpl, connection);
