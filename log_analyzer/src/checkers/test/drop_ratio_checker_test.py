@@ -12,9 +12,9 @@ class TestDropRatioChecker(unittest.TestCase):
         self.checker = DropRatioChecker()
 
     @patch(CHANNEL_MANAGER)
-    def test_when_ratio_bigger_than_threshold_should_flip_flag_true(self, mgr):
+    def test_when_events_and_rate_bigger_should_true_flag(self, mgr):
         # Given
-        channel = self.__get_channel(0.75)
+        channel = self.__get_channel([[1, 2, 3], [1, 2, 3, 4]])
         mgr.return_value.get_channels.return_value = [channel]
         self.checker.set_config({DROP_RATIO_THRESHOLD: 0.7})
         # When
@@ -23,9 +23,42 @@ class TestDropRatioChecker(unittest.TestCase):
         channel.update_flag.assert_called_with(HIGH_DROP_RATIO, True)
 
     @patch(CHANNEL_MANAGER)
-    def test_when_rate_smaller_threshold_should_make_flag_false(self, mgr):
+    def test_when_events_and_rate_smaller_should_false_flag(self, mgr):
         # Given
-        channel = self.__get_channel(0.75)
+        channel = self.__get_channel([[1], [1, 2, 3]])
+        mgr.return_value.get_channels.return_value = [channel]
+        self.checker.set_config({DROP_RATIO_THRESHOLD: 0.7})
+        # When
+        self.checker.run()
+        # Then
+        channel.update_flag.assert_called_with(HIGH_DROP_RATIO, False)
+
+    @patch(CHANNEL_MANAGER)
+    def test_when_no_read_nor_dropped_packets_should_false_flag(self, mgr):
+        # Given
+        channel = self.__get_channel([[], []])
+        mgr.return_value.get_channels.return_value = [channel]
+        self.checker.set_config({DROP_RATIO_THRESHOLD: 0.8})
+        # When
+        self.checker.run()
+        # Then
+        channel.update_flag.assert_called_with(HIGH_DROP_RATIO, False)
+
+    @patch(CHANNEL_MANAGER)
+    def test_when_no_read_packets_should_true_flag(self, mgr):
+        # Given
+        channel = self.__get_channel([[1], []])
+        mgr.return_value.get_channels.return_value = [channel]
+        self.checker.set_config({DROP_RATIO_THRESHOLD: 0.8})
+        # When
+        self.checker.run()
+        # Then
+        channel.update_flag.assert_called_with(HIGH_DROP_RATIO, True)
+
+    @patch(CHANNEL_MANAGER)
+    def test_when_no_dropped_packets_should_false_flag(self, mgr):
+        # Given
+        channel = self.__get_channel([[], [1]])
         mgr.return_value.get_channels.return_value = [channel]
         self.checker.set_config({DROP_RATIO_THRESHOLD: 0.8})
         # When
@@ -36,8 +69,8 @@ class TestDropRatioChecker(unittest.TestCase):
     @patch(CHANNEL_MANAGER)
     def test_when_multi_channels_should_handle_each_case(self, mgr):
         # Given
-        channel = self.__get_channel(0.75)
-        channel_2 = self.__get_channel(0.9)
+        channel = self.__get_channel([[1, 2, 3], [1, 2, 3, 4]])
+        channel_2 = self.__get_channel([[1], [1]])
         mgr.return_value.get_channels.return_value = [channel, channel_2]
         self.checker.set_config({DROP_RATIO_THRESHOLD: 0.8})
         # When
@@ -47,8 +80,8 @@ class TestDropRatioChecker(unittest.TestCase):
         channel_2.update_flag.assert_called_with(HIGH_DROP_RATIO, True)
 
     @staticmethod
-    def __get_channel(threshold):
+    def __get_channel(vals):
         channel = Mock()
-        channel.calculate_drop_ratio.return_value = threshold
+        channel.get_event.side_effect = vals
 
         return channel
