@@ -34,6 +34,12 @@ function create_flags(channel, channel_div){
 }
 
 function create_flag(channel_div, key, val){
-    const flag = create_element_with_text("P1", `${key}: ${val}`);
+    let text = ''
+    if (val){
+        text = `${key}` + "       ⛔";
+    }else {
+        text = `${key}` + "       ✅";
+    }
+    const flag = create_element_with_text("P", text);
     channel_div.appendChild(flag);
 }
