@@ -17,46 +17,15 @@ class Channel(object):
         if self.__packet_count % PACKETS_THRESHOULD == 0:
             self.__events.clear()
 
-        print(self.__packet_count)
         self.__packet_count += 1
         self.__events.append(events)
 
     def update_flag(self, flag, value):
         val = self.__flags.get(flag)
         if val is None:
-            raise ValueError("Not a correct flag")
+            raise ValueError("{} Not a correct flag".format(flag))
 
         self.__flags[flag] = value
-
-    def calculate_drop_rate(self):
-        nr_dropped_event = len(self.get_event(PACKET_DROPPED))
-        nr_executed_event = len(self.get_event(EXECTION_TIME))
-
-        if nr_dropped_event and nr_executed_event:
-            return -1
-
-        if not nr_executed_event:
-            return 1
-
-        if not nr_dropped_event:
-            return 0
-
-        return nr_dropped_event/nr_executed_event
-
-    def calculate_drop_ratio(self):
-        nr_dropped_event = len(self.get_event(PACKET_DROPPED))
-        nr_read_event = len(self.get_event(READ_TIME))
-
-        if nr_dropped_event and nr_read_event:
-            return -1
-
-        if not nr_read_event:
-            return 1
-
-        if not nr_dropped_event:
-            return 0
-
-        return nr_dropped_event/nr_read_event
 
     def get_event(self, event_type):
         return list(filter(lambda x: x.get_type() == event_type,
@@ -81,12 +50,12 @@ class Channel(object):
         self.__latest_packet_id = latest_packet_id
 
     def get_dict(self):
-        dict = {
+        c_dict = {
                 "name": self.__name,
                 "flags": self.__flags
                 }
 
-        return dict
+        return c_dict
 
     def __str__(self):
         return self.__name + " " + str(self.__packet_count)
