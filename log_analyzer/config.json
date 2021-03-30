@@ -20,6 +20,13 @@
             "configuration": {
                 "DROP_RATIO_THRESHOLD": 0.75
             }
+        },
+        {
+            "name": "execution_time_checker",
+            "enabled": true,
+            "configuration": {
+                "EXECUTION_TIME_THRESHOLD": 0.75
+            }
         }
     ]
 }
