@@ -180,6 +180,8 @@ class Scheduler {
   ///      a clean shutdown.
   void Stop();
 
+  void SetStateInvalid();
+
   /// Tells the current state of Scheduler (running or stopped/preparation).
   /// \return True if Scheduler is running.
   bool IsRunning();
@@ -214,7 +216,8 @@ template <class T>
 ReceiverChannel<T> Scheduler::CreateReceiverChannel(
     const char* name, int capacity, const UDPConnection& connection) {
   Protocol<T> protocol(connection);
-  protocol.ReceiverSideHandshake();
+  if(!protocol.ReceiverSideHandshake())
+    this->SetStateInvalid();
   ChannelImpl* chimpl =
       CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
   return ReceiverChannel<T>(chimpl, connection);
@@ -234,7 +237,8 @@ template <class T>
 SenderChannel<T> Scheduler::CreateSenderChannel(
     const char* name, int capacity, const UDPConnection& connection) {
   Protocol<T> protocol(connection);
-  protocol.SenderSideHandshake();
+  if(!protocol.SenderSideHandshake())
+    this->SetStateInvalid();
   ChannelImpl* chimpl =
       CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
   return SenderChannel<T>(chimpl, connection);

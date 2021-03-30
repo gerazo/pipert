@@ -58,6 +58,8 @@ class SchedulerImpl {
   /// See Scheduler::Stop().
   void Stop();
 
+  void SetStateInvalid();
+
   /// Return current state.
   /// See Scheduler::IsRunning().
   bool IsRunning() { return running_.load(std::memory_order_acquire); }
@@ -127,6 +129,7 @@ class SchedulerImpl {
   std::atomic_bool running_;  ///< Tells what state was reached by all threads.
   int workers_number_;        ///< Real number of worker threads.
   ProfilerImpl* profiler_;  ///< Implementation of the profiler if there is any.
+  bool valid_state = true;
 };
 
 }  // namespace pipert

@@ -16,29 +16,29 @@ Protocol<T>::Protocol(const UDPConnection& connection)
     : connection_(connection) {}
 
 template <class T>
-void Protocol<T>::SenderSideHandshake() {
+bool Protocol<T>::SenderSideHandshake() {
   CompatibilityChecker<T> local_properties;
   local_properties.Init();
   connection_.Send(&local_properties, sizeof(local_properties));
   char buffer[9];
   connection_.Receive(buffer, 9);
   if(!strcmp(buffer, HandshakeErrorMsg)){
-    //TODO: smth error handling here
-    assert(true);
+    return false;
   }
+  return true;
 }
 
 template <class T>
-void Protocol<T>::ReceiverSideHandshake() {
+bool Protocol<T>::ReceiverSideHandshake() {
   CompatibilityChecker<T> local_properties, remote_properties;
   local_properties.Init();
   connection_.Receive(&remote_properties, sizeof(remote_properties));
   if(local_properties == remote_properties) {
     connection_.Send(HandshakeSuccessMsg, 9);
+    return true;
   } else {
     connection_.Send(HandshakeErrorMsg, 9);
-    //TODO: smth error handling here
-    assert(true);
+    return false;
   }
 }
 

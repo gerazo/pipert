@@ -33,6 +33,11 @@ void Scheduler::Stop() {
   impl_->Stop();
 }
 
+void Scheduler::SetStateInvalid() {
+  assert(impl_);
+  impl_->SetStateInvalid();
+}
+
 bool Scheduler::IsRunning() {
   assert(impl_);
   return impl_->IsRunning();

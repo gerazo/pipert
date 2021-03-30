@@ -16,8 +16,8 @@ class Protocol {
   Protocol(const UDPConnection& connection);
   ~Protocol() = default;
 
-  void SenderSideHandshake();
-  void ReceiverSideHandshake();
+  bool SenderSideHandshake();
+  bool ReceiverSideHandshake();
 
  private:
   UDPConnection connection_;

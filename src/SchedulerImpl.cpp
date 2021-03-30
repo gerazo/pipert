@@ -63,7 +63,8 @@ void SchedulerImpl::UnregisterChannel(ChannelImpl* channel) {
 
 void SchedulerImpl::Start() {
   assert(!running_.load(std::memory_order_acquire));
-  if(running_.load(std::memory_order_acquire))
+  assert(valid_state);
+  if(running_.load(std::memory_order_acquire) || !valid_state)
     return;
   running_.store(true, std::memory_order_release);
   keep_running_.store(true, std::memory_order_release);
@@ -89,6 +90,13 @@ void SchedulerImpl::Stop() {
   running_.store(false, std::memory_order_release);
   workers_.clear();
   if (profiler_) profiler_->Stop();
+}
+
+void SchedulerImpl::SetStateInvalid() {
+  assert(!running_.load(std::memory_order_acquire));
+  if(running_.load(std::memory_order_acquire))
+    return;
+  valid_state = false;
 }
 
 void SchedulerImpl::JobsArrived(ChannelImpl* channel) {
