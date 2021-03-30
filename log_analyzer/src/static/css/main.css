@@ -35,3 +35,9 @@ margin: 2px;
   font-weight: 400;
   cursor: pointer;
 }
+
+.channel p {
+  margin: 3px;
+  text-align: left;
+  width: 100%;
+}
