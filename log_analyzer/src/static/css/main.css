@@ -10,8 +10,14 @@ body {
   border-radius: 5px;
 }
 
+.charts {
+  width: 40%;
+  float: left;
+}
+
 .channels-container {
-width: 70%;
+width: 60%;
+float: left;
 }
 
 .channel {

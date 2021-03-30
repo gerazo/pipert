@@ -15,6 +15,9 @@
             integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
             crossorigin="anonymous"></script>
     <!-- Bootstrap end  -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js" 
+            integrity="sha512-d9xgZrVZpmmQlfonhQUvTR7lMPtO7NkZMkA0ABN3PHCbKA5nqylQ/yWlFAyY6hYgdF1Qh6nYiuADWwKB4C2WSw=="
+            crossorigin="anonymous"></script>
 
     <script src="{{ url_for('static', filename='js/application.js') }}"></script>
     <link rel="stylesheet" href="static/css/main.css"/>
@@ -54,4 +57,7 @@
 </nav>
 </body>
     <div class="channels-container"></div>
+    <div class="container charts">
+      <canvas id="myChart"></canvas>
+    </div>
 </html>
