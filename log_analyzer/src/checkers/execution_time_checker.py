@@ -15,16 +15,11 @@ class ExecutionTimeChecker(BaseChecker):
 
 
     def __calculate_exectutinme_time(self, channel):
-
         nr_execution_events= channel.get_event(Execution_Time)
-        if len(nr_execution_events)>0 :
-            print(len(nr_execution_events))
         if(len(nr_execution_events)==0) :
             return -1
         else:
             sumAverage=0
             for event in nr_dropped_events :
                 sumAverage+=event.get_avg()
-        print("AVG")
-
         return sumAverage/len(nr_execution_events)
