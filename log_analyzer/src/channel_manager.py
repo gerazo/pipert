@@ -1,4 +1,5 @@
 from src.channel import Channel
+from src.channel_calc import ChannelCalc
 
 
 class ChannelManager(object):
@@ -31,7 +32,8 @@ class ChannelManager(object):
             return self.__channels
 
         def get_channels_dict(self):
-            return [channel.get_dict() for channel in self.__channels]
+            return [ChannelCalc(channel).get_dict() for channel in
+                    self.__channels]
 
     __instance = None
 

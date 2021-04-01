@@ -34,6 +34,9 @@ class Channel(object):
     def get_flag(self, flag):
         return self.__flags[flag]
 
+    def get_flags(self):
+        return self.__flags
+
     def get_name(self):
         return self.__name
 
@@ -48,14 +51,6 @@ class Channel(object):
 
     def set_latest_packet_id(self, latest_packet_id):
         self.__latest_packet_id = latest_packet_id
-
-    def get_dict(self):
-        c_dict = {
-                "name": self.__name,
-                "flags": self.__flags
-                }
-
-        return c_dict
 
     def __str__(self):
         return self.__name + " " + str(self.__packet_count)

@@ -12,4 +12,3 @@ class ExecutionTimeChecker(BaseChecker):
                 channel.update_flag(HIGH_EXECUTION_TIME, True)
             else:
                 channel.update_flag(HIGH_EXECUTION_TIME, False)
-

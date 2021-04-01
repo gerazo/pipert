@@ -12,4 +12,3 @@ class DropRatioChecker(BaseChecker):
                 channel.update_flag(HIGH_DROP_RATIO, True)
             else:
                 channel.update_flag(HIGH_DROP_RATIO, False)
-

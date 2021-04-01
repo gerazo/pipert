@@ -12,4 +12,3 @@ class DropRateChecker(BaseChecker):
                 channel.update_flag(HIGH_DROP_RATE, True)
             else:
                 channel.update_flag(HIGH_DROP_RATE, False)
-

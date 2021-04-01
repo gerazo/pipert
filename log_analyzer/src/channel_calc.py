@@ -1,5 +1,6 @@
 from src.constants import PACKET_DROPPED, EXECTION_TIME, READ_TIME
 
+
 class ChannelCalc(object):
     def __init__(self, channel):
         self.__channel = channel
@@ -44,3 +45,12 @@ class ChannelCalc(object):
 
         return sum_average/nr_execution_events
 
+    def get_dict(self):
+        c_dict = {
+                "name": self.__channel.get_name(),
+                "flags": self.__channel.get_flags(),
+                "DROP_RATE": self.calculate_drop_rate(),
+                "EXECUTION_TIME": self.calculate_exectutinme_time()
+                }
+
+        return c_dict
