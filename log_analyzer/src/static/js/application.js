@@ -1,7 +1,8 @@
 $(document).ready(function(){
     let socket = io.connect('http://' + document.domain + ':' + location.port);
-    let drop_rate_chart = draw_chart([], []);
-    
+    let drop_rate_chart = draw_chart('Drop Rates', "drop_rate_chart", [], []);
+    let execution_time_chart = draw_chart("Execution Time", 
+                                          "execution_time_chart", [], []);
     socket.on('update_channels', function(channels){
         $(".channels-container").empty();
         $.each(channels, function(i, channel){
@@ -9,8 +10,11 @@ $(document).ready(function(){
             $(".channels-container").append(channel_div);
         });
         channel_names = get_channel_names(channels);
-        drop_rates = get_drop_rates(channels);
+        drop_rates = get_field(channels, "DROP_RATE");
+        execution_rates = get_field(channels, "EXECUTION_TIME");
+        console.log(execution_rates);
         update_chart(drop_rate_chart, channel_names, drop_rates);
+        update_chart(execution_time_chart, channel_names, execution_rates);
     });
 });
 
@@ -49,21 +53,21 @@ function create_flag(channel_div, key, val){
 }
 
 
-function draw_chart(channel_names, drop_rates){
-    let myChart = document.getElementById('myChart').getContext('2d');
+function draw_chart(name, id, channel_names, data){
+    let myChart = document.getElementById(id).getContext('2d');
 
     // Chart.defaults.global.defaultFontFamily = 'Lato';
     // Chart.defaults.global.defaultFontSize = 18;
     // Chart.defaults.global.defaultFontColor = '#777';
 
-    let drop_rate_chart = new Chart(myChart, {
+    let chart = new Chart(myChart, {
         type:'horizontalBar', // bar, horizontalBar, pie, line, doughnut, 
                              // radar, polarArea
         data:{
           labels:channel_names,
           datasets:[{
-            label:'Drop Rates',
-            data: drop_rates,
+            label:name,
+            data: data,
             backgroundColor:'green',
             backgroundColor:[
               'rgba(255, 99, 132, 0.6)',
@@ -83,7 +87,7 @@ function draw_chart(channel_names, drop_rates){
         options:{
           title:{
             display:true,
-            text:'Drop Rates',
+            text:name,
             fontSize:25
           },
           legend:{
@@ -102,7 +106,7 @@ function draw_chart(channel_names, drop_rates){
           responsiveAnimationDuration: 0, // animation duration after a resize
     });
 
-    return drop_rate_chart;
+    return chart;
 }
 
 function get_channel_names(channels){
@@ -114,10 +118,10 @@ function get_channel_names(channels){
     return names
 }
 
-function get_drop_rates(channels){
+function get_field(channels, field){
     rates = []
     channels.forEach(function(channel){
-        rates.push(channel.DROP_RATE);
+        rates.push(channel[field]);
     });
     
     return rates
