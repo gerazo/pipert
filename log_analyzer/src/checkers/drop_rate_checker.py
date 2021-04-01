@@ -1,28 +1,14 @@
 from src.checkers.base_checker import BaseChecker
 from src.channel_manager import ChannelManager
-from src.constants import (DROP_RATE_THRESHOLD, HIGH_DROP_RATE,
-                           PACKET_DROPPED, EXECTION_TIME)
+from src.channel_calc import ChannelCalc
+from src.constants import DROP_RATE_THRESHOLD, HIGH_DROP_RATE
 
 
 class DropRateChecker(BaseChecker):
     def run(self):
         for channel in ChannelManager().get_channels():
-            if(self.__calculate_drop_rate(channel) >
+            if(ChannelCalc(channel).calculate_drop_rate() >
                self._config[DROP_RATE_THRESHOLD]):
                 channel.update_flag(HIGH_DROP_RATE, True)
             else:
                 channel.update_flag(HIGH_DROP_RATE, False)
-
-    def __calculate_drop_rate(self, channel):
-        nr_dropped_event = len(channel.get_event(PACKET_DROPPED))
-        nr_executed_event = len(channel.get_event(EXECTION_TIME))
-        if (not nr_dropped_event) and (not nr_executed_event):
-            return -1
-
-        if not nr_executed_event:
-            return 1
-
-        if not nr_dropped_event:
-            return 0
-
-        return nr_dropped_event/nr_executed_event
