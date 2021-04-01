@@ -5,9 +5,13 @@ class ChannelManager(object):
     class __ChannelManager(object):
         def __init__(self):
             self.__channels = []
+            self.__channelsMap = []
 
         def add_packet(self, packet):
             should_add_reciever = True
+            sender_reciever = [packet.get_sender(), packet.get_receiver()]
+            if not (sender_reciever in self.__channelsMap):
+                self.__channelsMap.append(sender_reciever)
             for channel in self.__channels:
                 if channel.get_name() == packet.get_receiver():
                     channel.add_events(packet.get_events())
@@ -32,6 +36,32 @@ class ChannelManager(object):
 
         def get_channels_dict(self):
             return [channel.get_dict() for channel in self.__channels]
+
+        def generate_channels_ordered_map(self):
+            channels_map_copy = self.__channelsMap.copy()
+            na_connections = list(filter(lambda x: x[0] == "N/A",
+                                         channels_map_copy))
+            connections_without_na = list(
+                filter(lambda x: x not in na_connections, channels_map_copy))
+            filtered_na_list = list(
+                filter(lambda x: x[1] not in [item[0]
+                                              for item in
+                                              connections_without_na],
+                       na_connections))
+            correct_connections = filtered_na_list+connections_without_na
+            result = [correct_connections[0][0], correct_connections[0][1]]
+            next_to_find = correct_connections[0][1]
+            correct_connections.remove(correct_connections[0])
+            while(len(correct_connections) > 0):
+                next_connection = list(
+                    filter(lambda x: x[1] == next_to_find,
+                           correct_connections))
+                if(len(next_connection) == 0):
+                    break
+                result.append(next_connection[0][0])
+                next_to_find = next_connection[0][0]
+                correct_connections.remove(next_connection[0])
+            return result
 
     __instance = None
 
