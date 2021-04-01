@@ -1,12 +1,16 @@
 $(document).ready(function(){
-    var socket = io.connect('http://' + document.domain + ':' + location.port);
-
+    let socket = io.connect('http://' + document.domain + ':' + location.port);
+    let drop_rate_chart = draw_chart([], []);
+    
     socket.on('update_channels', function(channels){
         $(".channels-container").empty();
         $.each(channels, function(i, channel){
             const channel_div = create_channel(channel);
             $(".channels-container").append(channel_div);
         });
+        channel_names = get_channel_names(channels);
+        drop_rates = get_drop_rates(channels);
+        update_chart(drop_rate_chart, channel_names, drop_rates);
     });
 });
 
@@ -45,27 +49,22 @@ function create_flag(channel_div, key, val){
 }
 
 
-$(document).ready(function(){
+function draw_chart(channel_names, drop_rates){
     let myChart = document.getElementById('myChart').getContext('2d');
 
-    Chart.defaults.global.defaultFontFamily = 'Lato';
-    Chart.defaults.global.defaultFontSize = 18;
-    Chart.defaults.global.defaultFontColor = '#777';
+    // Chart.defaults.global.defaultFontFamily = 'Lato';
+    // Chart.defaults.global.defaultFontSize = 18;
+    // Chart.defaults.global.defaultFontColor = '#777';
 
-    let massPopChart = new Chart(myChart, {
-        type:'bar', // bar, horizontalBar, pie, line, doughnut, radar, polarArea
+    let drop_rate_chart = new Chart(myChart, {
+        type:'horizontalBar', // bar, horizontalBar, pie, line, doughnut, 
+                             // radar, polarArea
         data:{
-          labels:['Boston', 'Worcester', 'Springfield', 'Lowell', 'Cambridge'],
+          labels:channel_names,
           datasets:[{
-            label:'Population',
-            data:[
-              617594,
-              181045,
-              153060,
-              106519,
-              105162
-            ],
-            //backgroundColor:'green',
+            label:'Drop Rates',
+            data: drop_rates,
+            backgroundColor:'green',
             backgroundColor:[
               'rgba(255, 99, 132, 0.6)',
               'rgba(54, 162, 235, 0.6)',
@@ -74,8 +73,58 @@ $(document).ready(function(){
               'rgba(153, 102, 255, 0.6)',
               'rgba(255, 159, 64, 0.6)',
               'rgba(255, 99, 132, 0.6)'
-            ]
+            ],
+            borderWidth:1,
+            borderColor:'#777',
+            hoverBorderWidth:3,
+            hoverBorderColor:'#000'
           }]
-        }
-      });
-});
+        },
+        options:{
+          title:{
+            display:true,
+            text:'Drop Rates',
+            fontSize:25
+          },
+          legend:{
+            display:false,
+          }
+          },
+          tooltips:{
+            enabled:false
+          },
+          animation: {
+            duration: 0 // general animation time
+        },
+          hover: {
+            animationDuration: 0 // duration of animations when hovering an item
+          },
+          responsiveAnimationDuration: 0, // animation duration after a resize
+    });
+
+    return drop_rate_chart;
+}
+
+function get_channel_names(channels){
+    names = []
+    channels.forEach(function(channel){
+        names.push(channel.name);
+    });
+    
+    return names
+}
+
+function get_drop_rates(channels){
+    rates = []
+    channels.forEach(function(channel){
+        rates.push(channel.DROP_RATE);
+    });
+    
+    return rates
+}
+
+function update_chart(chart, labels, data) {
+    chart.data.datasets[0].data = data;
+    chart.data.labels = labels;
+    chart.update();
+}

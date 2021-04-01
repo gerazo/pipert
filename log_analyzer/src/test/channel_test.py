@@ -63,18 +63,6 @@ class TestChannel(unittest.TestCase):
         # Then
         self.assertTrue(c.get_flag(FROZEN))
 
-    def test_get_dict(self):
-        # Given
-        c = Channel("c", [], 12)
-        # When
-        c.update_flag(HIGH_DROP_RATE, True)
-        c_dict = c.get_dict()
-        # Then
-        flags_names = [FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO]
-        flags = {flag: c.get_flag(flag) for flag in flags_names}
-        exp_dict = {"name": c.get_name(), "flags": flags}
-        self.assertEqual(c_dict, exp_dict)
-
     def test_get_event(self):
         # Given
         e = Event("LOGAA", 1, 2, 3, 4, 5)
