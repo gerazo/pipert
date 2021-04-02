@@ -16,14 +16,12 @@ std::uint8_t buffer[buffer_size];
 }  // namespace
 
 TEST(UDPConnectionTest, TestSendingReceiving) {
-  pipert::UDPConnection connection_receiver =
-    pipert::UDPConnection(server_port);
+  pipert::UDPConnection connection_receiver(server_port);
   for (int i = 0; i < buffer_size; i++) {
     buffer[i] = 7;
   }
   char ip[] = "127.0.0.1";
-  pipert::UDPConnection connection =
-    pipert::UDPConnection(server_port, ip);
+  pipert::UDPConnection connection(server_port, ip);
   connection.Send(buffer, buffer_size);
   EXPECT_TRUE(connection.IsConnected());
   for (int i = 0; i < buffer_size; i++) {

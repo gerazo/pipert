@@ -20,6 +20,9 @@ class UDPConnection {
   /// \param binding_port UDP connection port
   UDPConnection(int binding_port);
 
+  UDPConnection(const UDPConnection&) = delete;
+  UDPConnection& operator=(const UDPConnection&) = delete;
+
   /// Destructor of UDPConnection.
   ~UDPConnection();
 
