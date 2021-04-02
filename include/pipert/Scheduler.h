@@ -240,7 +240,8 @@ SenderChannel<T> Scheduler::CreateSenderChannel(
   if(!protocol.SenderSideHandshake())
     this->SetStateInvalid();
   ChannelImpl* chimpl =
-      CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
+      CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr,
+                        &SenderChannel<T>::SenderCallback);
   return SenderChannel<T>(chimpl, connection);
 }
 
