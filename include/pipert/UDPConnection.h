@@ -29,6 +29,9 @@ class UDPConnection {
   /// Returns whether the UDP connection was properly initialized.
   bool IsConnected() const { return socket_filedesc_ != -1; }
 
+  /// Sets socket's blocking mode
+  int SetBlockingMode(bool is_blocking);
+
   /// Sends the data through UDP connection.
   /// \param buffer holds the buffer that needs to be sent.
   /// \param size holds the buffer size.

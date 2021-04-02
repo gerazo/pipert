@@ -236,6 +236,7 @@ ScheduledChannel<T> Scheduler::CreateScheduledChannel(
 template <class T>
 SenderChannel<T> Scheduler::CreateSenderChannel(
     const char* name, int capacity, UDPConnection* connection) {
+  connection->SetBlockingMode(false);
   Protocol<T> protocol(connection);
   if(!protocol.SenderSideHandshake())
     this->SetStateInvalid();

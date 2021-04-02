@@ -7,9 +7,11 @@
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <fcntl.h>
 
 namespace pipert {
-UDPConnection::UDPConnection(int remote_port, const char* remote_address) {
+UDPConnection::UDPConnection(int remote_port,
+                             const char* remote_address) {
   socket_filedesc_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (socket_filedesc_ != -1) {
     memset(&remote_address_, 0, sizeof(remote_address_));
@@ -50,6 +52,14 @@ UDPConnection::~UDPConnection() {
   if (IsConnected()) {
     close(socket_filedesc_);
   }
+}
+
+int UDPConnection::SetBlockingMode(bool is_blocking) {
+  const int flags = fcntl(socket_filedesc_, F_GETFL, 0);
+  if (((flags & O_NONBLOCK) && !is_blocking) ||
+      (!(flags & O_NONBLOCK) && is_blocking))
+    return 0;
+  return fcntl(socket_filedesc_, F_SETFL, is_blocking ? flags ^ O_NONBLOCK : flags | O_NONBLOCK);
 }
 
 void UDPConnection::Send(void* buffer, int size) {
