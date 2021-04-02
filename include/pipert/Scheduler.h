@@ -107,7 +107,7 @@ class Scheduler {
 
   template <class T>
   ReceiverChannel<T> CreateReceiverChannel(
-      const char* name, int capacity, const UDPConnection& connection);
+      const char* name, int capacity, UDPConnection* connection);
 
   /// Create a ScheduledChannel.
   ///
@@ -158,7 +158,7 @@ class Scheduler {
 
   template <class T>
   SenderChannel<T> CreateSenderChannel(
-      const char* name, int capacity, const UDPConnection& connection);
+      const char* name, int capacity, UDPConnection* connection);
 
   /// Start all worker threads by entering _running state_.
   ///
@@ -214,7 +214,7 @@ PolledChannel<T> Scheduler::CreatePolledChannel(const char* name,
 
 template <class T>
 ReceiverChannel<T> Scheduler::CreateReceiverChannel(
-    const char* name, int capacity, const UDPConnection& connection) {
+    const char* name, int capacity, UDPConnection* connection) {
   Protocol<T> protocol(connection);
   if(!protocol.ReceiverSideHandshake())
     this->SetStateInvalid();
@@ -235,7 +235,7 @@ ScheduledChannel<T> Scheduler::CreateScheduledChannel(
 
 template <class T>
 SenderChannel<T> Scheduler::CreateSenderChannel(
-    const char* name, int capacity, const UDPConnection& connection) {
+    const char* name, int capacity, UDPConnection* connection) {
   Protocol<T> protocol(connection);
   if(!protocol.SenderSideHandshake())
     this->SetStateInvalid();

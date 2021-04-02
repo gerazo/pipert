@@ -8,18 +8,18 @@ namespace pipert {
 template <class T>
 class ReceiverChannel : public Channel<T> {
  public:
-  ReceiverChannel(ChannelImpl* impl, const UDPConnection& connection);
+  ReceiverChannel(ChannelImpl* impl, UDPConnection* connection);
 
   ReceiverChannel(ReceiverChannel&&) = default;
   ReceiverChannel& operator=(ReceiverChannel&&) = default;
 
  private:
-  UDPConnection connection_;
+  UDPConnection* connection_;
 };
 
 template <class T>
 ReceiverChannel<T>::ReceiverChannel(ChannelImpl* impl,
-                                    const UDPConnection& connection)
+                                    UDPConnection* connection)
     : Channel<T>(impl), connection_(connection) {}
 
 }  // namespace pipert

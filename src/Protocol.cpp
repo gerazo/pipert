@@ -12,16 +12,16 @@ template <class T>
 char Protocol<T>::HandshakeErrorMsg[] = "CONN_ERR";
 
 template <class T>
-Protocol<T>::Protocol(const UDPConnection& connection)
+Protocol<T>::Protocol(UDPConnection* connection)
     : connection_(connection) {}
 
 template <class T>
 bool Protocol<T>::SenderSideHandshake() {
   CompatibilityChecker<T> local_properties;
   local_properties.Init();
-  connection_.Send(&local_properties, sizeof(local_properties));
+  connection_->Send(&local_properties, sizeof(local_properties));
   char buffer[9];
-  connection_.Receive(buffer, 9);
+  connection_->Receive(buffer, 9);
   if(!strcmp(buffer, HandshakeErrorMsg)){
     return false;
   }
@@ -32,12 +32,12 @@ template <class T>
 bool Protocol<T>::ReceiverSideHandshake() {
   CompatibilityChecker<T> local_properties, remote_properties;
   local_properties.Init();
-  connection_.Receive(&remote_properties, sizeof(remote_properties));
+  connection_->Receive(&remote_properties, sizeof(remote_properties));
   if(local_properties == remote_properties) {
-    connection_.Send(HandshakeSuccessMsg, 9);
+    connection_->Send(HandshakeSuccessMsg, 9);
     return true;
   } else {
-    connection_.Send(HandshakeErrorMsg, 9);
+    connection_->Send(HandshakeErrorMsg, 9);
     return false;
   }
 }

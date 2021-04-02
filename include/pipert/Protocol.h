@@ -13,14 +13,14 @@ class Protocol {
   static char HandshakeSuccessMsg[];
   static char HandshakeErrorMsg[];
 
-  Protocol(const UDPConnection& connection);
+  Protocol(UDPConnection* connection);
   ~Protocol() = default;
 
   bool SenderSideHandshake();
   bool ReceiverSideHandshake();
 
  private:
-  UDPConnection connection_;
+  UDPConnection* connection_;
 };
 
 template <class T>

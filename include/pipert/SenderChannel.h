@@ -2,26 +2,24 @@
 #define _SENDERCHANNEL_H_
 
 #include "pipert/Channel.h"
-#include "pipert/UDPConnection.h"
-
 
 namespace pipert {
 
 template <class T>
 class SenderChannel : public Channel<T> {
  public:
-  SenderChannel(ChannelImpl* impl, const UDPConnection& connection);
+  SenderChannel(ChannelImpl* impl, UDPConnection* connection);
 
   SenderChannel(SenderChannel&&) = default;
   SenderChannel& operator=(SenderChannel&&) = default;
 
  private:
-  UDPConnection connection_;
+  UDPConnection* connection_;
 };
 
 template <class T>
 SenderChannel<T>::SenderChannel(ChannelImpl* impl,
-                                const UDPConnection& connection)
+                                UDPConnection* connection)
     : Channel<T>(impl), connection_(connection) {}
 
 }  // namespace pipert
