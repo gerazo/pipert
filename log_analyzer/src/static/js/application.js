@@ -1,8 +1,11 @@
 $(document).ready(function(){
     let socket = io.connect('http://' + document.domain + ':' + location.port);
-    let drop_rate_chart = draw_chart('Drop Rates', "drop_rate_chart", [], []);
     let execution_time_chart = draw_chart("Execution Time", 
-                                          "execution_time_chart", [], []);
+                                          "execution_time_chart", "line", 
+                                          [], []);
+    let drop_rate_chart = draw_chart("Drop Rates", "drop_rate_chart", 
+                                     "horizontalBar", [], []);
+    let i = 0;
     socket.on('update_channels', function(channels){
         $(".channels-container").empty();
         $.each(channels, function(i, channel){
@@ -12,9 +15,11 @@ $(document).ready(function(){
         channel_names = get_channel_names(channels);
         drop_rates = get_field(channels, "DROP_RATE");
         execution_rates = get_field(channels, "EXECUTION_TIME");
-        console.log(execution_rates);
-        update_chart(drop_rate_chart, channel_names, drop_rates);
-        update_chart(execution_time_chart, channel_names, execution_rates);
+        if (i % 20 == 0) {
+            update_chart(drop_rate_chart, channel_names, drop_rates);
+            update_chart(execution_time_chart, channel_names, execution_rates);
+        }
+        i++;
     });
 });
 
@@ -53,23 +58,13 @@ function create_flag(channel_div, key, val){
 }
 
 
-function draw_chart(name, id, channel_names, data){
+function draw_chart(name, id, chart_type, channel_names, data){
     let myChart = document.getElementById(id).getContext('2d');
-
-    // Chart.defaults.global.defaultFontFamily = 'Lato';
-    // Chart.defaults.global.defaultFontSize = 18;
-    // Chart.defaults.global.defaultFontColor = '#777';
-
-    let chart = new Chart(myChart, {
-        type:'horizontalBar', // bar, horizontalBar, pie, line, doughnut, 
-                             // radar, polarArea
-        data:{
-          labels:channel_names,
-          datasets:[{
-            label:name,
-            data: data,
-            backgroundColor:'green',
-            backgroundColor:[
+    let background_color = undefined;
+    if (chart_type == 'line') {
+        background_color = 'rgba(0, 0, 0, 0.1)'; 
+    }else {
+        background_color = [
               'rgba(255, 99, 132, 0.6)',
               'rgba(54, 162, 235, 0.6)',
               'rgba(255, 206, 86, 0.6)',
@@ -77,7 +72,21 @@ function draw_chart(name, id, channel_names, data){
               'rgba(153, 102, 255, 0.6)',
               'rgba(255, 159, 64, 0.6)',
               'rgba(255, 99, 132, 0.6)'
-            ],
+            ]
+    }
+    // Chart.defaults.global.defaultFontFamily = 'Lato';
+    // Chart.defaults.global.defaultFontSize = 18;
+    // Chart.defaults.global.defaultFontColor = '#777';
+
+    let chart = new Chart(myChart, {
+        type:chart_type, // bar, horizontalBar, pie, line, doughnut, 
+                             // radar, polarArea
+        data:{
+          labels:channel_names,
+          datasets:[{
+            label: name,
+            data: data,
+            backgroundColor: background_color,
             borderWidth:1,
             borderColor:'#777',
             hoverBorderWidth:3,

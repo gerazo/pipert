@@ -14,6 +14,11 @@ def index():
     return render_template('index.html')
 
 
+@app.route('/stats')
+def stats():
+    return render_template('stats.html')
+
+
 @app.route('/settings')
 def settings():
     cr = ConfigReader()
@@ -31,11 +36,6 @@ def get_packet():
 
 def run():
     socketio.run(app)
-
-# @socketio.on('message')
-# def receive_message(message):
-#     print("#########", message)
-#     send("Hello From the BackEnd")
 
 
 if __name__ == '__main__':
