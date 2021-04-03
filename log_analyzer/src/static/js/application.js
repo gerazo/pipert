@@ -21,6 +21,17 @@ $(document).ready(function(){
         }
         i++;
     });
+    socket.on('channels_map', function(channels){
+        nodes = create_nodes(channels);
+        edges = create_edges(channels);
+        var container = document.getElementById("channels-map");
+        var data = {
+            nodes: nodes,
+            edges: edges
+        };
+        var options = {};
+        var network = new vis.Network(container, data, options);
+   });
 });
 
 function create_channel(channel){
@@ -140,4 +151,30 @@ function update_chart(chart, labels, data) {
     chart.data.datasets[0].data = data;
     chart.data.labels = labels;
     chart.update();
+}
+
+function create_nodes(arr) {
+    let ret = [];
+    arr.forEach(function(item, index, array) {
+        ret.push({id: index, value:12, shape: "box", color: random_rgba(),
+                  label: item});
+    })
+
+    return ret;
+}
+
+function create_edges(arr) {
+    let ret = [];
+    for (let i = 0; i < (arr.length - 1); i++) {
+        ret.push({from: i, to: i+1, arrows: "to"});
+    }
+
+    return ret;
+}
+
+function random_rgba() {
+    var o = Math.round, r = Math.random, s = 255;
+    var color = 'rgba(' + o(r() * s) + ', ' + o(r() * s) + ', ' + 
+                 o(r() * s) + ', ' + r().toFixed(1) + ')';
+    return color;
 }

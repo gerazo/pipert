@@ -27,11 +27,16 @@ def settings():
 
 
 @app.route('/', methods=['POST'])
-def get_packet():
-    channels = request.json
-    # print(channels)
-    socketio.emit("update_channels", channels, json=True)
-    return jsonify({"ok": True})
+def index_post():
+    req_json = request.json
+    if req_json.get("c_dicts"):
+        socketio.emit("update_channels", req_json.get("c_dicts"), json=True)
+        return jsonify({"ok": True})
+
+    if req_json.get("c_map"):
+        print(req_json.get("c_map"))
+        socketio.emit("channels_map", req_json.get("c_map"), json=True)
+        return jsonify({"ok": True})
 
 
 def run():
