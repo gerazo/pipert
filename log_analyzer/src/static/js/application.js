@@ -1,3 +1,5 @@
+import { get_channel_color } from './utils.js';
+
 $(document).ready(function(){
     let socket = io.connect('http://' + document.domain + ':' + location.port);
     let execution_time_chart = draw_chart("Execution Time", 
@@ -12,9 +14,9 @@ $(document).ready(function(){
             const channel_div = create_channel(channel);
             $(".channels-container").append(channel_div);
         });
-        channel_names = get_channel_names(channels);
-        drop_rates = get_field(channels, "DROP_RATE");
-        execution_rates = get_field(channels, "EXECUTION_TIME");
+        var channel_names = get_channel_names(channels);
+        var drop_rates = get_field(channels, "DROP_RATE");
+        var execution_rates = get_field(channels, "EXECUTION_TIME");
         if (i % 20 == 0) {
             update_chart(drop_rate_chart, channel_names, drop_rates);
             update_chart(execution_time_chart, channel_names, execution_rates);
@@ -22,8 +24,8 @@ $(document).ready(function(){
         i++;
     });
     socket.on('channels_map', function(channels){
-        nodes = create_nodes(channels);
-        edges = create_edges(channels);
+        var nodes = create_nodes(channels);
+        var edges = create_edges(channels);
         var container = document.getElementById("channels-map");
         var data = {
             nodes: nodes,
@@ -40,7 +42,7 @@ function create_channel(channel){
     channel_div.appendChild(name);
     create_flags(channel, channel_div);
     channel_div.className = "channel";
-
+    channel_div.style.background = get_channel_color(channel.name); 
     return channel_div
 }
 
@@ -130,7 +132,7 @@ function draw_chart(name, id, chart_type, channel_names, data){
 }
 
 function get_channel_names(channels){
-    names = []
+    let names = []
     channels.forEach(function(channel){
         names.push(channel.name);
     });
@@ -139,7 +141,7 @@ function get_channel_names(channels){
 }
 
 function get_field(channels, field){
-    rates = []
+    let rates = []
     channels.forEach(function(channel){
         rates.push(channel[field]);
     });
@@ -156,8 +158,8 @@ function update_chart(chart, labels, data) {
 function create_nodes(arr) {
     let ret = [];
     arr.forEach(function(item, index, array) {
-        ret.push({id: index, value:12, shape: "box", color: random_rgba(),
-                  label: item});
+        ret.push({id: index, value:12, shape: "box",
+                  color: get_channel_color(item), label: item});
     })
 
     return ret;
@@ -170,11 +172,4 @@ function create_edges(arr) {
     }
 
     return ret;
-}
-
-function random_rgba() {
-    var o = Math.round, r = Math.random, s = 255;
-    var color = 'rgba(' + o(r() * s) + ', ' + o(r() * s) + ', ' + 
-                 o(r() * s) + ', ' + r().toFixed(1) + ')';
-    return color;
 }
