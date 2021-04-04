@@ -39,6 +39,49 @@ class ChannelManager(object):
             return [ChannelCalc(channel).get_dict() for channel in
                     self.__channels]
 
+        def get_pipline_thrust_spent_time(self):
+
+            minimum_events_spent_times = \
+                [ChannelCalc(x).get_minimum_passed_time_event()
+                 for x in self.__channels]
+            maximum_events_spent_times = \
+                [ChannelCalc(x).get_maximum_passed_time_event()
+                 for x in self.__channels]
+            while -1 in minimum_events_spent_times:
+                minimum_events_spent_times.remove(-1)
+            while -1 in maximum_events_spent_times:
+                maximum_events_spent_times.remove(-1)
+            if(len(minimum_events_spent_times) > 0 and
+                    len(maximum_events_spent_times) > 0):
+                return max(maximum_events_spent_times)\
+                       - min(minimum_events_spent_times)
+            else:
+                return -2
+
+        def get_pipeline_maximum_Total_execution_time(self):
+            channels_maximum_execution_times = \
+                [ChannelCalc(x).calculate_maximum_exectutinme_time()
+                 for x in self.__channels]
+            while -1 in channels_maximum_execution_times:
+                channels_maximum_execution_times.remove(-1)
+            if(len(channels_maximum_execution_times) > 0):
+                return sum(channels_maximum_execution_times)
+            else:
+                return -1
+
+        def calculate_pipeline_total_execution_time_to_pipeline_time(self):
+            pipline_total_time = self.get_pipline_thrust_spent_time()
+            pipeline_total_execution_time = \
+                self.get_pipeline_maximum_Total_execution_time()
+            if(pipline_total_time != -1 and pipline_total_time != -1):
+                if(pipline_total_time !=0 and pipline_total_time != 0):
+                    return pipeline_total_execution_time / pipline_total_time
+                else:
+                    return -1
+
+            else:
+                return -1
+
         def generate_channels_ordered_map(self):
             channels_map_copy = self.__channelsMap.copy()
             na_connections = list(filter(lambda x: x[0] == "N/A",
@@ -63,6 +106,7 @@ class ChannelManager(object):
                 result.append(next_connection[0][0])
                 next_to_find = next_connection[0][0]
                 correct_connections.remove(next_connection[0])
+            result.reverse()
             return result
 
     __instance = None
