@@ -1,7 +1,6 @@
 let channels_colors = {}
 
 export function get_channel_color(channel) {
-    console.log(channels_colors);
     if (!(channel in channels_colors)) {
        channels_colors[channel] = get_random_color(); 
     }

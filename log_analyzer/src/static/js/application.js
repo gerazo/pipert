@@ -1,3 +1,4 @@
+import { create_channels } from './channels.js';
 import { get_channel_color } from './utils.js';
 
 $(document).ready(function(){
@@ -9,11 +10,7 @@ $(document).ready(function(){
                                      "horizontalBar", [], []);
     let i = 0;
     socket.on('update_channels', function(channels){
-        $(".channels-container").empty();
-        $.each(channels, function(i, channel){
-            const channel_div = create_channel(channel);
-            $(".channels-container").append(channel_div);
-        });
+        create_channels(channels);
         var channel_names = get_channel_names(channels);
         var drop_rates = get_field(channels, "DROP_RATE");
         var execution_rates = get_field(channels, "EXECUTION_TIME");
@@ -35,41 +32,6 @@ $(document).ready(function(){
         var network = new vis.Network(container, data, options);
    });
 });
-
-function create_channel(channel){
-    const channel_div = document.createElement("div");
-    const name = create_element_with_text("H2", channel.name);
-    channel_div.appendChild(name);
-    create_flags(channel, channel_div);
-    channel_div.className = "channel";
-    channel_div.style.background = get_channel_color(channel.name); 
-    return channel_div
-}
-
-function create_element_with_text(elem, text){
-    const e = document.createElement(elem);
-    const t = document.createTextNode(text);
-    e.appendChild(t);
-    return e
-}
-
-function create_flags(channel, channel_div){
-    for (const [key, value] of Object.entries(channel.flags)) {
-        create_flag(channel_div, key, value);
-    }
-}
-
-function create_flag(channel_div, key, val){
-    let text = ''
-    if (val){
-        text = `${key}` + "       ⛔";
-    }else {
-        text = `${key}` + "       ✅";
-    }
-    const flag = create_element_with_text("P", text);
-    channel_div.appendChild(flag);
-}
-
 
 function draw_chart(name, id, chart_type, channel_names, data){
     let myChart = document.getElementById(id).getContext('2d');
