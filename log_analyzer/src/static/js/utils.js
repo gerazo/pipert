@@ -13,8 +13,8 @@ function rand(min, max) {
 }
 
 function get_random_color() {
-    var h = rand(50, 360);
+    var h = rand(0, 360);
     var s = rand(50, 100);
-    var l = rand(40, 100);
+    var l = rand(30, 100);
     return 'hsl(' + h + ',' + s + '%,' + l + '%)';
 }

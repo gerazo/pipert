@@ -12,10 +12,10 @@ export function create_channels(channels) {
 function create_channel(channel){
     const channel_div = document.createElement("div");
     const name = create_element_with_text("H2", channel.name);
+    name.style.color = get_channel_color(channel.name); 
     channel_div.appendChild(name);
     create_flags(channel, channel_div);
     channel_div.className = `channel ${channel.name}`;
-    channel_div.style.background = get_channel_color(channel.name); 
     return channel_div
 }
 

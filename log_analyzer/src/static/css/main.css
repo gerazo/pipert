@@ -23,6 +23,7 @@ float: left;
 .channel {
 border: 2px solid black;
 border-radius: 5px;
+background-color: #ffffcc;
 text-align: center;
 width: 30%;
 display: inline-block;

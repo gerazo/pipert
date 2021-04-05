@@ -1,89 +1,31 @@
 import { create_channels } from './channels.js';
 import { create_map } from './channels_map.js'
+import { add_dataset, create_line_live_chart, update } from './charts.js';
 
 $(document).ready(function(){
     let socket = io.connect('http://' + document.domain + ':' + location.port);
-    let execution_time_chart = draw_chart("Execution Time", 
-                                          "execution_time_chart", "line", 
-                                          [], []);
-    let drop_rate_chart = draw_chart("Drop Rates", "drop_rate_chart", 
-                                     "horizontalBar", [], []);
-    let i = 0;
+    let names = [];
+    let ex_chart = create_line_live_chart("execution_time_chart", "Execution Time");
+    let drop_chart = create_line_live_chart("drop_rate_chart", "Drop Rate");
     socket.on('update_channels', function(channels){
         create_channels(channels);
-        var channel_names = get_channel_names(channels);
-        var drop_rates = get_field(channels, "DROP_RATE");
         var execution_rates = get_field(channels, "EXECUTION_TIME");
-        if (i % 20 == 0) {
-            update_chart(drop_rate_chart, channel_names, drop_rates);
-            update_chart(execution_time_chart, channel_names, execution_rates);
+        // var drop_rates = get_field(channels, "DROP_RATE")
+        if (!( names.length == get_channel_names(channels).length)) {
+            names = get_channel_names(channels);
+            for (const channel_name of names) {
+                add_dataset(ex_chart, channel_name);
+                add_dataset(drop_chart, channel_name);
+            }
         }
-        i++;
+        
+        update(ex_chart, execution_rates);
+        update(drop_chart, drop_rates);
     });
     socket.on('channels_map', function(channels){
       create_map(channels);
    });
 });
-
-function draw_chart(name, id, chart_type, channel_names, data){
-    let myChart = document.getElementById(id).getContext('2d');
-    let background_color = undefined;
-    if (chart_type == 'line') {
-        background_color = 'rgba(0, 0, 0, 0.1)'; 
-    }else {
-        background_color = [
-              'rgba(255, 99, 132, 0.6)',
-              'rgba(54, 162, 235, 0.6)',
-              'rgba(255, 206, 86, 0.6)',
-              'rgba(75, 192, 192, 0.6)',
-              'rgba(153, 102, 255, 0.6)',
-              'rgba(255, 159, 64, 0.6)',
-              'rgba(255, 99, 132, 0.6)'
-            ]
-    }
-    // Chart.defaults.global.defaultFontFamily = 'Lato';
-    // Chart.defaults.global.defaultFontSize = 18;
-    // Chart.defaults.global.defaultFontColor = '#777';
-
-    let chart = new Chart(myChart, {
-        type:chart_type, // bar, horizontalBar, pie, line, doughnut, 
-                             // radar, polarArea
-        data:{
-          labels:channel_names,
-          datasets:[{
-            label: name,
-            data: data,
-            backgroundColor: background_color,
-            borderWidth:1,
-            borderColor:'#777',
-            hoverBorderWidth:3,
-            hoverBorderColor:'#000'
-          }]
-        },
-        options:{
-          title:{
-            display:true,
-            text:name,
-            fontSize:25
-          },
-          legend:{
-            display:false,
-          }
-          },
-          tooltips:{
-            enabled:false
-          },
-          animation: {
-            duration: 0 // general animation time
-        },
-          hover: {
-            animationDuration: 0 // duration of animations when hovering an item
-          },
-          responsiveAnimationDuration: 0, // animation duration after a resize
-    });
-
-    return chart;
-}
 
 function get_channel_names(channels){
     let names = []
@@ -101,10 +43,4 @@ function get_field(channels, field){
     });
     
     return rates
-}
-
-function update_chart(chart, labels, data) {
-    chart.data.datasets[0].data = data;
-    chart.data.labels = labels;
-    chart.update();
 }
