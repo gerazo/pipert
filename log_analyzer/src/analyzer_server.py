@@ -30,16 +30,16 @@ class AnalyzerServer(object):
             pm.add(data)
             cm.add_packet(pm.get_latest_packet())
             checkers_manager.run()
-            requests.post("http://127.0.0.1:5000", 
+            requests.post("http://127.0.0.1:5000",
                           json={"c_dicts": cm.get_channels_dict()})
             self.__send_channels_map(cm)
 
     def __send_channels_map(self, cm):
-       c_map = cm.generate_channels_ordered_map()
-       nr_channels_map = len(c_map)
-       if nr_channels_map != self.__update_map_controller:
+        c_map = cm.generate_channels_ordered_map()
+        nr_channels_map = len(c_map)
+        if nr_channels_map != self.__update_map_controller:
             self.__update_map_controller = nr_channels_map
-            requests.post("http://127.0.0.1:5000", 
+            requests.post("http://127.0.0.1:5000",
                           json={"c_map": c_map})
 
     def run(self):

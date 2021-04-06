@@ -1,6 +1,6 @@
 from src.checkers.base_checker import BaseChecker
 from src.channel_manager import ChannelManager
-from src.constants import CHANNEL_READ_THRESHOLD,HIGH_READ_TIME
+from src.constants import CHANNEL_READ_THRESHOLD, HIGH_READ_TIME
 
 
 class ReadTimeChecker(BaseChecker):
