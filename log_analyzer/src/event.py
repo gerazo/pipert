@@ -7,6 +7,7 @@ class Event(object):
         self.__min_val = min_val
         self.__max_val = max_val
         self.__avg_val = avg_val
+        self.__packet_id = None
 
     def get_type(self):
         return self.__type[4:]
@@ -35,6 +36,9 @@ class Event(object):
                 "avg": self.get_avg()}
 
         return dict
+
+    def set_packet_id(self, id):
+        self.__packet_id = id
 
     def __str__(self):
         return "type: {}, log count: {}, " \
