@@ -10,9 +10,18 @@ class ChannelManager(object):
 
         def add_packet(self, packet):
             should_add_reciever = True
-            sender_reciever = [packet.get_sender(), packet.get_receiver()]
-            if not (sender_reciever in self.__channelsMap):
-                self.__channelsMap.append(sender_reciever)
+            if(packet.get_sender() != "N/A"):
+                sender_reciever = [packet.get_sender(), packet.get_receiver()]
+                if not (sender_reciever in self.__channelsMap):
+                    self.__channelsMap.append(sender_reciever)
+            else:
+                external_channel_name = "external_" + packet.get_receiver()
+                if(not (
+                        external_channel_name
+                        in [x.get_name() for x in self.__channels])):
+                    self.__channels.append(
+                        Channel(external_channel_name, [], packet.get_id()))
+
             for channel in self.__channels:
                 if channel.get_name() == packet.get_receiver():
                     channel.add_events(packet.get_events())
