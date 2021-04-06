@@ -2,6 +2,7 @@ from src.constants import PACKET_DROPPED, EXECTION_TIME, READ_TIME
 from src.utils import flatten_list
 
 
+
 class ChannelCalc(object):
     def __init__(self, channel):
         self.__channel = channel
@@ -75,6 +76,8 @@ class ChannelCalc(object):
             sum([event.get_max() for event in execution_events])
 
         return sum_maximum_executiontime/nr_execution_events
+
+
 
     def get_dict(self):
         c_dict = {

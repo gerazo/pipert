@@ -27,6 +27,13 @@
             "configuration": {
                 "EXECUTION_TIME_THRESHOLD": 0.75
             }
+        },
+        {
+            "name": "read_time_checker",
+            "enabled": true,
+            "configuration": {
+                "CHANNEL_READ_THRESHOLD": 1
+            }
         }
     ]
 }

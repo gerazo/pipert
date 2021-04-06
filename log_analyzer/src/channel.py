@@ -1,7 +1,7 @@
 from src.utils import flatten_list
 from src.constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
                            PACKETS_THRESHOULD, PACKET_DROPPED, EXECTION_TIME,
-                           READ_TIME, HIGH_EXECUTION_TIME)
+                           READ_TIME, HIGH_EXECUTION_TIME,HIGH_READ_TIME)
 
 
 class Channel(object):
@@ -9,7 +9,7 @@ class Channel(object):
         self.__name = name
         self.__events = [events]
         self.__flags = {FROZEN: False, HIGH_DROP_RATE: False,
-                        HIGH_DROP_RATIO: False, HIGH_EXECUTION_TIME: False}
+                        HIGH_DROP_RATIO: False, HIGH_EXECUTION_TIME: False,HIGH_READ_TIME:False}
         self.__packet_count = 1
         self.__latest_packet_id = latest_packet_id
 

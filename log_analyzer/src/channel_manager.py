@@ -2,6 +2,7 @@ from src.channel import Channel
 from src.channel_calc import ChannelCalc
 
 
+
 class ChannelManager(object):
     class __ChannelManager(object):
         def __init__(self):
@@ -81,6 +82,33 @@ class ChannelManager(object):
 
             else:
                 return -1
+
+        def calculate_channel_time_to_read(self,channel):
+            channelsMap=self.generate_channels_ordered_map()
+            # bug may happen here because of NA connections
+            if channel.get_name() in channelsMap :
+                channelIndex=channelsMap.index(channel.get_name())
+                if channelIndex == 0 :
+                    return 0
+                else:
+                    previous_channel=channelsMap[channelIndex-1]
+                    channel_events=channel.get_events()[0]
+                    previous_channel= next_connection = list(
+                        filter(lambda x: x.get_name()== previous_channel,
+                               self.__channels))
+                    previous_channel_events=previous_channel[0].get_events()[0]
+
+                    channel_events_passed_times = [x.get_passed_time() for x in channel_events]
+                    previous_channel_events_passed_times = [x.get_passed_time() for x in previous_channel_events]
+                    if(len(channel_events_passed_times)>0 and len(previous_channel_events_passed_times)>0):
+                        return((sum(channel_events_passed_times)/len(channel_events_passed_times))-(sum(previous_channel_events_passed_times)/len(previous_channel_events_passed_times)))
+                    else:
+                        return 0
+            else:
+                return 0
+
+
+
 
         def generate_channels_ordered_map(self):
             channels_map_copy = self.__channelsMap.copy()
