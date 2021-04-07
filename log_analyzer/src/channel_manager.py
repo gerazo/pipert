@@ -41,7 +41,10 @@ class ChannelManager(object):
                 sender = "External_" + receiver
                 self.__na_channels.append(sender)
             else:
-                self.__channels.append(sender)
+                channel_names = [c.get_name() for c in self.__channels]
+                if sender not in channel_names:
+                    c = Channel(sender, [], -1)
+                    self.__channels.append(c)
 
             sender_n_receiver = (sender, receiver) 
 
@@ -54,10 +57,6 @@ class ChannelManager(object):
             channels_names = [c.get_name() for c in self.__channels]
             unique_channels = channels_names + self.__na_channels
             channels_dict = {c: i for i, c in enumerate(unique_channels)}
-            print("=====================")
-            print(unique_channels)
-            print(channels_dict)
-            print("=====================")
             connections = [(channels_dict[s], channels_dict[r]) for (s,r) in 
                             self.__channels_map]
 

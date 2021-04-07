@@ -16,8 +16,9 @@ class Channel(object):
         self.__latest_packet_id = latest_packet_id
 
     def add_events(self, events):
-        if self.__packet_count % PACKETS_THRESHOULD == 0:
+        if self.__packet_count > PACKETS_THRESHOULD:
             self.__events.clear()
+            self.__packet_count = 0
 
         self.__packet_count += 1
         self.__events.append(events)
