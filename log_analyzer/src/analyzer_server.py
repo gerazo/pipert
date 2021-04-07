@@ -25,7 +25,6 @@ class AnalyzerServer(object):
         checkers_manager = CheckersManager()
         counter = 0
         while True:
-            print(counter, PACKETS_THRESHOULD)
             if counter == PACKETS_THRESHOULD:
                 checkers_manager.run()
                 requests.post("http://127.0.0.1:5000",
@@ -44,7 +43,6 @@ class AnalyzerServer(object):
             counter += 1
 
     def run(self):
-        self.__configure_server()
         self.__start_server()
 
     def get_output(self):

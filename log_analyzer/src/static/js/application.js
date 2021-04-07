@@ -10,7 +10,7 @@ $(document).ready(function(){
     socket.on('update_channels', function(channels){
         create_channels(channels);
         var execution_rates = get_field(channels, "EXECUTION_TIME");
-        // var drop_rates = get_field(channels, "DROP_RATE")
+        var drop_rates = get_field(channels, "DROP_RATE")
         if (!( names.length == get_channel_names(channels).length)) {
             names = get_channel_names(channels);
             for (const channel_name of names) {
@@ -22,8 +22,8 @@ $(document).ready(function(){
         update(ex_chart, execution_rates);
         update(drop_chart, drop_rates);
     });
-    socket.on('channels_map', function(channels){
-      create_map(channels);
+    socket.on('channels_map', function(dict){
+      create_map(dict);
    });
 });
 

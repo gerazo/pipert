@@ -33,9 +33,8 @@ def index_post():
         socketio.emit("update_channels", req_json.get("c_dicts"), json=True)
         return jsonify({"ok": True})
 
-    if req_json.get("c_map"):
-        print(req_json.get("c_map"))
-        socketio.emit("channels_map", req_json.get("c_map"), json=True)
+    if req_json.get("unique_channels"):
+        socketio.emit("channels_map", req_json, json=True)
         return jsonify({"ok": True})
 
 
