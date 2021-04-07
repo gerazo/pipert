@@ -11,7 +11,6 @@ class AnalyzerServer(object):
         self.__ip = ip
         self.__port = port
         self.__output = ""
-        self.__update_map_controller = 0
 
     def __configure_server(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -32,15 +31,11 @@ class AnalyzerServer(object):
             checkers_manager.run()
             requests.post("http://127.0.0.1:5000",
                           json={"c_dicts": cm.get_channels_dict()})
-            self.__send_channels_map(cm)
-
-    def __send_channels_map(self, cm):
-        c_map = cm.generate_channels_ordered_map()
-        nr_channels_map = len(c_map)
-        if nr_channels_map != self.__update_map_controller:
-            self.__update_map_controller = nr_channels_map
-            requests.post("http://127.0.0.1:5000",
-                          json={"c_map": c_map})
+            if cm.should_update_map():
+                unique_channels, c_map = cm.get_channels_map()
+                requests.post("http://127.0.0.1:5000",
+                              json={"unique_channels": unique_channels,
+                                    "channels_map": c_map})
 
     def run(self):
         self.__configure_server()

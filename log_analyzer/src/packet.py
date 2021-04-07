@@ -7,6 +7,13 @@ class Packet(object):
 
         self.set_id_for_events()
 
+    def has_event(self, event_type):
+        for event in self.get_events():
+            if event.get_type() == event_type:
+                return True
+
+        return False
+
     def get_receiver(self):
         return self.__receiver
 

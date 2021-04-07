@@ -30,7 +30,7 @@
         },
         {
             "name": "read_time_checker",
-            "enabled": true,
+            "enabled": false,
             "configuration": {
                 "CHANNEL_READ_THRESHOLD": 1
             }

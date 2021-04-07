@@ -1,45 +1,73 @@
 from src.channel import Channel
 from src.channel_calc import ChannelCalc
+from src.constants import PACKET_PUSHED
 
 
 class ChannelManager(object):
     class __ChannelManager(object):
         def __init__(self):
             self.__channels = []
-            self.__channelsMap = []
+            self.__na_channels = []
+            self.__channels_map = []
+            self.__should_update_map = False
 
         def add_packet(self, packet):
+            receiver = packet.get_receiver()
+            self.__add_reciever(receiver, packet.get_events(), packet.get_id())
+
+            sender = packet.get_sender()
+            has_pushed_events = packet.has_event(PACKET_PUSHED)
+            self.__add_to_channels_map(receiver, sender, has_pushed_events)
+
+        def __add_reciever(self, receiver_channel, events, packet_id): 
             should_add_reciever = True
-            if(packet.get_sender() != "N/A"):
-                sender_reciever = [packet.get_sender(), packet.get_receiver()]
-                if not (sender_reciever in self.__channelsMap):
-                    self.__channelsMap.append(sender_reciever)
-            else:
-                external_channel_name = "external_" + packet.get_receiver()
-                if(not (
-                        external_channel_name
-                        in [x.get_name() for x in self.__channels])):
-                    self.__channels.append(
-                        Channel(external_channel_name, [], packet.get_id()))
-
             for channel in self.__channels:
-                if channel.get_name() == packet.get_receiver():
-                    channel.add_events(packet.get_events())
-                    channel.set_latest_packet_id(packet.get_id())
+                if channel.get_name() == receiver_channel:
+                    channel.add_events(events)
+                    channel.set_latest_packet_id(packet_id)
                     should_add_reciever = False
-
+                    return
+            
             if should_add_reciever:
-                self.__channels.append(
-                    Channel(packet.get_receiver(),
-                            packet.get_events(), packet.get_id()))
+                c = Channel(receiver_channel, events, packet_id)
+                self.__channels.append(c)
 
-            should_add_sender = True
-            for channel in self.__channels:
-                if channel.get_name() == packet.get_sender():
-                    should_add_sender = False
 
-            if should_add_sender:
-                self.__channels.append(Channel(packet.get_sender(), [], -1))
+        def __add_to_channels_map(self, receiver, sender, has_pushed_events):
+            if not has_pushed_events:
+                return
+
+            if sender == "N/A":
+                sender = "External_" + receiver
+                self.__na_channels.append(sender)
+            else:
+                self.__channels.append(sender)
+
+            sender_n_receiver = (sender, receiver) 
+
+            if sender_n_receiver not in self.__channels_map:
+                self.__channels_map.append(sender_n_receiver)
+                self.__should_update_map = True
+
+
+        def get_channels_map(self):
+            channels_names = [c.get_name() for c in self.__channels]
+            unique_channels = channels_names + self.__na_channels
+            channels_dict = {c: i for i, c in enumerate(unique_channels)}
+            print("=====================")
+            print(unique_channels)
+            print(channels_dict)
+            print("=====================")
+            connections = [(channels_dict[s], channels_dict[r]) for (s,r) in 
+                            self.__channels_map]
+
+            return unique_channels, connections
+
+        def should_update_map(self):
+            val = self.__should_update_map
+            self.__should_update_map = False
+
+            return val
 
         def get_channels(self):
             return self.__channels
@@ -49,7 +77,6 @@ class ChannelManager(object):
                     self.__channels]
 
         def get_pipline_thrust_spent_time(self):
-
             minimum_events_spent_times = \
                 [ChannelCalc(x).get_minimum_passed_time_event()
                  for x in self.__channels]
@@ -91,65 +118,39 @@ class ChannelManager(object):
             else:
                 return -1
 
-        def calculate_channel_time_to_read(self, channel):
-            channelsMap = self.generate_channels_ordered_map()
-            # bug may happen here because of NA connections
-            if channel.get_name() in channelsMap:
-                channelIndex = channelsMap.index(channel.get_name())
-                if channelIndex == 0:
-                    return 0
-                else:
-                    previous_channel = channelsMap[channelIndex-1]
-                    channel_events = channel.get_events()[0]
-                    previous_channel = list(
-                        filter(lambda x: x.get_name() == previous_channel,
-                               self.__channels))
-                    previous_channel_events =\
-                        previous_channel[0].get_events()[0]
-                    channel_events_passed_times =\
-                        [x.get_passed_time() for x in channel_events]
-                    previous_channel_events_passed_times = \
-                        [x.get_passed_time() for x in previous_channel_events]
-                    if(len(channel_events_passed_times
-                           ) > 0 and len(previous_channel_events_passed_times
-                                         ) > 0):
-                        return\
-                            ((sum(channel_events_passed_times
-                                  )/len(channel_events_passed_times)
-                              )-(sum(previous_channel_events_passed_times
-                                     )/len(
-                                previous_channel_events_passed_times)))
-                    else:
-                        return 0
-            else:
-                return 0
+        # def calculate_channel_time_to_read(self, channel):
+        #     channelsMap = self.generate_channels_ordered_map()
+        #     # bug may happen here because of NA connections
+        #     if channel.get_name() in channelsMap:
+        #         channelIndex = channelsMap.index(channel.get_name())
+        #         if channelIndex == 0:
+        #             return 0
+        #         else:
+        #             previous_channel = channelsMap[channelIndex-1]
+        #             channel_events = channel.get_events()[0]
+        #             previous_channel = list(
+        #                 filter(lambda x: x.get_name() == previous_channel,
+        #                        self.__channels))
+        #             previous_channel_events =\
+        #                 previous_channel[0].get_events()[0]
+        #             channel_events_passed_times =\
+        #                 [x.get_passed_time() for x in channel_events]
+        #             previous_channel_events_passed_times = \
+        #                 [x.get_passed_time() for x in previous_channel_events]
+        #             if(len(channel_events_passed_times
+        #                    ) > 0 and len(previous_channel_events_passed_times
+        #                                  ) > 0):
+        #                 return\
+        #                     ((sum(channel_events_passed_times
+        #                           )/len(channel_events_passed_times)
+        #                       )-(sum(previous_channel_events_passed_times
+        #                              )/len(
+        #                         previous_channel_events_passed_times)))
+        #             else:
+        #                 return 0
+        #     else:
+        #         return 0
 
-        def generate_channels_ordered_map(self):
-            channels_map_copy = self.__channelsMap.copy()
-            na_connections = list(filter(lambda x: x[0] == "N/A",
-                                         channels_map_copy))
-            connections_without_na = list(
-                filter(lambda x: x not in na_connections, channels_map_copy))
-            filtered_na_list = list(
-                filter(lambda x: x[1] not in [item[0]
-                                              for item in
-                                              connections_without_na],
-                       na_connections))
-            correct_connections = filtered_na_list+connections_without_na
-            result = [correct_connections[0][0], correct_connections[0][1]]
-            next_to_find = correct_connections[0][1]
-            correct_connections.remove(correct_connections[0])
-            while(len(correct_connections) > 0):
-                next_connection = list(
-                    filter(lambda x: x[1] == next_to_find,
-                           correct_connections))
-                if(len(next_connection) == 0):
-                    break
-                result.append(next_connection[0][0])
-                next_to_find = next_connection[0][0]
-                correct_connections.remove(next_connection[0])
-            result.reverse()
-            return result
 
     __instance = None
 
