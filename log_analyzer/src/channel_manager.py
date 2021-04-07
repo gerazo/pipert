@@ -39,7 +39,8 @@ class ChannelManager(object):
 
             if sender == "N/A":
                 sender = "External_" + receiver
-                self.__na_channels.append(sender)
+                if sender not in self.__na_channels:
+                    self.__na_channels.append(sender)
             else:
                 channel_names = [c.get_name() for c in self.__channels]
                 if sender not in channel_names:
