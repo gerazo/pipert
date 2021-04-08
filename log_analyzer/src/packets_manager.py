@@ -10,6 +10,7 @@ class PacketsManager(object):
         def add(self, packet):
             packet = PacketDecoder(packet).decode_packet()
             packet.set_id(self.__packets_count)
+            packet.set_id_for_events()
             self.__latest_packet = packet
             self.__packets_count += 1
 

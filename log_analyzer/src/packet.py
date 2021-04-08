@@ -5,8 +5,6 @@ class Packet(object):
         self.__events = events
         self.__id = None
 
-        self.set_id_for_events()
-
     def has_event(self, event_type):
         for event in self.get_events():
             if event.get_type() == event_type:
