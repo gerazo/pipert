@@ -5,12 +5,12 @@ class Packet(object):
         self.__events = events
         self.__id = None
 
-    def has_event(self, event_type):
+    def get_event_count(self, event_type):
         for event in self.get_events():
             if event.get_type() == event_type:
-                return True
+                return event.get_log_count()
 
-        return False
+        return 0
 
     def get_receiver(self):
         return self.__receiver

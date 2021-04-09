@@ -16,11 +16,10 @@ class ChannelManager(object):
             self.__add_reciever(receiver, packet.get_events(), packet.get_id())
 
             sender = packet.get_sender()
-            has_pushed_events = packet.has_event(PACKET_PUSHED)
-            self.__add_to_channels_map(receiver, sender, has_pushed_events)
+            pushed_events_count = packet.get_event_count(PACKET_PUSHED)
+            self.__add_to_channels_map(receiver, sender, pushed_events_count)
 
         def __add_reciever(self, receiver_channel, events, packet_id):
-            should_add_reciever = True
             for channel in self.__channels:
                 if channel.get_name() == receiver_channel:
                     channel.add_events(events)
@@ -28,12 +27,12 @@ class ChannelManager(object):
                     should_add_reciever = False
                     return
 
-            if should_add_reciever:
-                c = Channel(receiver_channel, events, packet_id)
-                self.__channels.append(c)
+            c = Channel(receiver_channel, events, packet_id)
+            self.__channels.append(c)
 
-        def __add_to_channels_map(self, receiver, sender, has_pushed_events):
-            if not has_pushed_events:
+        def __add_to_channels_map(self, receiver, sender, cnt):
+            # This second condition should be deleted when Sending Bug is fixed
+            if not cnt or sender == "N/A":
                 return
 
             if sender == "N/A":
