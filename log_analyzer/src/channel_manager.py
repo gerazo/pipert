@@ -19,7 +19,7 @@ class ChannelManager(object):
             has_pushed_events = packet.has_event(PACKET_PUSHED)
             self.__add_to_channels_map(receiver, sender, has_pushed_events)
 
-        def __add_reciever(self, receiver_channel, events, packet_id): 
+        def __add_reciever(self, receiver_channel, events, packet_id):
             should_add_reciever = True
             for channel in self.__channels:
                 if channel.get_name() == receiver_channel:
@@ -27,11 +27,10 @@ class ChannelManager(object):
                     channel.set_latest_packet_id(packet_id)
                     should_add_reciever = False
                     return
-            
+
             if should_add_reciever:
                 c = Channel(receiver_channel, events, packet_id)
                 self.__channels.append(c)
-
 
         def __add_to_channels_map(self, receiver, sender, has_pushed_events):
             if not has_pushed_events:
@@ -47,19 +46,18 @@ class ChannelManager(object):
                     c = Channel(sender, [], -1)
                     self.__channels.append(c)
 
-            sender_n_receiver = (sender, receiver) 
+            sender_n_receiver = (sender, receiver)
 
             if sender_n_receiver not in self.__channels_map:
                 self.__channels_map.append(sender_n_receiver)
                 self.__should_update_map = True
 
-
         def get_channels_map(self):
             channels_names = [c.get_name() for c in self.__channels]
             unique_channels = channels_names + self.__na_channels
             channels_dict = {c: i for i, c in enumerate(unique_channels)}
-            connections = [(channels_dict[s], channels_dict[r]) for (s,r) in 
-                            self.__channels_map]
+            connections = [(channels_dict[s], channels_dict[r]) for (s, r) in
+                           self.__channels_map]
 
             return unique_channels, connections
 
@@ -118,39 +116,38 @@ class ChannelManager(object):
             else:
                 return -1
 
-        # def calculate_channel_time_to_read(self, channel):
-        #     channelsMap = self.generate_channels_ordered_map()
-        #     # bug may happen here because of NA connections
-        #     if channel.get_name() in channelsMap:
-        #         channelIndex = channelsMap.index(channel.get_name())
-        #         if channelIndex == 0:
-        #             return 0
-        #         else:
-        #             previous_channel = channelsMap[channelIndex-1]
-        #             channel_events = channel.get_events()[0]
-        #             previous_channel = list(
-        #                 filter(lambda x: x.get_name() == previous_channel,
-        #                        self.__channels))
-        #             previous_channel_events =\
-        #                 previous_channel[0].get_events()[0]
-        #             channel_events_passed_times =\
-        #                 [x.get_passed_time() for x in channel_events]
-        #             previous_channel_events_passed_times = \
-        #                 [x.get_passed_time() for x in previous_channel_events]
-        #             if(len(channel_events_passed_times
-        #                    ) > 0 and len(previous_channel_events_passed_times
-        #                                  ) > 0):
-        #                 return\
-        #                     ((sum(channel_events_passed_times
-        #                           )/len(channel_events_passed_times)
-        #                       )-(sum(previous_channel_events_passed_times
-        #                              )/len(
-        #                         previous_channel_events_passed_times)))
-        #             else:
-        #                 return 0
-        #     else:
-        #         return 0
-
+    # def calculate_channel_time_to_read(self, channel):
+    #     channelsMap = self.generate_channels_ordered_map()
+    #     # bug may happen here because of NA connections
+    #     if channel.get_name() in channelsMap:
+    #         channelIndex = channelsMap.index(channel.get_name())
+    #         if channelIndex == 0:
+    #             return 0
+    #         else:
+    #             previous_channel = channelsMap[channelIndex-1]
+    #             channel_events = channel.get_events()[0]
+    #             previous_channel = list(
+    #                 filter(lambda x: x.get_name() == previous_channel,
+    #                        self.__channels))
+    #             previous_channel_events =\
+    #                 previous_channel[0].get_events()[0]
+    #             channel_events_passed_times =\
+    #                 [x.get_passed_time() for x in channel_events]
+    #             previous_channel_events_passed_times = \
+    #                 [x.get_passed_time() for x in previous_channel_events]
+    #             if(len(channel_events_passed_times
+    #                    ) > 0 and len(previous_channel_events_passed_times
+    #                                  ) > 0):
+    #                 return\
+    #                     ((sum(channel_events_passed_times
+    #                           )/len(channel_events_passed_times)
+    #                       )-(sum(previous_channel_events_passed_times
+    #                              )/len(
+    #                         previous_channel_events_passed_times)))
+    #             else:
+    #                 return 0
+    #     else:
+    #         return 0
 
     __instance = None
 
