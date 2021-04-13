@@ -24,24 +24,30 @@ class AnalyzerServer(object):
         pm = PacketsManager()
         cm = ChannelManager()
         checkers_manager = CheckersManager()
-        counter = 0
+        flags_counter = 0
+        measures_counter = 0
         while True:
-            if counter == PACKETS_THRESHOULD:
+            if flags_counter == PACKETS_THRESHOULD:
                 checkers_manager.run()
                 requests.post("http://127.0.0.1:5000",
-                              json={"c_dicts": cm.get_channels_dict()})
+                              json={"c_dicts": cm.get_channels_flags()})
                 if cm.should_update_map():
                     unique_channels, c_map = cm.get_channels_map()
                     requests.post("http://127.0.0.1:5000",
                                   json={"unique_channels": unique_channels,
                                         "channels_map": c_map})
-                counter = 0
+                flags_counter = 0
+                measures_counter += 1
+                if measures_counter == 10:
+                    requests.post("http://127.0.0.1:5000",
+                                  json={"m_dicts": cm.get_channels_measures()})
+                    measures_counter = 0
 
             data, address = s.recvfrom(512)
             self.__output = data
             pm.add(data)
             cm.add_packet(pm.get_latest_packet())
-            counter += 1
+            flags_counter += 1
 
     def run(self):
         self.__start_server()

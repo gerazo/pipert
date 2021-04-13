@@ -23,23 +23,22 @@ export function add_dataset(chart, channel) {
             label: channel,
             borderColor: get_channel_color(channel),
             backgroundColor: get_channel_color(channel),
-            fill: false
+            fill: false,
+            spanGaps: true
     }
     chart.data.datasets.push(dataset);
     chart.update();
 }
 
-export function update(chart, data) {
-    chart.data.labels.push(pretty_date(Date.now()));
-    if (chart.data.labels.length > 100) {
-        chart.data.labels.shift();
+export function update(chart, data, label_begin) {
+    let labels = [];
+    for (let i = label_begin; i < label_begin+10; i++) {
+        labels.push(i);
     }
+    chart.data.labels = labels
     let i = 0;
     chart.data.datasets.forEach((dataset) => {
-        dataset.data.push(data[i]);
-        if (dataset.data.length > 100) {
-            dataset.data.shift();
-        }
+        dataset.data = data[i];
         i++;
     });
 

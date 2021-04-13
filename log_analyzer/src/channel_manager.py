@@ -69,9 +69,15 @@ class ChannelManager(object):
         def get_channels(self):
             return self.__channels
 
-        def get_channels_dict(self):
-            return [ChannelCalc(channel).get_dict() for channel in
-                    self.__channels]
+        def get_channels_flags(self):
+            return [{"name": channel.get_name(),
+                    "flags": channel.get_flags()} 
+                    for channel in self.__channels]
+
+        def get_channels_measures(self):
+            return [{"name": channel.get_name(),
+                    "measures": channel.get_measures()}
+                    for channel in self.__channels]
 
         def get_pipline_thrust_spent_time(self):
             minimum_events_spent_times = \

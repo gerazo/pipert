@@ -37,6 +37,11 @@ def index_post():
         socketio.emit("channels_map", req_json, json=True)
         return jsonify({"ok": True})
 
+    if req_json.get("m_dicts"):
+        socketio.emit("measures_update", req_json.get("m_dicts"), json=True)
+        return jsonify({"ok": True})
+        
+
 
 def run():
     socketio.run(app)
