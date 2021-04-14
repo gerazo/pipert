@@ -9,7 +9,7 @@
 namespace pipert {
 
 template <class T>
-class NetworkPacket{
+class NetworkPacket : public Packet<T> {
  public:
   NetworkPacket() = default;
   NetworkPacket(Timer::Time timestamp, T& data);
@@ -17,26 +17,13 @@ class NetworkPacket{
 
   NetworkPacket(const NetworkPacket<T>&) = default;
   NetworkPacket& operator=(const NetworkPacket&) = default;
-
-  const T& data() const { return data_; }
-  T& data() {return data_; }
-  Timer::Time timestamp() const { return timestamp_; }
-
- private:
-  Timer::Time timestamp_;
-  T data_;
 };
 
 template <class T>
 NetworkPacket<T>::NetworkPacket(Timer::Time timestamp, T& data)
-    : timestamp_(timestamp), data_(data) {
+    : Packet<T>(timestamp, data) {
   static_assert(std::is_trivially_copyable<T>::value,
                   "Network protocol requires trivially copyable type");
-}
-
-template <class T>
-NetworkPacket<T> ConvertToNetworkPacket(Packet<T>& packet) {
-  return NetworkPacket<T>(packet.timestamp(), packet.data());
 }
 
 }  // namespace pipert

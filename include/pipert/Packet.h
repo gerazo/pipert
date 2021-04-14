@@ -59,6 +59,9 @@ class Packet : public PacketBase {
   /// \return Reference to the contained data.
   T& data();
 
+ protected:
+  Packet() = default;
+
  private:
   T data_;  ///< Data stored in this package
 };
