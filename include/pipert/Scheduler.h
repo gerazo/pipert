@@ -242,7 +242,7 @@ SenderChannel<T> Scheduler::CreateSenderChannel(
     this->SetStateInvalid();
   ChannelImpl* chimpl =
       CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr,
-                        &SenderChannel<T>::SenderCallback);
+                        &SenderChannel<T>::CallbackTranslator);
   return SenderChannel<T>(chimpl, connection);
 }
 

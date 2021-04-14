@@ -1,22 +1,20 @@
 #ifndef _SENDERCHANNEL_H_
 #define _SENDERCHANNEL_H_
 
-#include "pipert/Channel.h"
 #include "pipert/NetworkPacket.h"
+#include "pipert/ScheduledChannel.h"
 
 #include <functional>
 
 namespace pipert {
 
 template <class T>
-class SenderChannel : public Channel<T> {
+class SenderChannel : public ScheduledChannel<T> {
  public:
   SenderChannel(ChannelImpl* impl, UDPConnection* connection);
 
   SenderChannel(SenderChannel&&) = default;
   SenderChannel& operator=(SenderChannel&&) = default;
-
-  static void SenderCallback(ChannelBase* this_channel, PacketBase* packet);
 
   void SendPacket(PacketToProcess<T> packet);
 
@@ -27,20 +25,9 @@ class SenderChannel : public Channel<T> {
 template <class T>
 SenderChannel<T>::SenderChannel(ChannelImpl* impl,
                                 UDPConnection* connection)
-    : Channel<T>(impl), connection_(connection) {}
-
-template <class T>
-void SenderChannel<T>::SenderCallback(ChannelBase* this_channel,
-                                      PacketBase* packet) {
-  assert(this_channel);
-  SenderChannel<T>* my_this =
-      reinterpret_cast<SenderChannel<T>*>(this_channel);
-  assert(my_this);
-  std::function<void(PacketToProcess<T>)> processing_fun =
-      std::bind(&SenderChannel<T>::SendPacket, my_this, std::placeholders::_1);
-  processing_fun(
-      PacketToProcess<T>(reinterpret_cast<Packet<T>*>(packet), my_this));
-}
+    : ScheduledChannel<T>(impl,
+      std::bind(&SenderChannel<T>::SendPacket, this, std::placeholders::_1)),
+      connection_(connection) {}
 
 template <class T>
 void SenderChannel<T>::SendPacket(PacketToProcess<T> packet) {
