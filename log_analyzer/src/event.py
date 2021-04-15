@@ -27,6 +27,9 @@ class Event(object):
     def get_avg(self):
         return self.__avg_val
 
+    def get_packet_id(self):
+        return self.__packet_id
+
     def get_dict(self):
         dict = {"type": self.get_type(),
                 "log_count": self.get_log_count(),
