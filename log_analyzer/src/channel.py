@@ -2,7 +2,8 @@ from src.utils import flatten_list
 from rdp import rdp
 from src.constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
                            PACKETS_THRESHOULD, PACKET_DROPPED, EXECTION_TIME,
-                           READ_TIME, HIGH_EXECUTION_TIME, HIGH_READ_TIME,HIGH_FILL_TIME,
+                           READ_TIME, HIGH_EXECUTION_TIME, HIGH_READ_TIME,
+                           HIGH_FILL_TIME,
                            HIGH_CHANNEL_TIME_TO_BUFFER)
 
 

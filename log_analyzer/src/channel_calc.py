@@ -1,4 +1,5 @@
-from src.constants import PACKET_DROPPED, EXECTION_TIME, READ_TIME,PACKET_PUSHED,PACKET_RETRIEVED
+from src.constants import PACKET_DROPPED, EXECTION_TIME, READ_TIME,\
+    PACKET_PUSHED, PACKET_RETRIEVED
 
 
 class ChannelCalc(object):
