@@ -2,14 +2,15 @@ from src.checkers.base_checker import BaseChecker
 from src.channel_manager import ChannelManager
 from src.channel_calc import ChannelCalc
 from src.constants import (HIGH_EXECUTION_TIME, EXECUTION_TIME_THRESHOLD,
-                          EXECTION_TIME)
+                           EXECTION_TIME)
 
 
 class ExecutionTimeChecker(BaseChecker):
     def run(self):
         for channel in ChannelManager().get_channels():
             execution_time = self.__calculate_exectutinme_time(channel)
-            channel.add_measure("Execution Time", [self._packet_cycle, execution_time])
+            channel.add_measure("Execution Time", [
+                self._packet_cycle, execution_time])
 
             if (execution_time > self._config[EXECUTION_TIME_THRESHOLD]):
                 channel.update_flag(HIGH_EXECUTION_TIME, True)

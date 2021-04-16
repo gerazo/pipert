@@ -40,7 +40,6 @@ def index_post():
     if req_json.get("m_dicts"):
         socketio.emit("measures_update", req_json.get("m_dicts"), json=True)
         return jsonify({"ok": True})
-        
 
 
 def run():

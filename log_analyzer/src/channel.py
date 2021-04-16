@@ -17,7 +17,7 @@ class Channel(object):
                         HIGH_READ_TIME: False,
                         HIGH_READ_TIME: False,
                         HIGH_FILL_TIME: False,
-                        HIGH_CHANNEL_TIME_TO_BUFFER:False}
+                        HIGH_CHANNEL_TIME_TO_BUFFER: False}
         self.__measures = {}
         self.__packet_count = 1
         self.__latest_packet_id = latest_packet_id
@@ -55,18 +55,15 @@ class Channel(object):
 
     def get_measures(self):
         ret_measures = {}
-        for measure_name in self.__measures:
-            ret_measures.update({measure_name:\
-                self.__prepare_points_for_drawing(self.__measures[measure_name])})
-            self.__measures[measure_name] = []
-
+        for measure_name in self.__measures:ret_measures.update({measure_name:self.__prepare_points_for_drawing(self.__measures[measure_name])})
+        self.__measures[measure_name] = []
         return ret_measures
 
     def __prepare_points_for_drawing(self, points):
         minimized_points = rdp(points, epsilon=0.5)
         ret_points = [None] * 10
         for point in minimized_points:
-            index = int((point[0]%10)-1)
+            index = int((point[0] % 10) - 1)
             ret_points[index] = point[1]
 
         return ret_points

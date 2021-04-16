@@ -1,8 +1,7 @@
 from src.checkers.base_checker import BaseChecker
 from src.channel_manager import ChannelManager
-from src.channel_calc import ChannelCalc
-from src.constants import (DROP_RATIO_THRESHOLD, HIGH_DROP_RATIO,
-                          PACKET_DROPPED, READ_TIME)
+from src.constants import DROP_RATIO_THRESHOLD, HIGH_DROP_RATIO, \
+    PACKET_DROPPED, READ_TIME
 
 
 class DropRatioChecker(BaseChecker):
