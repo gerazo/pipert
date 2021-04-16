@@ -30,9 +30,23 @@
         },
         {
             "name": "read_time_checker",
-            "enabled": false,
+            "enabled": true,
             "configuration": {
-                "CHANNEL_READ_THRESHOLD": 1
+                "CHANNEL_READ_THRESHOLD": 20
+            }
+        },
+        {
+            "name": "fill_time_checker",
+            "enabled": true,
+            "configuration": {
+                "CHANNEL_FILL_THRESHOLD": 20
+            }
+        },
+        {
+            "name": "time_to_buffer_average_checker",
+            "enabled": true,
+            "configuration": {
+                "CHANNEL_TIME_TO_BUFFER_AVERAGE_THRESHOLD": 700
             }
         }
     ]

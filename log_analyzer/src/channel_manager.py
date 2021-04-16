@@ -1,6 +1,7 @@
 from src.channel import Channel
 from src.channel_calc import ChannelCalc
-from src.constants import PACKET_PUSHED
+from src.utils import calc_avg
+from src.constants import EXECTION_TIME,PACKET_PUSHED,PACKET_RETRIEVED
 
 
 class ChannelManager(object):
@@ -108,6 +109,53 @@ class ChannelManager(object):
             else:
                 return -1
 
+        def calculate_channel_time_to_buffer_average(self, channel):
+            previous_channel_connection=list(filter(lambda x: x[1] == channel.get_name() and not x[0].startswith("External"),self.__channels_map))
+            if(len(previous_channel_connection) == 0):
+                return 0
+            else:
+                previous_channel_name=previous_channel_connection[0][0]
+                privious_chaannel=list(filter(lambda x: x.get_name() == previous_channel_name ,self.__channels))[0]
+                previous_channel_packet_events_pushed_average= calc_avg([x.get_avg() for x in (privious_chaannel.get_event(PACKET_RETRIEVED))])
+                previous_channel_packet_events_execution_time_average= calc_avg([x.get_avg() for x in (privious_chaannel.get_event(EXECTION_TIME))])
+                channel_packet_pushed_events=channel.get_event("Packet Pushed")
+                channel_packet_pushed_events_avg= calc_avg([x.get_avg()  for x in channel_packet_pushed_events])
+                result= channel_packet_pushed_events_avg-previous_channel_packet_events_pushed_average+previous_channel_packet_events_execution_time_average
+                if(result<0):
+                    return -1
+                else:
+                    return result
+
+        def calculate_channel_time_to_read(self, channel):
+            read_time_avarage = [x.get_avg() for x in channel.get_event("Read Time")]
+            if(len(read_time_avarage)>0):
+                return calc_avg(read_time_avarage)
+            else:
+                return 0
+        def calculate_channel_time_to_fill(self, channel):
+            fill_time_avarage = [x.get_avg() for x in channel.get_event("Fill Time")]
+            if(len(fill_time_avarage)>0):
+                return calc_avg(fill_time_avarage)
+            else:
+                return 0
+
+
+        def calculate_channel_packet_lifetime(self,channel):
+            fill_time_avarage = [x.get_avg() for x in channel.get_event("Fill Time")]
+            read_time_avarage = [x.get_avg() for x in channel.get_event("Read Time")]
+            execution_time_avarage=[x.get_avg() for x in channel.get_event("Execution Time")]
+            pushed_time_avarage=[x.get_avg() for x in channel.get_event("Packet Pushed")]
+            retrieved_time_avarage=[x.get_avg() for x in channel.get_event("Packet Retrieved")]
+            return sum(fill_time_avarage) + sum(read_time_avarage) + sum(execution_time_avarage)+abs(sum(retrieved_time_avarage)-sum(pushed_time_avarage))
+
+        def calculate_channels_packet_lifetime(self):
+            channels_packet_lifetime= [[x,self.calculate_channel_packet_lifetime(x)] for x in self.__channels]
+            tolat_packets_life=sum([y for [x,y] in channels_packet_lifetime])
+            if tolat_packets_life==0 :
+                return 0
+            else:
+                return [[x,y/tolat_packets_life*100] for [x,y] in channels_packet_lifetime]
+
         def calculate_pipeline_total_execution_time_to_pipeline_time(self):
             pipline_total_time = self.get_pipline_thrust_spent_time()
             pipeline_total_execution_time = \
@@ -120,39 +168,6 @@ class ChannelManager(object):
 
             else:
                 return -1
-
-    # def calculate_channel_time_to_read(self, channel):
-    #     channelsMap = self.generate_channels_ordered_map()
-    #     # bug may happen here because of NA connections
-    #     if channel.get_name() in channelsMap:
-    #         channelIndex = channelsMap.index(channel.get_name())
-    #         if channelIndex == 0:
-    #             return 0
-    #         else:
-    #             previous_channel = channelsMap[channelIndex-1]
-    #             channel_events = channel.get_events()[0]
-    #             previous_channel = list(
-    #                 filter(lambda x: x.get_name() == previous_channel,
-    #                        self.__channels))
-    #             previous_channel_events =\
-    #                 previous_channel[0].get_events()[0]
-    #             channel_events_passed_times =\
-    #                 [x.get_passed_time() for x in channel_events]
-    #             previous_channel_events_passed_times = \
-    #                 [x.get_passed_time() for x in previous_channel_events]
-    #             if(len(channel_events_passed_times
-    #                    ) > 0 and len(previous_channel_events_passed_times
-    #                                  ) > 0):
-    #                 return\
-    #                     ((sum(channel_events_passed_times
-    #                           )/len(channel_events_passed_times)
-    #                       )-(sum(previous_channel_events_passed_times
-    #                              )/len(
-    #                         previous_channel_events_passed_times)))
-    #             else:
-    #                 return 0
-    #     else:
-    #         return 0
 
     __instance = None
 
