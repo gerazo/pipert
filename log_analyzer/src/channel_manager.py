@@ -1,6 +1,7 @@
 from src.channel import Channel
 from src.constants import EXECTION_TIME, PACKET_PUSHED,\
     PACKET_RETRIEVED, READ_TIME, FILL_TIME
+from src.config_reader import ConfigReader
 
 
 class ChannelManager(object):
@@ -10,6 +11,7 @@ class ChannelManager(object):
             self.__na_channels = []
             self.__channels_map = []
             self.__should_update_map = False
+            self.__packets_cycle_threshold = ConfigReader().get_packets_cycle_threshold()
 
         def add_packet(self, packet):
             receiver = packet.get_receiver()
@@ -22,7 +24,7 @@ class ChannelManager(object):
         def __add_reciever(self, receiver_channel, events, packet_id):
             for channel in self.__channels:
                 if channel.get_name() == receiver_channel:
-                    channel.add_events(events)
+                    channel.add_events(events, self.__packets_cycle_threshold)
                     channel.set_latest_packet_id(packet_id)
                     should_add_reciever = False
                     return

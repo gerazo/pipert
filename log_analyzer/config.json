@@ -1,11 +1,12 @@
 {
+    "port": 8000,
+    "ip": "127.0.0.1",
+    "packets_cycle_threshold": 1000,
     "checkers": [
         {
             "name": "frozen_checker",
             "enabled": true,
-            "configuration": {
-                "FROZEN_LIMITS": 20
-            }
+            "configuration": {}
         },
         {
             "name": "drop_rate_checker",

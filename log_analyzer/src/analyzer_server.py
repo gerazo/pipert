@@ -3,8 +3,7 @@ import requests
 from src.channel_manager import ChannelManager
 from src.packets_manager import PacketsManager
 from src.checkers_manager import CheckersManager
-from src.constants import PACKETS_THRESHOULD
-
+from src.config_reader import ConfigReader
 
 class AnalyzerServer(object):
 
@@ -24,10 +23,11 @@ class AnalyzerServer(object):
         pm = PacketsManager()
         cm = ChannelManager()
         checkers_manager = CheckersManager()
+        packets_cycle_threshold = ConfigReader().get_packets_cycle_threshold()
         flags_counter = 0
         measures_counter = 0
         while True:
-            if flags_counter == PACKETS_THRESHOULD:
+            if flags_counter == packets_cycle_threshold:
                 checkers_manager.run()
                 requests.post("http://127.0.0.1:5000",
                               json={"c_dicts": cm.get_channels_flags()})

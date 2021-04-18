@@ -1,7 +1,7 @@
 from src.utils import flatten_list
 from rdp import rdp
 from src.constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
-                           PACKETS_THRESHOULD, PACKET_DROPPED, EXECTION_TIME,
+                           PACKET_DROPPED, EXECTION_TIME,
                            READ_TIME, HIGH_EXECUTION_TIME, HIGH_READ_TIME,
                            HIGH_FILL_TIME,
                            HIGH_CHANNEL_TIME_TO_BUFFER)
@@ -22,8 +22,8 @@ class Channel(object):
         self.__packet_count = 1
         self.__latest_packet_id = latest_packet_id
 
-    def add_events(self, events):
-        if self.__packet_count > PACKETS_THRESHOULD:
+    def add_events(self, events, packets_cycle_threshold):
+        if self.__packet_count > packets_cycle_threshold:
             self.__events.clear()
             self.__packet_count = 0
 

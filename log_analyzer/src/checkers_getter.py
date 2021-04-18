@@ -2,13 +2,9 @@ from src.config_reader import ConfigReader
 
 
 class CheckersGetter(object):
-    def __init__(self):
-        self.config_reader = ConfigReader()
-        self.config_reader.read()
-
     def get_enabled_checkers(self):
         enabled_checkers = []
-        for checker in self.config_reader.read_enabled_checkers():
+        for checker in ConfigReader().read_enabled_checkers():
             c = self.__import_checker(checker[0])
             c.set_config(checker[1])
             enabled_checkers.append(c)
