@@ -6,47 +6,47 @@
         {
             "name": "frozen_checker",
             "enabled": true,
-            "configuration": {}
+            "parameters": {}
         },
         {
             "name": "drop_rate_checker",
             "enabled": true,
-            "configuration": {
+            "parameters": {
                 "DROP_RATE_THRESHOLD": 0.5
             }
         },
         {
             "name": "drop_ratio_checker",
             "enabled": true,
-            "configuration": {
+            "parameters": {
                 "DROP_RATIO_THRESHOLD": 0.75
             }
         },
         {
             "name": "execution_time_checker",
             "enabled": true,
-            "configuration": {
+            "parameters": {
                 "EXECUTION_TIME_THRESHOLD": 0.75
             }
         },
         {
             "name": "read_time_checker",
             "enabled": true,
-            "configuration": {
+            "parameters": {
                 "CHANNEL_READ_THRESHOLD": 20
             }
         },
         {
             "name": "fill_time_checker",
             "enabled": true,
-            "configuration": {
+            "parameters": {
                 "CHANNEL_FILL_THRESHOLD": 20
             }
         },
         {
             "name": "time_to_buffer_average_checker",
             "enabled": true,
-            "configuration": {
+            "parameters": {
                 "CHANNEL_TIME_TO_BUFFER_AVERAGE_THRESHOLD": 700
             }
         }
