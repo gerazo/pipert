@@ -11,7 +11,8 @@
 
 namespace pipert {
 UDPConnection::UDPConnection(int remote_port,
-                             const char* remote_address) {
+                             const char* remote_address,
+                             int polling_timeout) {
   socket_filedesc_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (socket_filedesc_ != -1) {
     memset(&remote_address_, 0, sizeof(remote_address_));
@@ -25,10 +26,12 @@ UDPConnection::UDPConnection(int remote_port,
       return;
     }
   }
+  polling_timeout_ = polling_timeout;
+  fd_.fd = socket_filedesc_;
   assert(socket_filedesc_ != -1);  // opening socket failed
 }
 
-UDPConnection::UDPConnection(int binding_port) {
+UDPConnection::UDPConnection(int binding_port, int polling_timeout) {
   socket_filedesc_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (socket_filedesc_ != -1) {
     memset(&remote_address_, 0, sizeof(remote_address_));
@@ -45,6 +48,8 @@ UDPConnection::UDPConnection(int binding_port) {
       return;
 	  }
   }
+  polling_timeout_ = polling_timeout;
+  fd_.fd = socket_filedesc_;
   assert(socket_filedesc_ != -1);  // opening socket failed
 }
 
@@ -68,6 +73,14 @@ void UDPConnection::Send(void* buffer, int size) {
     sendto(socket_filedesc_, buffer, size, 0,
            (struct sockaddr*)&remote_address_, sizeof(remote_address_));
   }
+}
+
+int UDPConnection::Poll() {
+  if (IsConnected()) {
+    fd_.events = POLLIN;
+    return poll(&fd_, 1, polling_timeout_);
+  }
+  return -1;
 }
 
 int UDPConnection::Receive(void* buffer, int size) {

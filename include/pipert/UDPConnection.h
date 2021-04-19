@@ -3,6 +3,7 @@
 
 #include <netinet/in.h>
 #include <sys/socket.h>
+#include <poll.h>
 
 namespace pipert {
 
@@ -13,12 +14,17 @@ class UDPConnection {
   ///
   /// \param remote_port UDP connection port
   /// \param remote_address UDP connection ip address
-  UDPConnection(int remote_port, const char* remote_address);
+  /// \param polling_timeout waiting time in milliseconds for an event to
+  ///                        occur on the file descriptor. (Default: 1000)
+  UDPConnection(int remote_port, const char* remote_address,
+                int polling_timeout = 1000);
 
   /// Constructs new UDP connection instance.
   ///
   /// \param binding_port UDP connection port
-  UDPConnection(int binding_port);
+  /// \param polling_timeout waiting time in milliseconds for an event to
+  ///                        occur on the file descriptor. (Default: 1000)
+  UDPConnection(int binding_port, int polling_timeout = 1000);
 
   UDPConnection(const UDPConnection&) = delete;
   UDPConnection& operator=(const UDPConnection&) = delete;
@@ -37,7 +43,14 @@ class UDPConnection {
   /// \param size holds the buffer size.
   void Send(void* buffer, int size);
 
-  /// Receives data from UDP connectom.
+  /// Waits for some event on the file descriptor.
+  /// \return A positive value indicates the total number of file
+  ///         descriptors that have been selected. A value of 0
+  ///         indicates that the call timed out. Upon failure, return
+  ///         value is -1.
+  int Poll();
+
+  /// Receives data from UDP connection.
   /// \param buffer provides the buffer in which to receive data.
   /// \param size holds the buffer size.
   /// \return The number of bytes received, or -1 if an error occurred.
@@ -45,7 +58,9 @@ class UDPConnection {
 
  private:
   int socket_filedesc_;
+  int polling_timeout_;
   struct sockaddr_in local_address_, remote_address_;
+  struct pollfd fd_;
 };
 
 }  // namespace pipert
