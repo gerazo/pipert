@@ -1,5 +1,4 @@
-from src.utils import flatten_list
-from rdp import rdp
+from src.utils import flatten_list, reduce_points_n_extract_x_axis
 from src.constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
                            PACKET_DROPPED, EXECTION_TIME,
                            READ_TIME, HIGH_EXECUTION_TIME, HIGH_READ_TIME,
@@ -53,20 +52,17 @@ class Channel(object):
     def get_flags(self):
         return self.__flags
 
-    def get_measures(self):
+    def get_all_measures(self):
         ret_measures = {}
-        for measure_name in self.__measures:ret_measures.update({measure_name:self.__prepare_points_for_drawing(self.__measures[measure_name])})
-        self.__measures[measure_name] = []
+        for measure_name in self.__measures:
+            ret_measures.update({measure_name:
+                                 reduce_points_n_extract_x_axis(self.__measures[measure_name])})
+            self.__measures[measure_name] = []
+
         return ret_measures
 
-    def __prepare_points_for_drawing(self, points):
-        minimized_points = rdp(points, epsilon=0.5)
-        ret_points = [None] * 10
-        for point in minimized_points:
-            index = int((point[0] % 10) - 1)
-            ret_points[index] = point[1]
-
-        return ret_points
+    def get_measure(self, measure):
+        return self.__measures.get(measure)[-1][1]
 
     def get_name(self):
         return self.__name

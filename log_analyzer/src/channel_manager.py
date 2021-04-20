@@ -74,7 +74,7 @@ class ChannelManager(object):
 
         def get_channels_measures(self):
             return [{"name": channel.get_name(),
-                    "measures": channel.get_measures()}
+                    "measures": channel.get_all_measures()}
                     for channel in self.__channels]
     __instance = None
 
