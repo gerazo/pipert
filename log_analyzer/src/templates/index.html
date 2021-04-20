@@ -4,6 +4,9 @@
 <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock %}
 
+{% set title = 'Home' %}
+{% set active_page = 'index' %}
+
 {% block content %}
   <div class="channels-container"></div>
   <div class="container charts">

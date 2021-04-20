@@ -1,5 +1,6 @@
 import socket
 import requests
+from time import sleep
 from src.channel_manager import ChannelManager
 from src.packets_manager import PacketsManager
 from src.checkers_manager import CheckersManager
@@ -28,6 +29,8 @@ class AnalyzerServer(object):
         packets_cycle_threshold = ConfigReader().get_packets_cycle_threshold()
         flags_counter = 0
         measures_counter = 0
+        sleep(1)
+        self.__send_measurements_names()
         while True:
             if flags_counter == packets_cycle_threshold:
                 measurement_manager.run()
@@ -44,6 +47,9 @@ class AnalyzerServer(object):
                 if measures_counter == 10:
                     requests.post("http://127.0.0.1:5000",
                                   json={"m_dicts": cm.get_channels_measures()})
+                    pipeline_measures = measurement_manager.get_pipeline_measurements()
+                    requests.post("http://127.0.0.1:5000/measurements",
+                                  json={"pipeline_measures": pipeline_measures})
                     measures_counter = 0
 
             data, address = s.recvfrom(512)
@@ -51,6 +57,17 @@ class AnalyzerServer(object):
             pm.add(data)
             cm.add_packet(pm.get_latest_packet())
             flags_counter += 1
+
+    @staticmethod
+    def __send_measurements_names():
+        pipeline_measures = ConfigReader().get_enabled_pipeline_measurements()
+        channel_measures = ConfigReader().get_enabled_channel_measurements()
+        measures_to_send = [m for m in pipeline_measures]
+        requests.post("http://127.0.0.1:5000/measurements",
+                      json={"pipeline_measures_names": measures_to_send})
+        measures_to_send = [m for m in channel_measures]
+        requests.post("http://127.0.0.1:5000/measurements",
+                      json={"channel_measures_names": measures_to_send})
 
     def run(self):
         self.__start_server()

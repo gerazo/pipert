@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block js %}
+<script>
+    let channels_measurements = JSON.parse('{{ channel_measures | tojson }}');
+    let pipeline_measurements = JSON.parse('{{ pipeline_measures | tojson }}');
+</script>
+<script type="module" src="{{ url_for('static', filename='js/measurements.js') }}"></script>
+{% endblock %}
+
+{% set title = 'Measurements' %}
+{% set active_page = 'measurements' %}
+
+{% block content %}
+    <h1>Channels Measurements</h1>
+    <div class = "container">
+        {% for measure in channel_measures: %}
+            <div class='measure'>
+                <canvas id='{{ measure[0] }}'></canvas>
+            </div>
+	    {% endfor %}
+    </div>
+    <h1>PipeLine Measurements</h1>
+    <div class = "container">
+        {% for measure in pipeline_measures: %}
+            <canvas id='{{ measure[0] }}'></li>
+	    {% endfor %}
+    </div>
+{% endblock %}

@@ -2,6 +2,15 @@ body {
   padding-top: 70px;
 }
 
+h1 {
+  border: 2px solid #68977e;
+  border-radius: 5px;
+  text-align: center;
+  background-color: #807e81;
+  color: whitesmoke;
+  padding-bottom: 3px;
+}
+
 .navbar-nav.navbar-center {
   position: absolute;
   left: 50%;
@@ -30,18 +39,6 @@ display: inline-block;
 margin: 2px;
 }
 
-.checkbox {
-  box-sizing: border-box;
-  padding: 0;
-  height: 13px;
-  width: 13px;
-}
-
-.checkbox-text {
-  font-weight: 400;
-  cursor: pointer;
-}
-
 .channel p {
   margin: 3px;
   text-align: left;
@@ -51,4 +48,11 @@ margin: 2px;
 #channels-map {
     width: 100%;
     height: 800px;
+}
+
+.measure {
+  text-align: center;
+  width: 45%;
+  display: inline-block;
+  margin: 2px;
 }

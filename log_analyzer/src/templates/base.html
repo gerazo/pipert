@@ -23,7 +23,7 @@
     {% block js %} {% endblock %}
     <link rel="stylesheet" href="static/css/main.css"/>
 
-    <title>Log Analyzer</title>
+    <title>Log Analyzer | {{ title }}</title>
 
 </head>
 <body>
@@ -38,13 +38,15 @@
     <div class="collapse navbar-collapse">
       <ul class="navbar-nav navbar-center">
         <li class="nav-item">
-            <a class="nav-link active" aria-current="page" href="/">Home</a>
+            <a class="nav-link {{'active' if active_page == 'index' }}" 
+               aria-current="page" href="/">Home</a>
         </li>
         <li class = "nav-item">
             <a class="nav-link active" aria-current="page" href="#"> | </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/stats">Stats</a>
+            <a class="nav-link {{'active' if active_page == 'measurements' }}" 
+               href="/measurements">Measurements</a>
         </li>
       </ul>
     </div>

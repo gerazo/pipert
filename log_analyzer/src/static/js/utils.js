@@ -18,3 +18,22 @@ function get_random_color() {
     var l = rand(30, 100);
     return 'hsl(' + h + ',' + s + '%,' + l + '%)';
 }
+
+
+export function get_channel_names(channels){
+    let names = []
+    channels.forEach(function(channel){
+        names.push(channel.name);
+    });
+    
+    return names
+}
+
+export function get_field(channels, field){
+    let rates = []
+    channels.forEach(function(channel){
+        rates.push(channel['measures'][field]);
+    });
+    
+    return rates
+}
