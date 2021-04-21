@@ -52,6 +52,11 @@ Profiler& Scheduler::GetProfiler() {
   return profiler_;
 }
 
+void Scheduler::AddReceiver(ReceiverBase* receiver) {
+  assert(impl_);
+  impl_->AddReceiver(receiver);
+}
+
 ChannelImpl* Scheduler::CreateChannelImpl(
     const char* name, int capacity, int packet_size, void* single_thread_object,
     ChannelBase::InternalCallback callback) {

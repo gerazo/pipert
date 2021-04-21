@@ -32,7 +32,9 @@ Receiver<T>::Receiver(Scheduler* scheduler,
                       Channel<T>* ch_to_write)
     : ReceiverBase(connection), ch_to_write_(ch_to_write) {
   Protocol<T> protocol(connection);
-  if(!protocol.ReceiverSideHandshake())
+  if(protocol.ReceiverSideHandshake())
+    scheduler->AddReceiver(this);
+  else
     scheduler->SetStateInvalid();
 }
 

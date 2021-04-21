@@ -18,6 +18,7 @@ namespace pipert {
 
 class ChannelImpl;
 class ProfilerImpl;
+class ReceiverBase;
 
 /// (_Part of internal implementation._)
 ///
@@ -49,6 +50,11 @@ class SchedulerImpl {
   /// This is used in configuration phase before running,
   /// and is automatically called before the destruction of a Channel.
   void UnregisterChannel(ChannelImpl* channel);
+
+  /// Add a Receiver that was newly created.
+  /// This is used in the configuration phase before running
+  /// and is automatically called at the end of Receiver construction.
+  void AddReceiver(ReceiverBase* receiver);
 
   /// Enter the running state.
   /// See Scheduler::Start().
@@ -119,6 +125,7 @@ class SchedulerImpl {
   void RunTasks();
 
   std::vector<ChannelImpl*> channels_;        ///< All registered channels.
+  std::vector<ReceiverBase*> receivers_;      ///< All receiver side objects.
   AdaptiveSpinLock global_mutex_;             ///< See GetMutex().
   std::condition_variable_any global_covar_;  ///< CV for waking up threads.
   /// Queue for states in timestamp order as a heap of monitor objects

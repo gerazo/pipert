@@ -4,7 +4,6 @@
 #include "pipert/PolledChannel.h"
 #include "pipert/Profiler.h"
 #include "pipert/Protocol.h"
-#include "pipert/ReceiverChannel.h"
 #include "pipert/ScheduledChannel.h"
 #include "pipert/SenderChannel.h"
 #include "pipert/UDPConnection.h"
@@ -12,6 +11,7 @@
 namespace pipert {
 
 class SchedulerImpl;
+class ReceiverBase;
 
 /// A Scheduler is the main object of a pipeline that owns all Channel objects
 /// and is responsible for the scheduling of processing tasks.
@@ -105,10 +105,6 @@ class Scheduler {
   template <class T>
   PolledChannel<T> CreatePolledChannel(const char* name, int capacity);
 
-  template <class T>
-  ReceiverChannel<T> CreateReceiverChannel(
-      const char* name, int capacity, UDPConnection* connection);
-
   /// Create a ScheduledChannel.
   ///
   /// This is the function you should use to create a ScheduledChannel.
@@ -160,6 +156,8 @@ class Scheduler {
   SenderChannel<T> CreateSenderChannel(
       const char* name, int capacity, UDPConnection* connection);
 
+  void AddReceiver(ReceiverBase* receiver);
+
   /// Start all worker threads by entering _running state_.
   ///
   /// \pre We should be in _preparation/stopped_ state.
@@ -210,17 +208,6 @@ PolledChannel<T> Scheduler::CreatePolledChannel(const char* name,
   ChannelImpl* chimpl =
       CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
   return PolledChannel<T>(chimpl);
-}
-
-template <class T>
-ReceiverChannel<T> Scheduler::CreateReceiverChannel(
-    const char* name, int capacity, UDPConnection* connection) {
-  Protocol<T> protocol(connection);
-  if(!protocol.ReceiverSideHandshake())
-    this->SetStateInvalid();
-  ChannelImpl* chimpl =
-      CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr, nullptr);
-  return ReceiverChannel<T>(chimpl, connection);
 }
 
 template <class T>

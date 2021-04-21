@@ -4,6 +4,8 @@
 #include <iostream>
 #include <mutex>
 
+#include "pipert/ReceiverBase.h"
+
 #include "ChannelImpl.h"
 #include "ProfileData.h"
 #include "ProfilerImpl.h"
@@ -61,6 +63,11 @@ void SchedulerImpl::UnregisterChannel(ChannelImpl* channel) {
   channels_.pop_back();
 }
 
+void SchedulerImpl::AddReceiver(ReceiverBase* receiver) {
+  assert(!running_.load(std::memory_order_acquire));
+  receivers_.push_back(receiver);
+}
+
 void SchedulerImpl::Start() {
   assert(!running_.load(std::memory_order_acquire));
   assert(valid_state);
@@ -73,6 +80,9 @@ void SchedulerImpl::Start() {
     workers_.emplace_back(&SchedulerImpl::RunTasks, this);
   }
   if (profiler_) profiler_->Start();
+  if (!receivers_.empty())
+    for (auto receiver : receivers_)
+      receiver->Start();
 }
 
 void SchedulerImpl::Stop() {
@@ -90,6 +100,9 @@ void SchedulerImpl::Stop() {
   running_.store(false, std::memory_order_release);
   workers_.clear();
   if (profiler_) profiler_->Stop();
+  if (!receivers_.empty())
+    for (auto receiver : receivers_)
+      receiver->Stop();
 }
 
 void SchedulerImpl::SetStateInvalid() {
