@@ -12,8 +12,8 @@ namespace pipert {
 template <class T>
 class Protocol {
  public:
-  static char HandshakeSuccessMsg[];
-  static char HandshakeErrorMsg[];
+  static const char kHandshakeSuccessMsg[];
+  static const char kHandshakeErrorMsg[];
 
   Protocol(UDPConnection* connection);
   ~Protocol() = default;
@@ -35,9 +35,9 @@ struct CompatibilityChecker {
 };
 
 template <class T>
-char Protocol<T>::HandshakeSuccessMsg[] = "CONN_EST";
+const char Protocol<T>::kHandshakeSuccessMsg[] = "CONN_EST";
 template <class T>
-char Protocol<T>::HandshakeErrorMsg[] = "CONN_ERR";
+const char Protocol<T>::kHandshakeErrorMsg[] = "CONN_ERR";
 
 template <class T>
 Protocol<T>::Protocol(UDPConnection* connection)
@@ -50,7 +50,7 @@ bool Protocol<T>::SenderSideHandshake() {
   connection_->Send(&local_properties, sizeof(local_properties));
   char buffer[9];
   connection_->Receive(buffer, 9);
-  if (!strcmp(buffer, HandshakeErrorMsg)){
+  if (!strcmp(buffer, kHandshakeErrorMsg)){
     return false;
   }
   return true;
@@ -62,10 +62,10 @@ bool Protocol<T>::ReceiverSideHandshake() {
   local_properties.Init();
   connection_->Receive(&remote_properties, sizeof(remote_properties));
   if (local_properties == remote_properties) {
-    connection_->Send(HandshakeSuccessMsg, 9);
+    connection_->Send(kHandshakeSuccessMsg, 9);
     return true;
   } else {
-    connection_->Send(HandshakeErrorMsg, 9);
+    connection_->Send(kHandshakeErrorMsg, 9);
     return false;
   }
 }
