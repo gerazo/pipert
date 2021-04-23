@@ -14,7 +14,6 @@ class Channel(object):
                         HIGH_DROP_RATIO: False,
                         HIGH_EXECUTION_TIME: False,
                         HIGH_READ_TIME: False,
-                        HIGH_READ_TIME: False,
                         HIGH_FILL_TIME: False,
                         HIGH_CHANNEL_TIME_TO_BUFFER: False}
         self.__measures = {}

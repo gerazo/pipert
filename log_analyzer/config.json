@@ -31,11 +31,6 @@
             "key": "Fill Time"
         },
         {
-            "name": "fill_time_measurement",
-            "enabled": true,
-            "key": "Fill Time"
-        },
-        {
             "name": "read_time_measurement",
             "enabled": true,
             "key": "Read Time"
