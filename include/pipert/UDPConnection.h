@@ -41,7 +41,7 @@ class UDPConnection {
   /// Sends the data through UDP connection.
   /// \param buffer holds the buffer that needs to be sent.
   /// \param size holds the buffer size.
-  void Send(void* buffer, int size);
+  void Send(const void* buffer, int size);
 
   /// Waits for some event on the file descriptor.
   /// \return A positive value indicates the total number of file

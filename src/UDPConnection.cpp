@@ -67,7 +67,7 @@ int UDPConnection::SetBlockingMode(bool is_blocking) {
   return fcntl(socket_filedesc_, F_SETFL, is_blocking ? flags ^ O_NONBLOCK : flags | O_NONBLOCK);
 }
 
-void UDPConnection::Send(void* buffer, int size) {
+void UDPConnection::Send(const void* buffer, int size) {
   assert(size > 0 && size <= 508);
   if (IsConnected()) {
     sendto(socket_filedesc_, buffer, size, 0,
