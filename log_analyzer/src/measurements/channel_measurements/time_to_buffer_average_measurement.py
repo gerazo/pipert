@@ -53,8 +53,6 @@ class TimeToBufferAverageMeasurement(BaseChannelMeasurement):
                 - previous_channel_packet_events_pushed_average \
                 + previous_channel_packet_events_execution_time_average
             if(result < 0):
-                print(result)
                 return -1
             else:
-                print(result)
                 return result
