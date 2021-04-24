@@ -136,6 +136,7 @@ class SchedulerImpl {
   std::atomic_bool running_;  ///< Tells what state was reached by all threads.
   int workers_number_;        ///< Real number of worker threads.
   ProfilerImpl* profiler_;  ///< Implementation of the profiler if there is any.
+  /// State of the Scheduler. See Protocol class for more details.
   bool valid_state = true;
 };
 

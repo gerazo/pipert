@@ -8,21 +8,46 @@
 
 namespace pipert {
 
+
+/// Receiver side object of the pipeline over the network.
+///
+/// Receiver allocates it's own thread where it keeps polling
+/// and reading data from the given socket. Socket handling functions
+/// come from the constructor parameter named connection. See
+/// UDPConnection class for details.
+///
+/// Receiver is handled automatically from the Scheduler
+/// (see SchedulerImpl::Start() and SchedulerImpl::Stop()).
+/// To use a Receiver in your pipeline you just need to create
+/// the object with the proper parameters.
+///
+/// \tparam T Type of the Channel where the received data goes.
 template <class T>
 class Receiver : public ReceiverBase {
  public:
+  /// Parametrized constructor of Receiver.
+  /// Doing the handshake and register Receiver into the
+  /// Scheduler is done during the construction of this object.
+  /// \param scheduler Main Scheduler for setting status after the handshake
+  ///                  and registering created receiver.
+  /// \param connection Network properties of the sender side.
+  /// \param ch_to_write Channel to write the received Packets.
   Receiver(Scheduler* scheduler, UDPConnection* connection,
            Channel<T>* ch_to_write);
 
   Receiver(Receiver&&) = default;
   Receiver& operator=(Receiver&&) = default;
 
+  /// Starts the receiver thread.
   void Start() override;
+  /// Stops the receiver thread.
   void Stop() override;
 
  private:
-  Channel<T>* ch_to_write_;
+  Channel<T>* ch_to_write_;  ///< Channel where the received Packets are written.
 
+  /// Reads from the network socket and puts data to
+  /// the given Channel.
   void Receive() override;
 };
 

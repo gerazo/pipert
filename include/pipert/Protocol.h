@@ -9,28 +9,60 @@
 
 namespace pipert {
 
+/// Network protocol to establish connection between computers.
+///
+/// Protocol is created at the construction of the sender side
+/// channel (see Scheduler::CreateSenderChannel()) and the
+/// receiver side object (see Receiver::Receiver()). It is used
+/// for checking the basic porperties of the communication
+/// participants. For these checks the protocol uses a helper class
+/// named CompatibilityChecker and the handshake processes.
+///
+/// \tparam T Type of user data which is contained by the Packet.
 template <class T>
 class Protocol {
  public:
+  /// This message being sent after a successful handshake.
   static const char kHandshakeSuccessMsg[];
+  /// This message being sent after a failed handshake.
   static const char kHandshakeErrorMsg[];
 
+  /// Constructs a new Protocol object to call the proper
+  /// handshake function.
+  /// \param connection Network properties of the other participant.
   Protocol(UDPConnection* connection);
   ~Protocol() = default;
 
+  /// Sender side handshake function which sends the
+  /// collected data of the local properties and waits
+  /// for the answer about the success of the handshake.
+  /// \return Success of the handshake.
   bool SenderSideHandshake();
+
+  /// Receiver side handshake function which
+  /// waits for the properties of the sender side,
+  /// compares them with the local properties and
+  /// sends back the proper result message.
+  /// \return Success of the handshake.
   bool ReceiverSideHandshake();
 
  private:
-  UDPConnection* connection_;
+  UDPConnection* connection_;  ///< Connection for the handshake functions.
 };
 
+/// Simple helper struct to determine the possible
+/// differences between the sender and receiver computers.
+/// \tparam T Type of user data which is contained by the Packet.
 template <class T>
 struct CompatibilityChecker {
+  /// Basic properties to be checked in the handshakes.
   size_t sizeof_int, sizeof_intptr, sizeof_bool, sizeof_t,
          alignof_int, alignof_intptr, alignof_bool, alignof_t;
 
+  /// Fills the given variables with the local computer properties.
   void Init();
+  /// Overloaded equality operator to compare the member variables.
+  /// \return Whether all of the member variables are equal.
   bool operator==(const CompatibilityChecker<T>& other) const;
 };
 
