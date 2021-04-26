@@ -48,7 +48,7 @@ class Receiver : public ReceiverBase {
 
   /// Reads from the network socket and puts data to
   /// the given Channel.
-  void Receive() override;
+  void ReceivePacket() override;
 };
 
 template <class T>
@@ -69,7 +69,7 @@ void Receiver<T>::Start() {
   if (running_.load(std::memory_order_acquire))
     return;
   running_.store(true, std::memory_order_release);
-  polling_thread_ = std::thread(&Receiver<T>::Receive, this);
+  receiver_thread_ = std::thread(&Receiver<T>::ReceivePacket, this);
 }
 
 template <class T>
@@ -78,12 +78,12 @@ void Receiver<T>::Stop() {
   if (!running_.load(std::memory_order_acquire))
     return;
   running_.store(false, std::memory_order_release);
-  if (polling_thread_.joinable())
-    polling_thread_.join();
+  if (receiver_thread_.joinable())
+    receiver_thread_.join();
 }
 
 template <class T>
-void Receiver<T>::Receive() {
+void Receiver<T>::ReceivePacket() {
   while(running_.load(std::memory_order_acquire)) {
     pipert::NetworkPacket<T> network_packet;
     if (connection_->Poll() > 0) {

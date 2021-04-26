@@ -31,11 +31,11 @@ class ReceiverBase {
     : connection_(connection) {}
   ~ReceiverBase() {}
 
-  UDPConnection* connection_;  ///< Connection details of the sender computer.
-  std::thread polling_thread_; ///< Dedicated thread for Receive() data.
-  std::atomic_bool running_;   ///< Switches the states in the Receive method.
+  UDPConnection* connection_;   ///< Connection details of the sender computer.
+  std::thread receiver_thread_; ///< Dedicated thread for receive packets.
+  std::atomic_bool running_;    ///< Switches the states in the Receive method.
 
-  virtual void Receive() = 0;
+  virtual void ReceivePacket() = 0;
 };
 
 }  // namespace pipert
