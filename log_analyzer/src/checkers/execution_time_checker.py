@@ -13,9 +13,11 @@ class ExecutionTimeChecker(BaseChecker):
       then we set the flag for HIGH_EXECUTION_TIME  in the channel value to true
    else we set flag for HIGH_EXECUTION_TIME  in the channel value to false
 
-   Parameters: none
+   Args:
+        none
 
-   Returns: none
+   Returns:
+        none
    """
 
     def run(self):

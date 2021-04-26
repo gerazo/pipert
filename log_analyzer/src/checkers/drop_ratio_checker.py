@@ -13,9 +13,11 @@ class DropRatioChecker(BaseChecker):
       then we set the flag for HIGH_DROP_RATIO  in the channel value to true
    else we set flag for HIGH_DROP_RATIO  in the channel value to false
 
-   Parameters: none
+   Args:
+        none
 
-   Returns: none
+   Returns:
+        none
    """
     def run(self):
         for channel in ChannelManager().get_channels():

@@ -9,6 +9,16 @@ class ExecutionTimeMeasurement(BaseChannelMeasurement):
             channel.add_measure(self._measurement_key, 
                                 [self._packet_cycle, exec_time])
 
+    """ calculate the value of 
+        execution_time_average = sum( execution_time_events_values) / number(execution_time_events)
+    if there is no execution time events returns execution_time_average=-1
+    
+    Args:
+         channel: the channel which we want to calculate the measurement for
+         
+    Returns:
+         execution_time_average
+    """
     def __calculate_exectutinme_time(self, channel):
         execution_events = channel.get_event(EXECTION_TIME)
         nr_execution_events = len(execution_events)

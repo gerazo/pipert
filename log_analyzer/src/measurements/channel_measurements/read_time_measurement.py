@@ -10,6 +10,16 @@ class ReadTimeMeasurement(BaseChannelMeasurement):
             channel.add_measure(self._measurement_key,
                                 [self._packet_cycle, read_time])
 
+    """ calculate the value of packet read time
+        read_time_average = avg( read_time_events_values)
+    if there is no read time events returns read_time_average=0
+    
+    Args:
+         channel: the channel which we want to calculate the measurement for
+         
+    Returns:
+         read_time_average
+    """
     def __calculate_channel_time_to_read(self, channel):
         read_time_avarage = \
             [x.get_avg() for x in channel.get_event(READ_TIME)]

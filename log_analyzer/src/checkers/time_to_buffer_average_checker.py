@@ -8,12 +8,12 @@ from src.constants import CHANNEL_TIME_TO_BUFFER, HIGH_CHANNEL_TIME_TO_BUFFER,\
 # (average time spent from times packets released from previous channel to the times to buffer
 # of current channel) and set its flag value channels
 class TimeToBufferAverageChecker(BaseChecker):
-    """get the time to buffer measure value from the channel
+    """ get the time to buffer measure value from the channel
        if its larger than defined CHANNEL_TIME_TO_BUFFER_AVERAGE_THRESHOLD in the config file
           then we set the flag for HIGH_CHANNEL_TIME_TO_BUFFER  in the channel value to true
        else we set flag for HIGH_CHANNEL_TIME_TO_BUFFER  in the channel value to false
 
-       Parameters: none
+       Args: none
 
        Returns: none
     """

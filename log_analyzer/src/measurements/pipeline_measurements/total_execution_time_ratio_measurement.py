@@ -3,6 +3,16 @@ from src.constants import EXECTION_TIME, PACKET_PUSHED, PACKET_RETRIEVED
 
 
 class TotalExecutionTimeRatioMeasurement(BasePipelineMeasurement):
+    """ calculate pipeline_executiontime_ratio=
+    pipeline_total_execution_time/pipline_total_time
+    which is the ration of pipeline thrust time to total exectuion time of all channels
+    Args:
+     NONE
+
+    Returns:
+    pipeline_executiontime_ratio
+     """
+
     def _measure(self):
         pipline_total_time = self.__get_pipline_thrust_spent_time()
         pipeline_total_execution_time = \
@@ -15,7 +25,15 @@ class TotalExecutionTimeRatioMeasurement(BasePipelineMeasurement):
 
         else:
             return -1
+    """ calculate channels_sum_max_execution_times= sum(maximum_execution_times) of all channels
+        if there is no execution times in the channels it will return -1
 
+     Args:
+     NONE
+     
+     Returns:
+     channels_sum_max_execution_times
+     """
     def __get_pipeline_maximum_Total_execution_time(self):
         channels_maximum_execution_times = \
                     [self.__calculate_max_exectutinme_time(x)
@@ -27,6 +45,15 @@ class TotalExecutionTimeRatioMeasurement(BasePipelineMeasurement):
         else:
             return -1
 
+    """ calculate channel sum_max_execution_time= sum(maximum_execution_time) 
+    if there is no execution times in the channel it will return -1
+    
+    Args:
+        channel: the channel which we want to calculate the measurement for
+        
+    Returns:
+        sum_max_execution_time
+    """
     def __calculate_max_exectutinme_time(self, channel):
         execution_events = channel.get_event(EXECTION_TIME)
         nr_execution_events = len(execution_events)
@@ -39,6 +66,14 @@ class TotalExecutionTimeRatioMeasurement(BasePipelineMeasurement):
 
         return sum_maximum_executiontime
 
+    """ calculate pipeline_thrust_time = maximum_passed_time-minimum_passed_time 
+    
+    Args:
+         NONE
+         
+    Returns:
+         pipeline_thrust_time
+    """
     def __get_pipline_thrust_spent_time(self):
         minimum_events_spent_times = \
             [self.__get_minimum_passed_time_event(x)
@@ -57,6 +92,16 @@ class TotalExecutionTimeRatioMeasurement(BasePipelineMeasurement):
         else:
             return -2
 
+    """ find the timestamp of the first PACKET_PUSHED event  in the channel and
+    return it as  minumumi_passed_time
+    if there is no PACKET_PUSHED event in channel's logs it will return -1 
+    
+    Args:
+         channel: the channel which we want to calculate the measurement for
+         
+    Returns:
+         miniumum_passed_time
+    """
     def __get_minimum_passed_time_event(self, channel):
         channel_events = channel.get_event(PACKET_PUSHED)
         if len(channel_events) > 0:
@@ -66,6 +111,16 @@ class TotalExecutionTimeRatioMeasurement(BasePipelineMeasurement):
             min_event_passed_time = -1
         return min_event_passed_time
 
+    """ find the timestamp of the last PACKET_RETRIEVED event  in the channel and
+    return it as  maximum_passed_time
+    if there is no PACKET_RETRIEVED event in channel's logs it will return -1 
+    
+    Args:
+         channel: the channel which we want to calculate the measurement for
+         
+    Returns:
+         maximum_passed_time
+    """
     def __get_maximum_passed_time_event(self, channel):
         channel_events = channel.get_event(PACKET_RETRIEVED)
         if len(channel_events) > 0:

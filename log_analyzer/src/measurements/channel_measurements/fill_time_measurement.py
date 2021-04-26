@@ -10,6 +10,17 @@ class FillTimeMeasurement(BaseChannelMeasurement):
             channel.add_measure(self._measurement_key,
                                 [self._packet_cycle, fill_time])
 
+    """ calculate the value of packet fill time
+        fill_time_average = avg( fill_time_events_values)
+    if there is no fill time events returns fill_time_average=0
+    
+    Args:
+         channel: the channel which we want to calculate the measurement for
+         
+    Returns:
+         fill_time_average
+    """
+
     def __calculate_channel_time_to_fill(self, channel):
         fill_time_avarage = \
             [x.get_avg() for x in channel.get_event(FILL_TIME)]

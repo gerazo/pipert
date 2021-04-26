@@ -13,9 +13,11 @@ class FrozenChecker(BaseChecker):
     we set the flag FROZEN value  of the channel to true else we put
     the FROZEN flag value to false
 
-    Parameters: none
+    Args:
+         none
 
-    Returns: none
+    Returns:
+         none
     """
     def run(self):
         for channel in ChannelManager().get_channels():

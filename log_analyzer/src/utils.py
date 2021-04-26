@@ -4,7 +4,15 @@ from rdp import rdp
 def flatten_list(listOfLists):
     return [item for sublist in listOfLists for item in sublist]
 
-
+""" calculate list_avg=sum(list)/size(list)
+    if list empty returns 0
+    
+   Args:
+        list: the list we want to calculate its average
+        
+   Returns:
+        list_avg
+   """
 def calc_avg(list):
     if(len(list) == 0):
         return 0
