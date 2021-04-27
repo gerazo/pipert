@@ -5,6 +5,13 @@ class Packet(object):
         self.__events = events
         self.__id = None
 
+    def get_event_count(self, event_type):
+        for event in self.get_events():
+            if event.get_type() == event_type:
+                return event.get_log_count()
+
+        return 0
+
     def get_receiver(self):
         return self.__receiver
 
@@ -19,6 +26,9 @@ class Packet(object):
 
     def set_id(self, id):
         self.__id = id
+
+    def set_id_for_events(self):
+        [event.set_packet_id(self.__id) for event in self.__events]
 
     def get_id(self):
         return self.__id

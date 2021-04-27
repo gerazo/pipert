@@ -1,7 +1,7 @@
-from checkers_getter import CheckersGetter
+from src.module_getter import ModuleGetter
 
 
 class CheckersManager(object):
     def run(self):
-        for checker in CheckersGetter().get_enabled_checkers():
+        for checker in ModuleGetter().get_enabled_checkers():
             checker.run()

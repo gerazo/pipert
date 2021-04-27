@@ -1,24 +1,104 @@
 {
+    "port": 8000,
+    "ip": "127.0.0.1",
+    "packets_cycle_threshold": 1000,
+    "pipeline_measurements": [
+        {
+            "name": "total_execution_time_ratio_measurement",
+            "enabled": true,
+            "key": "Total Execution Time Ratio"
+        }
+    ],
+    "channel_measurements": [
+        {
+            "name": "drop_rate_measurement",
+            "enabled": true,
+            "key": "Drop Rate"
+        },
+        {
+            "name": "drop_ratio_measurement",
+            "enabled": true,
+            "key": "Drop Ratio"
+        },
+        {
+            "name": "execution_time_measurement",
+            "enabled": true,
+            "key": "Execution Time"
+        },
+        {
+            "name": "fill_time_measurement",
+            "enabled": true,
+            "key": "Fill Time"
+        },
+        {
+            "name": "read_time_measurement",
+            "enabled": true,
+            "key": "Read Time"
+        },
+        {
+            "name": "time_to_buffer_average_measurement",
+            "enabled": true,
+            "key": "Time To Buffer Average"
+        },
+        {
+            "name": "packet_life_time_measurement",
+            "enabled": true,
+            "key": "Packet Life Time"
+        }
+    ],
     "checkers": [
         {
             "name": "frozen_checker",
             "enabled": true,
-            "configuration": {
-                "FROZEN_LIMITS": 20
-            }
+            "measure_key": null,
+            "parameters": {}
         },
         {
             "name": "drop_rate_checker",
             "enabled": true,
-            "configuration": {
+            "measure_key": "Drop Rate",
+            "parameters": {
                 "DROP_RATE_THRESHOLD": 0.5
             }
         },
         {
             "name": "drop_ratio_checker",
             "enabled": true,
-            "configuration": {
+            "measure_key": "Drop Ratio",
+            "parameters": {
                 "DROP_RATIO_THRESHOLD": 0.75
+            }
+        },
+        {
+            "name": "execution_time_checker",
+            "enabled": true,
+            "measure_key": "Execution Time",
+            "parameters": {
+                "EXECUTION_TIME_THRESHOLD": 0.75
+            }
+        },
+        {
+            "name": "read_time_checker",
+            "enabled": true,
+            "measure_key": "Read Time",
+            "parameters": {
+                "CHANNEL_READ_THRESHOLD": 20
+            }
+        },
+        {
+            "name": "fill_time_checker",
+            "enabled": true,
+            "measure_key": "Fill Time",
+            "parameters": {
+                "CHANNEL_FILL_THRESHOLD": 20
+            }
+        },
+        {
+            "name": "time_to_buffer_average_checker",
+            "enabled": true,
+            "measure_key": "Time To Buffer Average",
+            "parameters": {
+                "CHANNEL_TIME_TO_BUFFER_AVERAGE_THRESHOLD": 700
             }
         }
     ]

@@ -1,7 +1,9 @@
-from utils import flatten_list
-from constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
-                       PACKETS_THRESHOULD, PACKET_DROPPED, EXECTION_TIME,
-                       READ_TIME)
+from src.utils import flatten_list, reduce_points_n_extract_x_axis
+from src.constants import (FROZEN, HIGH_DROP_RATE, HIGH_DROP_RATIO,
+                           PACKET_DROPPED, EXECTION_TIME,
+                           READ_TIME, HIGH_EXECUTION_TIME, HIGH_READ_TIME,
+                           HIGH_FILL_TIME,
+                           HIGH_CHANNEL_TIME_TO_BUFFER)
 
 
 class Channel(object):
@@ -9,54 +11,35 @@ class Channel(object):
         self.__name = name
         self.__events = [events]
         self.__flags = {FROZEN: False, HIGH_DROP_RATE: False,
-                        HIGH_DROP_RATIO: False}
+                        HIGH_DROP_RATIO: False,
+                        HIGH_EXECUTION_TIME: False,
+                        HIGH_READ_TIME: False,
+                        HIGH_FILL_TIME: False,
+                        HIGH_CHANNEL_TIME_TO_BUFFER: False}
+        self.__measures = {}
         self.__packet_count = 1
         self.__latest_packet_id = latest_packet_id
 
-    def add_events(self, events):
-        if self.__packet_count % PACKETS_THRESHOULD == 0:
+    def add_events(self, events, packets_cycle_threshold):
+        if self.__packet_count > packets_cycle_threshold:
             self.__events.clear()
+            self.__packet_count = 0
 
-        print(self.__packet_count)
         self.__packet_count += 1
         self.__events.append(events)
+
+    def add_measure(self, measure_name, measure_val):
+        if not self.__measures.get(measure_name):
+            self.__measures.update({measure_name: []})
+
+        self.__measures.get(measure_name).append(measure_val)
 
     def update_flag(self, flag, value):
         val = self.__flags.get(flag)
         if val is None:
-            raise ValueError("Not a correct flag")
+            raise ValueError("{} Not a correct flag".format(flag))
 
         self.__flags[flag] = value
-
-    def calculate_drop_rate(self):
-        nr_dropped_event = len(self.get_event(PACKET_DROPPED))
-        nr_executed_event = len(self.get_event(EXECTION_TIME))
-
-        if nr_dropped_event and nr_executed_event:
-            return -1
-
-        if not nr_executed_event:
-            return 1
-
-        if not nr_dropped_event:
-            return 0
-
-        return nr_dropped_event/nr_executed_event
-
-    def calculate_drop_ratio(self):
-        nr_dropped_event = len(self.get_event(PACKET_DROPPED))
-        nr_read_event = len(self.get_event(READ_TIME))
-
-        if nr_dropped_event and nr_read_event:
-            return -1
-
-        if not nr_read_event:
-            return 1
-
-        if not nr_dropped_event:
-            return 0
-
-        return nr_dropped_event/nr_read_event
 
     def get_event(self, event_type):
         return list(filter(lambda x: x.get_type() == event_type,
@@ -64,6 +47,21 @@ class Channel(object):
 
     def get_flag(self, flag):
         return self.__flags[flag]
+
+    def get_flags(self):
+        return self.__flags
+
+    def get_all_measures(self):
+        ret_measures = {}
+        for measure_name in self.__measures:
+            ret_measures.update({measure_name:
+                                 reduce_points_n_extract_x_axis(self.__measures[measure_name])})
+            self.__measures[measure_name] = []
+
+        return ret_measures
+
+    def get_measure(self, measure):
+        return self.__measures.get(measure)[-1][1]
 
     def get_name(self):
         return self.__name
@@ -79,14 +77,6 @@ class Channel(object):
 
     def set_latest_packet_id(self, latest_packet_id):
         self.__latest_packet_id = latest_packet_id
-
-    def get_dict(self):
-        dict = {
-                "name": self.__name,
-                "flags": self.__flags
-                }
-
-        return dict
 
     def __str__(self):
         return self.__name + " " + str(self.__packet_count)

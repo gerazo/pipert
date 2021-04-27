@@ -1,20 +1,58 @@
 body {
-    padding-top: 70px;
+  padding-top: 70px;
+}
+
+h1 {
+  border: 2px solid #68977e;
+  border-radius: 5px;
+  text-align: center;
+  background-color: #807e81;
+  color: whitesmoke;
+  padding-bottom: 3px;
 }
 
 .navbar-nav.navbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translatex(-50%);
-    border: 2px solid #993300;
-    border-radius: 5px;
+  position: absolute;
+  left: 50%;
+  transform: translatex(-50%);
+  border: 2px solid #993300;
+  border-radius: 5px;
 }
 
-/* On Tabs & Desktops
-@media screen and (min-width: 768px) {
-  .navbar-left {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-} */
+.charts {
+  width: 40%;
+  float: left;
+}
+
+.channels-container {
+width: 60%;
+float: left;
+}
+
+.channel {
+border: 2px solid black;
+border-radius: 5px;
+background-color: #ffffcc;
+text-align: center;
+width: 30%;
+display: inline-block;
+margin: 2px;
+}
+
+.channel p {
+  margin: 3px;
+  text-align: left;
+  width: 100%;
+}
+
+#channels-map {
+    width: 100%;
+    height: 800px;
+}
+
+.measure {
+  text-align: center;
+  width: 45%;
+  display: inline-block;
+  margin: 2px;
+}

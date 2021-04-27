@@ -1,8 +1,8 @@
 import unittest
 from unittest.mock import patch
 
-from packet import Packet
-from packets_manager import PacketsManager
+from src.packet import Packet
+from src.packets_manager import PacketsManager
 
 PACKET_DECODER = "packets_manager.PacketDecoder"
 
