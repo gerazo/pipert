@@ -3,6 +3,7 @@
 #include <cassert>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
 #include <arpa/inet.h>
 #include <sys/types.h>
@@ -12,6 +13,7 @@
 namespace pipert {
 UDPConnection::UDPConnection(int remote_port,
                              const char* remote_address,
+                             int max_packet_size,
                              int polling_timeout) {
   socket_filedesc_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (socket_filedesc_ != -1) {
@@ -26,12 +28,15 @@ UDPConnection::UDPConnection(int remote_port,
       return;
     }
   }
+  max_packet_size_ = max_packet_size;
   polling_timeout_ = polling_timeout;
   fd_.fd = socket_filedesc_;
   assert(socket_filedesc_ != -1);  // opening socket failed
 }
 
-UDPConnection::UDPConnection(int binding_port, int polling_timeout) {
+UDPConnection::UDPConnection(int binding_port,
+                             int max_packet_size,
+                             int polling_timeout) {
   socket_filedesc_ = socket(AF_INET, SOCK_DGRAM, 0);
   if (socket_filedesc_ != -1) {
     memset(&remote_address_, 0, sizeof(remote_address_));
@@ -48,6 +53,7 @@ UDPConnection::UDPConnection(int binding_port, int polling_timeout) {
       return;
 	  }
   }
+  max_packet_size_ = max_packet_size;
   polling_timeout_ = polling_timeout;
   fd_.fd = socket_filedesc_;
   assert(socket_filedesc_ != -1);  // opening socket failed
@@ -67,8 +73,26 @@ int UDPConnection::SetBlockingMode(bool is_blocking) {
   return fcntl(socket_filedesc_, F_SETFL, is_blocking ? flags ^ O_NONBLOCK : flags | O_NONBLOCK);
 }
 
+void UDPConnection::DetectMaxPacketSize() {
+  max_packet_size_ = 512;
+  char cmd[128];
+  char cmd_prefix[64] = "ping ";
+  std::strcat(cmd_prefix, inet_ntoa(remote_address_.sin_addr));
+  std::strcat(cmd_prefix, " -c3 -w3 -M do -s ");
+  char cmd_postfix[32];
+  snprintf(cmd_postfix, 32, "%d%s", max_packet_size_, " > /dev/null 2>&1");
+  std::strcpy(cmd, cmd_prefix);
+  std::strcat(cmd, cmd_postfix);
+  while(!system(cmd)) {
+    max_packet_size_ *= 2;
+    snprintf(cmd_postfix, 32, "%d%s", max_packet_size_, " > /dev/null 2>&1");
+    std::strcpy(cmd, cmd_prefix);
+    std::strcat(cmd, cmd_postfix);
+  }
+}
+
 void UDPConnection::Send(const void* buffer, int size) {
-  assert(size > 0 && size <= 508);
+  assert(size > 0 && size <= max_packet_size_);
   if (IsConnected()) {
     sendto(socket_filedesc_, buffer, size, 0,
            (struct sockaddr*)&remote_address_, sizeof(remote_address_));
@@ -84,7 +108,7 @@ int UDPConnection::Poll() {
 }
 
 int UDPConnection::Receive(void* buffer, int size) {
-  assert(size > 0 && size <= 508);
+  assert(size > 0 && size <= max_packet_size_);
   if (IsConnected()) {
     socklen_t len = sizeof(remote_address_);
     return recvfrom(socket_filedesc_, buffer, size, 0,
