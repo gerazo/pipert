@@ -30,6 +30,8 @@ UDPConnection::UDPConnection(int remote_port,
   }
   max_packet_size_ = max_packet_size;
   polling_timeout_ = polling_timeout;
+  int val = IP_PMTUDISC_DO;
+  setsockopt(socket_filedesc_, IPPROTO_IP, IP_MTU_DISCOVER, &val, sizeof(val));
   fd_.fd = socket_filedesc_;
   assert(socket_filedesc_ != -1);  // opening socket failed
 }
@@ -55,6 +57,8 @@ UDPConnection::UDPConnection(int binding_port,
   }
   max_packet_size_ = max_packet_size;
   polling_timeout_ = polling_timeout;
+  int val = IP_PMTUDISC_DO;
+  setsockopt(socket_filedesc_, IPPROTO_IP, IP_MTU_DISCOVER, &val, sizeof(val));
   fd_.fd = socket_filedesc_;
   assert(socket_filedesc_ != -1);  // opening socket failed
 }
