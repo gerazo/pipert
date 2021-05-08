@@ -1,6 +1,6 @@
 from src.checkers.base_checker import BaseChecker
 from src.utils import flatten_list
-from src.channel_manager import ChannelManager
+from src.controllers.channels_manager import ChannelsManager
 from src.constants import FROZEN
 
 # This class contains the logic to check if channel is frozen (not sending any events through during the
@@ -20,7 +20,7 @@ class FrozenChecker(BaseChecker):
          none
     """
     def run(self):
-        for channel in ChannelManager().get_channels():
+        for channel in ChannelsManager().get_channels():
             events_list = flatten_list(channel.get_events())
             if events_list:
                 channel.update_flag(FROZEN, False)

@@ -1,7 +1,6 @@
 from src.checkers.base_checker import BaseChecker
-from src.channel_manager import ChannelManager
-from src.constants import CHANNEL_FILL_THRESHOLD, HIGH_FILL_TIME, FILL_TIME
-from src.utils import calc_avg
+from src.constants import CHANNEL_FILL_THRESHOLD, HIGH_FILL_TIME
+from src.controllers.channels_manager import ChannelsManager
 
 
 # This class contains the logic to check fill time and to set the fill time flag of the
@@ -20,7 +19,7 @@ class FillTimeChecker(BaseChecker):
          none
     """
     def run(self):
-        for channel in ChannelManager().get_channels():
+        for channel in ChannelsManager().get_channels():
             fill_time = channel.get_measure(self._measure_key)
             if (fill_time > self._parameters[CHANNEL_FILL_THRESHOLD]):
                 channel.update_flag(HIGH_FILL_TIME, True)

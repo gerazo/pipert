@@ -1,10 +1,10 @@
-from src.channel_manager import ChannelManager
+from src.controllers.channels_manager import ChannelsManager
 
 
 class BaseMeasurements(object):
     def __init__(self):
         self._packet_cycle = 1
-        self._channel_manager = ChannelManager()
+        self._channel_manager = ChannelsManager()
         self._measurement_key = None
 
     def run(self):

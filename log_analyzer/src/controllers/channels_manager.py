@@ -1,10 +1,9 @@
 from src.channel import Channel
-from src.constants import EXECTION_TIME, PACKET_PUSHED,\
-    PACKET_RETRIEVED, READ_TIME, FILL_TIME
 from src.config_reader import ConfigReader
+from src.constants import PACKET_PUSHED
 
 
-class ChannelManager(object):
+class ChannelsManager(object):
     class __ChannelManager(object):
         def __init__(self):
             self.__channels = []
@@ -79,7 +78,7 @@ class ChannelManager(object):
     __instance = None
 
     def __new__(cls):
-        if ChannelManager.__instance is None:
-            ChannelManager.__instance = ChannelManager.__ChannelManager()
+        if ChannelsManager.__instance is None:
+            ChannelsManager.__instance = ChannelsManager.__ChannelManager()
 
-        return ChannelManager.__instance
+        return ChannelsManager.__instance

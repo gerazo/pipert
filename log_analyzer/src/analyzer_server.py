@@ -1,14 +1,14 @@
 import socket
 import requests
 from time import sleep
-from src.channel_manager import ChannelManager
-from src.packets_manager import PacketsManager
-from src.checkers_manager import CheckersManager
+from src.controllers.channels_manager import ChannelsManager
+from src.controllers.packets_manager import PacketsManager
+from src.controllers.checkers_manager import CheckersManager
 from src.controllers.measurement_manager import MeasurementManager
 from src.config_reader import ConfigReader
 
-class AnalyzerServer(object):
 
+class AnalyzerServer(object):
     def __init__(self, ip, port):
         self.__ip = ip
         self.__port = port
@@ -23,7 +23,7 @@ class AnalyzerServer(object):
     def __start_server(self):
         s = self.__configure_server()
         pm = PacketsManager()
-        cm = ChannelManager()
+        cm = ChannelsManager()
         checkers_manager = CheckersManager()
         measurement_manager = MeasurementManager()
         packets_cycle_threshold = ConfigReader().get_packets_cycle_threshold()
