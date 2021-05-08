@@ -18,10 +18,10 @@ class FillTimeChecker(BaseChecker):
     Returns:
          none
     """
-    def run(self):
-        for channel in ChannelsManager().get_channels():
-            fill_time = channel.get_measure(self._measure_key)
-            if (fill_time > self._parameters[CHANNEL_FILL_THRESHOLD]):
-                channel.update_flag(HIGH_FILL_TIME, True)
-            else:
-                channel.update_flag(HIGH_FILL_TIME, False)
+    def _check(self, channel):
+        drop_rate = channel.get_measure(self._measure_key)
+        flag_val = drop_rate > self._parameters[CHANNEL_FILL_THRESHOLD]
+        return flag_val
+
+    def _set_flag_name(self):
+        return HIGH_FILL_TIME

@@ -1,8 +1,9 @@
 from rdp import rdp
 
 
-def flatten_list(listOfLists):
-    return [item for sublist in listOfLists for item in sublist]
+def flatten_list(list_of_lists):
+    return [item for sublist in list_of_lists for item in sublist]
+
 
 """ calculate list_avg=sum(list)/size(list)
     if list empty returns 0
@@ -13,11 +14,14 @@ def flatten_list(listOfLists):
    Returns:
         list_avg
    """
+
+
 def calc_avg(list):
-    if(len(list) == 0):
+    if (len(list) == 0):
         return 0
     else:
-        return sum(list)/len(list)
+        return sum(list) / len(list)
+
 
 def reduce_points_n_extract_x_axis(points):
     minimized_points = rdp(points, epsilon=0.5)

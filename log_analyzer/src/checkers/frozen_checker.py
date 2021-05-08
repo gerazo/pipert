@@ -1,7 +1,7 @@
 from src.checkers.base_checker import BaseChecker
-from src.utils import flatten_list
-from src.controllers.channels_manager import ChannelsManager
 from src.constants import FROZEN
+from src.utils import flatten_list
+
 
 # This class contains the logic to check if channel is frozen (not sending any events through during the
 # defined packets_cycle_threshold value in config file)
@@ -19,10 +19,10 @@ class FrozenChecker(BaseChecker):
     Returns:
          none
     """
-    def run(self):
-        for channel in ChannelsManager().get_channels():
-            events_list = flatten_list(channel.get_events())
-            if events_list:
-                channel.update_flag(FROZEN, False)
-            else:
-                channel.update_flag(FROZEN, True)
+    def _check(self, channel):
+        events_list = flatten_list(channel.get_events())
+        flag_val = len(events_list) == 0
+        return flag_val
+
+    def _set_flag_name(self):
+        return FROZEN

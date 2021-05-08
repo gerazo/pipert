@@ -36,7 +36,7 @@ class TestFrozenChecker(unittest.TestCase):
         # Given
         checker = FrozenChecker()
         channel = Channel("c", ["event"], -1)
-        channel.update_flag(FROZEN, True)
+        channel.add_flag(FROZEN, True)
         mgr.return_value.get_channels.return_value = [channel]
         # When
         checker.run()
@@ -48,7 +48,7 @@ class TestFrozenChecker(unittest.TestCase):
         # Given
         checker = FrozenChecker()
         channel = Channel("c", ["event"], -1)
-        channel.update_flag(FROZEN, True)
+        channel.add_flag(FROZEN, True)
         channel_2 = Channel("c2", [], -1)
         mgr.return_value.get_channels.return_value = [channel, channel_2]
         # When

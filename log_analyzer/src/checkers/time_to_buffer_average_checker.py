@@ -1,5 +1,4 @@
 from src.checkers.base_checker import BaseChecker
-from src.controllers.channels_manager import ChannelsManager
 from src.constants import HIGH_CHANNEL_TIME_TO_BUFFER, CHANNEL_TIME_TO_BUFFER_AVERAGE_THRESHOLD
 
 
@@ -16,10 +15,10 @@ class TimeToBufferAverageChecker(BaseChecker):
 
        Returns: none
     """
-    def run(self):
-        for channel in ChannelsManager().get_channels():
-            time_to_buffer = channel.get_measure(self._measure_key)
-            if (time_to_buffer > self._parameters[CHANNEL_TIME_TO_BUFFER_AVERAGE_THRESHOLD]):
-                channel.update_flag(HIGH_CHANNEL_TIME_TO_BUFFER, True)
-            else:
-                channel.update_flag(HIGH_CHANNEL_TIME_TO_BUFFER, False)
+    def _check(self, channel):
+        drop_rate = channel.get_measure(self._measure_key)
+        flag_val = drop_rate > self._parameters[CHANNEL_TIME_TO_BUFFER_AVERAGE_THRESHOLD]
+        return flag_val
+
+    def _set_flag_name(self):
+        return HIGH_CHANNEL_TIME_TO_BUFFER
