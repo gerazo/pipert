@@ -31,14 +31,14 @@ class Event(object):
         return self.__packet_id
 
     def get_dict(self):
-        dict = {"type": self.get_type(),
-                "log_count": self.get_log_count(),
-                "passed_time": self.get_passed_time(),
-                "max": self.get_max(),
-                "min": self.get_min(),
-                "avg": self.get_avg()}
+        event_dict = {"type": self.get_type(),
+                      "log_count": self.get_log_count(),
+                      "passed_time": self.get_passed_time(),
+                      "max": self.get_max(),
+                      "min": self.get_min(),
+                      "avg": self.get_avg()}
 
-        return dict
+        return event_dict
 
     def set_packet_id(self, id):
         self.__packet_id = id

@@ -9,6 +9,7 @@ class Channel(object):
         events: A list of the events in the channel
         latest_packet_id: An integer of the id for the last packet's events added to the channel
     """
+
     def __init__(self, name, events, latest_packet_id):
         self.__name = name
         self.__events = [events]
