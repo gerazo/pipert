@@ -1,5 +1,5 @@
 from src.module_getter import ModuleGetter
-from src.utils import reduce_points_n_extract_x_axis
+from src.utils import reduce_points_n_extract_y_axis
 
 
 class MeasurementManager(object):
@@ -29,7 +29,7 @@ class MeasurementManager(object):
         ret_measures = {}
         for measure_name in self.__pipeline_measurements_dict:
             ret_measures.update({measure_name:
-                                 reduce_points_n_extract_x_axis(self.__pipeline_measurements_dict[measure_name])})
+                                 reduce_points_n_extract_y_axis(self.__pipeline_measurements_dict[measure_name])})
             self.__pipeline_measurements_dict[measure_name] = []
 
         return ret_measures

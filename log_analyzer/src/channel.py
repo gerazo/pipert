@@ -1,4 +1,4 @@
-from src.utils import flatten_list, reduce_points_n_extract_x_axis
+from src.utils import flatten_list, reduce_points_n_extract_y_axis
 
 
 class Channel(object):
@@ -100,7 +100,7 @@ class Channel(object):
         ret_measures = {}
         for measure_name in self.__measures:
             ret_measures.update({measure_name:
-                                 reduce_points_n_extract_x_axis(self.__measures[measure_name])})
+                                 reduce_points_n_extract_y_axis(self.__measures[measure_name])})
             self.__measures[measure_name] = []
 
         return ret_measures
