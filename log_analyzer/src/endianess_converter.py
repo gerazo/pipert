@@ -1,6 +1,15 @@
 class EndianessConverter(object):
     @staticmethod
-    def swap_endians(value):
+    def swap_endianess(value):
+        """Converts the endianess of list of bytes
+
+        Args:
+            value: A byte representation
+
+        Returns:
+            The byte representation in the opposite endianess
+        """
+
         leftmost_byte = (value & eval('0x000000FF')) >> 0
 
         left_middle_byte = (value & eval('0x0000FF00')) >> 8
