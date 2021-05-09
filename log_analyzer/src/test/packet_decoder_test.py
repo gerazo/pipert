@@ -11,7 +11,7 @@ class TestPacketDecoder(unittest.TestCase):
         # When & Then
         self.assertRaises(ValueError, decoder.decode_packet)
 
-    def test_when_packet_should_decode(self):
+    def test_when_packet_decode_packet_should_store_sender_n_receiver_correctly(self):
         # Given
         packet = b'DGRPOutChannel\x00SENDReverserChannel\x00LOGAFill Time' \
                  b'\x00\x00\x00\x00\n\x00\x00\x08\xe3?\xf0\x00\x00\x00\x00' \
@@ -22,58 +22,33 @@ class TestPacketDecoder(unittest.TestCase):
 
         decoder = PacketDecoder(packet)
         # When
-        p, pos = decoder.decode_packet(0)
+        p = decoder.decode_packet()
         # Then
         self.assertEqual("OutChannel", p.get_receiver())
+        self.assertEqual("ReverserChannel", p.get_sender())
 
-    def test_when(self):
+    def test_when_packet_decode_packet_should_store_events_correctly(self):
         # Given
-        packets = b'DGRPOutChannel\x00SENDReverserChannel\x00LOGAFill Time' \
-                  b'\x00\x00\x00\x00\n\x00\x00,Q?' \
-                  b'\xf0\x00\x00\x00\x00\x00\x00?' \
-                  b'\xf0\x00\x00\x00\x00\x00\x00?' \
-                  b'\xe3333333LOGAPacket Pushed\x00\
-                  x00\x00\x00\n\x00\x00,\x8b?\xf0\x00\x00\x00' \
-                  b'\x00\x00\x00?\xf0\x00\x00' \
-                  b'\x00\x00\x00\x00@\x85\xe0\xcc\xcc\xcc\xcc' \
-                  b'\xcd'b'DGRPReverserChannel' \
-                  b'\x00SENDPrinterChannel\x00LOGAExecution Time' \
-                  b'\x00\x00\x00\x00\n\x00\x00+' \
-                  b'\xe4?\xf0\x00\x00\x00\x00\x00\x00?\xf0\x00\x00' \
-                  b'\x00\x00\x00\x00@-333333' \
-                  b'LOGAPacket Retrieved\x00\x00\x00\x00\n\x00\x00+\xee?' \
-                  b'\xf0\x00\x00\x00\x00\x00\x00?' \
-                  b'\xf0\x00\x00\x00\x00\x00\x00@' \
-                  b'\x85\xf4\x00\x00\x00\x00\x00' \
-                  b'LOGARead Time\x00\x00\x00' \
-                  b'\x00\n\x00\x00+\xf8?\xf0\x00\x00\x00\x00\x00\x00?' \
-                  b'\xf0\x00\x00\x00\x00\x00\x00' \
-                  b'@,333333LOGAFill Time\x00\x00\x00\x00\n\x00\x00,\t?' \
-                  b'\xf0\x00\x00\x00\x00\x00\x00?' \
-                  b'\xf0\x00\x00\x00\x00\x00\x00?\xec\xcc\xcc' \
-                  b'\xcc\xcc\xcc\xcd' \
-                  b'LOGAPacket Pushed' \
-                  b'\x00\x00\x00\x00\n\x00\x00,\x1f?\xf0\x00\x00' \
-                  b'\x00\x00\x00\x00?\xf0\x00\x00\x00' \
-                  b'\x00\x00\x00@}T\xcc\xcc\xcc\xcc\xcd'b'DGRP' \
-                  b'PrinterChannel\x00SENDN/A\x00LOGAExecution Time' \
-                  b'\x00\x00\x00\x00\n\x00\x00+|?\xf0\x00\x00\x00\x00\x00' \
-                  b'\x00?\xf0\x00\x00\x00\x00\x00\x00@@\x19' \
-                  b'\x99\x99\x99\x99\x9aLOGAPacket Retrieved\x00\x00\x00\x00' \
-                  b'\n\x00\x00+\x86?\xf0\x00\x00\x00\x00\x00\
-                  x00?\xf0\x00\x00\x00\x00\x00\x00@}\x00\x00\x00\x00\x00\x00' \
-                  b'LOGARead Time\x00\x00\x00\x00\n\x00\x00+\x91' \
-                  b'?\xf0\x00\x00\x00\x00\x00\x00?\xf0\x00\x00' \
-                  b'\x00\x00\x00\x00' \
-                  b'@@s33333LOGAFill Time\x00\x00\x00\x00\n\x00\x00+\xa2?\
-                  xf0\x00\x00\x00\x00\x00\x00?\xf0\x00\x00\x00\x00\x00\x00@' \
-                  b'\x03333333LOGAPacket Pushed\x00\x00\x00\x00\n\x00\x00+' \
-                  b'\xb2?\xf0\x00\x00\x00\x00\x00\x00?\xf0\x00\x00\x00' \
-                  b'\x00\x00\x00@vK33333'
+        packet = b'DGRPOutChannel\x00SENDReverserChannel\x00LOGAFill Time' \
+                 b'\x00\x00\x00\x00\n\x00\x00\x08\xe3?\xf0\x00\x00\x00\x00' \
+                 b'\x00\x00?\xf0\x00\x00\x00\x00\x00\x00?\xe6ffffff' \
+                 b'LOGAPacket Pushed\x00\x00\x00\x00\n\x00\x00\t8?\xf0' \
+                 b'\x00\x00\x00\x00\x00\x00@\x8c \x00' \
+                 b'\x00\x00\x00\x00@\x88\x0733333'
 
-        decoder = PacketDecoder(packets)
+        decoder = PacketDecoder(packet)
         # When
-        p = decoder.decode_packets()
-        print(p)
+        p = decoder.decode_packet()
         # Then
-        # self.assertEqual("OutChannel", p.get_receiver())
+        event1 = p.get_events()[0]
+        event2 = p.get_events()[1]
+        self.__check_event(event1, "Fill Time", 10, 2275, 1.0, 1.0, 0.7)
+        self.__check_event(event2, "Packet Pushed", 10, 2360, 1.0, 900.0, 768.9)
+
+    def __check_event(self,event,  event_type, log_cnt, p_time, min_val, max_val, avg_val):
+        self.assertEqual(event.get_type(), event_type)
+        self.assertEqual(event.get_log_count(), log_cnt)
+        self.assertEqual(event.get_passed_time(), p_time)
+        self.assertEqual(event.get_min(), min_val)
+        self.assertEqual(event.get_max(), max_val)
+        self.assertEqual(event.get_avg(), avg_val)
