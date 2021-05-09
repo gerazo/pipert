@@ -80,6 +80,7 @@ class Packet(object):
         Returns:
             A dictionary contains all the information of the packet
         """
+
         packet_dict = {"receiver_channel": self.get_receiver(),
                        "sender_channel": self.get_sender(),
                        "events": [event.get_dict() for event in self.get_events()]}
