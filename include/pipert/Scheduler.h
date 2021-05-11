@@ -3,11 +3,15 @@
 
 #include "pipert/PolledChannel.h"
 #include "pipert/Profiler.h"
+#include "pipert/Protocol.h"
 #include "pipert/ScheduledChannel.h"
+#include "pipert/SenderChannel.h"
+#include "pipert/UDPConnection.h"
 
 namespace pipert {
 
 class SchedulerImpl;
+class ReceiverBase;
 
 /// A Scheduler is the main object of a pipeline that owns all Channel objects
 /// and is responsible for the scheduling of processing tasks.
@@ -148,6 +152,28 @@ class Scheduler {
       const char* name, int capacity, void* single_thread_object,
       typename ScheduledChannel<T>::Callback callback);
 
+  /// Create a SenderChannel.
+  ///
+  /// This is the function you should use to create a SenderChannel.
+  /// See SenderChannel for details.
+  /// \tparam T See `Channel<T>` for details.
+  /// \param name The preferably unique name of the to-be-created Channel
+  ///             which will be used for identification in
+  ///             logs, monitoring and debugging.
+  ///             See ChannelBase::GetName() for details.
+  /// \param capacity The number of Packet objects that the to-be-created
+  ///                 Channel can hold.
+  ///                 See ChannelBase::GetCapacity().
+  /// \param connection Network properties of the receiver side computer.
+  ///                   See UDPConnection for details.
+  template <class T>
+  SenderChannel<T> CreateSenderChannel(
+      const char* name, int capacity, UDPConnection* connection);
+
+  /// Adds a new Receiver object to the Scheduler.
+  /// \param receiver Receiver object to be registered into the Scheduler.
+  void AddReceiver(ReceiverBase* receiver);
+
   /// Start all worker threads by entering _running state_.
   ///
   /// \pre We should be in _preparation/stopped_ state.
@@ -167,6 +193,10 @@ class Scheduler {
   ///      The corresponding thread pool is always rebuilt from scratch after
   ///      a clean shutdown.
   void Stop();
+
+  /// Sets the Scheduler's state to invalid. If a Scheduler is in invalid state
+  /// it cannot be started.
+  void SetStateInvalid();
 
   /// Tells the current state of Scheduler (running or stopped/preparation).
   /// \return True if Scheduler is running.
@@ -206,6 +236,19 @@ ScheduledChannel<T> Scheduler::CreateScheduledChannel(
       CreateChannelImpl(name, capacity, sizeof(Packet<T>), single_thread_object,
                         &ScheduledChannel<T>::CallbackTranslator);
   return ScheduledChannel<T>(chimpl, callback);
+}
+
+template <class T>
+SenderChannel<T> Scheduler::CreateSenderChannel(
+    const char* name, int capacity, UDPConnection* connection) {
+  connection->SetBlockingMode(false);
+  Protocol<T> protocol(connection);
+  if(!protocol.SenderSideHandshake())
+    this->SetStateInvalid();
+  ChannelImpl* chimpl =
+      CreateChannelImpl(name, capacity, sizeof(Packet<T>), nullptr,
+                        &SenderChannel<T>::CallbackTranslator);
+  return SenderChannel<T>(chimpl, connection);
 }
 
 }  // namespace pipert

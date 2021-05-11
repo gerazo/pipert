@@ -28,6 +28,7 @@ class PacketBase {
   Timer::Time timestamp() const { return timestamp_; }
 
  protected:
+  PacketBase() = default;
   PacketBase(Timer::Time timestamp) : timestamp_(timestamp) {};
 
  private:

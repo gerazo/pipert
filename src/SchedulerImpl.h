@@ -18,6 +18,7 @@ namespace pipert {
 
 class ChannelImpl;
 class ProfilerImpl;
+class ReceiverBase;
 
 /// (_Part of internal implementation._)
 ///
@@ -50,6 +51,11 @@ class SchedulerImpl {
   /// and is automatically called before the destruction of a Channel.
   void UnregisterChannel(ChannelImpl* channel);
 
+  /// Add a Receiver that was newly created.
+  /// This is used in the configuration phase before running
+  /// and is automatically called at the end of Receiver construction.
+  void AddReceiver(ReceiverBase* receiver);
+
   /// Enter the running state.
   /// See Scheduler::Start().
   void Start();
@@ -57,6 +63,8 @@ class SchedulerImpl {
   /// Enter the stopped/preparation/configuration state.
   /// See Scheduler::Stop().
   void Stop();
+
+  void SetStateInvalid();
 
   /// Return current state.
   /// See Scheduler::IsRunning().
@@ -117,6 +125,7 @@ class SchedulerImpl {
   void RunTasks();
 
   std::vector<ChannelImpl*> channels_;        ///< All registered channels.
+  std::vector<ReceiverBase*> receivers_;      ///< All receiver side objects.
   AdaptiveSpinLock global_mutex_;             ///< See GetMutex().
   std::condition_variable_any global_covar_;  ///< CV for waking up threads.
   /// Queue for states in timestamp order as a heap of monitor objects
@@ -127,6 +136,8 @@ class SchedulerImpl {
   std::atomic_bool running_;  ///< Tells what state was reached by all threads.
   int workers_number_;        ///< Real number of worker threads.
   ProfilerImpl* profiler_;  ///< Implementation of the profiler if there is any.
+  /// State of the Scheduler. See Protocol class for more details.
+  bool valid_state = true;
 };
 
 }  // namespace pipert
