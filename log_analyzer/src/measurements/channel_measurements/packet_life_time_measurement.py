@@ -13,7 +13,11 @@ class PacketLifeTimeMeasurement(BaseChannelMeasurement):
 
         total_packets_life = sum(channels_packet_life_time)
         for i, channel in enumerate(channels):
-            packet_life_time = channels_packet_life_time[i] / total_packets_life * 100
+            if total_packets_life:
+                packet_life_time = channels_packet_life_time[i] / total_packets_life * 100
+            else:
+                packet_life_time = 0
+
             channel.add_measure(self._measurement_key,
                                 [self._packet_cycle, packet_life_time])
 
