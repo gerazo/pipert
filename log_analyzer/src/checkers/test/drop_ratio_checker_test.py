@@ -1,87 +1,53 @@
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
+
+from src.channel import Channel
 from src.checkers.drop_ratio_checker import DropRatioChecker
 from src.constants import DROP_RATIO_THRESHOLD, HIGH_DROP_RATIO
 
 
-CHANNEL_MANAGER = "src.checkers.drop_ratio_checker.ChannelManager"
-
-
-class TestDropRatioChecker(unittest.TestCase):
+class TestDropRateChecker(unittest.TestCase):
     def setUp(self):
-        self.checker = DropRatioChecker()
+        self.__checker = DropRatioChecker()
+        self.__checker.set_measure_key("KEY")
+        self.__channels_manager = Mock()
+        self.__checker.set_manager(self.__channels_manager)
 
-    @patch(CHANNEL_MANAGER)
-    def test_when_events_and_rate_bigger_should_true_flag(self, mgr):
+    def test_when_measurement_less_should_return_false_flag(self):
         # Given
-        channel = self.__get_channel([[1, 2, 3], [1, 2, 3, 4]])
-        mgr.return_value.get_channels.return_value = [channel]
-        self.checker.set_config({DROP_RATIO_THRESHOLD: 0.7})
+        channel = self.create_channel('A', 0.5)
+        self.__checker.set_parameters({DROP_RATIO_THRESHOLD: 0.6})
+        self.__channels_manager.get_channels.return_value = [channel]
         # When
-        self.checker.run()
+        self.__checker.run()
         # Then
-        channel.update_flag.assert_called_with(HIGH_DROP_RATIO, True)
+        self.assertFalse(channel.get_flag(HIGH_DROP_RATIO))
 
-    @patch(CHANNEL_MANAGER)
-    def test_when_events_and_rate_smaller_should_false_flag(self, mgr):
+    def test_when_measurement_bigger_should_return_true_flag(self):
         # Given
-        channel = self.__get_channel([[1], [1, 2, 3]])
-        mgr.return_value.get_channels.return_value = [channel]
-        self.checker.set_config({DROP_RATIO_THRESHOLD: 0.7})
+        channel = self.create_channel('A', 0.5)
+        self.__checker.set_parameters({DROP_RATIO_THRESHOLD: 0.4})
+        self.__channels_manager.get_channels.return_value = [channel]
         # When
-        self.checker.run()
+        self.__checker.run()
         # Then
-        channel.update_flag.assert_called_with(HIGH_DROP_RATIO, False)
+        self.assertTrue(channel.get_flag(HIGH_DROP_RATIO))
 
-    @patch(CHANNEL_MANAGER)
-    def test_when_no_read_nor_dropped_packets_should_false_flag(self, mgr):
+    def test_when_multi_channel_should_handle_each(self):
         # Given
-        channel = self.__get_channel([[], []])
-        mgr.return_value.get_channels.return_value = [channel]
-        self.checker.set_config({DROP_RATIO_THRESHOLD: 0.8})
+        channel1 = self.create_channel('A', 0.5)
+        channel2 = self.create_channel('A', 0.3)
+        self.__checker.set_parameters({DROP_RATIO_THRESHOLD: 0.4})
+        self.__channels_manager.get_channels.return_value = [channel1, channel2]
         # When
-        self.checker.run()
+        self.__checker.run()
         # Then
-        channel.update_flag.assert_called_with(HIGH_DROP_RATIO, False)
-
-    @patch(CHANNEL_MANAGER)
-    def test_when_no_read_packets_should_true_flag(self, mgr):
-        # Given
-        channel = self.__get_channel([[1], []])
-        mgr.return_value.get_channels.return_value = [channel]
-        self.checker.set_config({DROP_RATIO_THRESHOLD: 0.8})
-        # When
-        self.checker.run()
-        # Then
-        channel.update_flag.assert_called_with(HIGH_DROP_RATIO, True)
-
-    @patch(CHANNEL_MANAGER)
-    def test_when_no_dropped_packets_should_false_flag(self, mgr):
-        # Given
-        channel = self.__get_channel([[], [1]])
-        mgr.return_value.get_channels.return_value = [channel]
-        self.checker.set_config({DROP_RATIO_THRESHOLD: 0.8})
-        # When
-        self.checker.run()
-        # Then
-        channel.update_flag.assert_called_with(HIGH_DROP_RATIO, False)
-
-    @patch(CHANNEL_MANAGER)
-    def test_when_multi_channels_should_handle_each_case(self, mgr):
-        # Given
-        channel = self.__get_channel([[1, 2, 3], [1, 2, 3, 4]])
-        channel_2 = self.__get_channel([[1], [1]])
-        mgr.return_value.get_channels.return_value = [channel, channel_2]
-        self.checker.set_config({DROP_RATIO_THRESHOLD: 0.8})
-        # When
-        self.checker.run()
-        # Then
-        channel.update_flag.assert_called_with(HIGH_DROP_RATIO, False)
-        channel_2.update_flag.assert_called_with(HIGH_DROP_RATIO, True)
+        self.assertTrue(channel1.get_flag(HIGH_DROP_RATIO))
+        self.assertFalse(channel2.get_flag(HIGH_DROP_RATIO))
 
     @staticmethod
-    def __get_channel(vals):
-        channel = Mock()
-        channel.get_event.side_effect = vals
+    def create_channel(name, measure_val):
+        channel = Channel(name, [], -1)
+        channel.add_measure("KEY", (1, measure_val))
 
         return channel

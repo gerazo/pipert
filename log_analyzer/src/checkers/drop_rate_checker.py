@@ -8,6 +8,7 @@ class DropRateChecker(BaseChecker):
     then we set the flag for HIGH_DROP_RATE  in the channel value to true
     else we set flag for HIGH_DROP_RATE  in the channel value to false
    """
+
     def _set_flag_name(self):
         return HIGH_DROP_RATE
 

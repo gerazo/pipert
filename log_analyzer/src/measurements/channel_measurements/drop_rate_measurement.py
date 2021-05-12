@@ -12,6 +12,7 @@ class DropRateMeasurement(BaseChannelMeasurement):
 
         Args:
              channel: the channel which we want to calculate the measurement for
+
         Returns:
              An integer or real number represents the drop_rate,
              if there is no executed events nor dropped events it will return -1
