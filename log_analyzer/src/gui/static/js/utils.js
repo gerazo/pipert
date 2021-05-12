@@ -1,3 +1,7 @@
+/*
+* Helper function to used in several models
+* */
+
 let channels_colors = {}
 
 export function get_channel_color(channel) {
@@ -13,9 +17,10 @@ function rand(min, max) {
 }
 
 function get_random_color() {
-    var h = rand(0, 360);
-    var s = rand(50, 100);
-    var l = rand(30, 100);
+    const h = rand(0, 360);
+    const s = rand(50, 100);
+    const l = rand(30, 100);
+
     return 'hsl(' + h + ',' + s + '%,' + l + '%)';
 }
 
