@@ -9,12 +9,12 @@ class BaseMeasurements(object):
 
     def run(self):
         raise NotImplementedError
-    
-    def _measure(self):
-        raise NotImplementedError
 
     def set_measurement_key(self, m_key):
         self._measurement_key = m_key
+
+    def set_manager(self, mgr):
+        self._channel_manager = mgr
 
     def get_measurement_key(self):
         return self._measurement_key
