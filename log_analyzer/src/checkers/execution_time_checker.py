@@ -2,20 +2,11 @@ from src.checkers.base_checker import BaseChecker
 from src.constants import (HIGH_EXECUTION_TIME, EXECUTION_TIME_THRESHOLD)
 
 
-# This class contains the logic to check execution time and to set the execution time flag of the
-# channels
-
 class ExecutionTimeChecker(BaseChecker):
     """ get the execution time measure value from the channel
    if its larger than defined EXECUTION_TIME_THRESHOLD in the config file
-      then we set the flag for HIGH_EXECUTION_TIME  in the channel value to true
+  then we set the flag for HIGH_EXECUTION_TIME  in the channel value to true
    else we set flag for HIGH_EXECUTION_TIME  in the channel value to false
-
-   Args:
-        none
-
-   Returns:
-        none
    """
 
     def _check(self, channel):

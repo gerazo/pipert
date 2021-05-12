@@ -1,83 +1,53 @@
 import unittest
-from unittest.mock import patch, Mock
+from unittest.mock import Mock
+
+from src.channel import Channel
 from src.checkers.execution_time_checker import ExecutionTimeChecker
-from src.constants import HIGH_EXECUTION_TIME, EXECUTION_TIME_THRESHOLD
+from src.constants import EXECUTION_TIME_THRESHOLD, HIGH_EXECUTION_TIME
 
 
-CHANNEL_MANAGER = "src.checkers.execution_time_checker.ChannelManager"
-
-
-class TestExecutionTimeChecker(unittest.TestCase):
+class TestDropRateChecker(unittest.TestCase):
     def setUp(self):
-        self.checker = ExecutionTimeChecker()
+        self.__checker = ExecutionTimeChecker()
+        self.__checker.set_measure_key("KEY")
+        self.__channels_manager = Mock()
+        self.__checker.set_manager(self.__channels_manager)
 
-    @patch(CHANNEL_MANAGER)
-    def test_when_exec_events_time_more_threshould_should_true_flag(self, mgr):
+    def test_when_measurement_less_should_return_false_flag(self):
         # Given
-        events = self.__get_events([3.5, 5.0])
-        channel = self.__get_channel(events)
-        mgr.return_value.get_channels.return_value = [channel]
-        self.checker.set_config({EXECUTION_TIME_THRESHOLD: 0.7})
+        channel = self.create_channel('A', 0.5)
+        self.__checker.set_parameters({EXECUTION_TIME_THRESHOLD: 0.6})
+        self.__channels_manager.get_channels.return_value = [channel]
         # When
-        self.checker.run()
+        self.__checker.run()
         # Then
-        channel.update_flag.assert_called_with(HIGH_EXECUTION_TIME, True)
+        self.assertFalse(channel.get_flag(HIGH_EXECUTION_TIME))
 
-    @patch(CHANNEL_MANAGER)
-    def test_when_exec_events_time_less_threshould_should_false_flag(self,
-                                                                     mgr):
+    def test_when_measurement_bigger_should_return_true_flag(self):
         # Given
-        events = self.__get_events([0.5, 0.5, 0.5])
-        channel = self.__get_channel(events)
-        mgr.return_value.get_channels.return_value = [channel]
-        self.checker.set_config({EXECUTION_TIME_THRESHOLD: 0.7})
+        channel = self.create_channel('A', 0.5)
+        self.__checker.set_parameters({EXECUTION_TIME_THRESHOLD: 0.4})
+        self.__channels_manager.get_channels.return_value = [channel]
         # When
-        self.checker.run()
+        self.__checker.run()
         # Then
-        channel.update_flag.assert_called_with(HIGH_EXECUTION_TIME, False)
+        self.assertTrue(channel.get_flag(HIGH_EXECUTION_TIME))
 
-    @patch(CHANNEL_MANAGER)
-    def test_when_no_exec_events_should_false_flag(self, mgr):
+    def test_when_multi_channel_should_handle_each(self):
         # Given
-        channel = self.__get_channel([])
-        mgr.return_value.get_channels.return_value = [channel]
-        self.checker.set_config({EXECUTION_TIME_THRESHOLD: 0.7})
+        channel1 = self.create_channel('A', 0.5)
+        channel2 = self.create_channel('A', 0.3)
+        self.__checker.set_parameters({EXECUTION_TIME_THRESHOLD: 0.4})
+        self.__channels_manager.get_channels.return_value = [channel1, channel2]
         # When
-        self.checker.run()
+        self.__checker.run()
         # Then
-        channel.update_flag.assert_called_with(HIGH_EXECUTION_TIME, False)
-
-    @patch(CHANNEL_MANAGER)
-    def test_when_multi_channel_should_handle_each_case(self, mgr):
-        # Given
-        channel = self.__get_channel([])
-        events_2 = self.__get_events([0.5, 0.5, 0.5])
-        channel_2 = self.__get_channel(events_2)
-        events_3 = self.__get_events([3.5, 5.0])
-        channel_3 = self.__get_channel(events_3)
-        mgr.return_value.get_channels.return_value = [channel, channel_2,
-                                                      channel_3]
-        self.checker.set_config({EXECUTION_TIME_THRESHOLD: 0.7})
-        # When
-        self.checker.run()
-        # Then
-        channel.update_flag.assert_called_with(HIGH_EXECUTION_TIME, False)
-        channel_2.update_flag.assert_called_with(HIGH_EXECUTION_TIME, False)
-        channel_3.update_flag.assert_called_with(HIGH_EXECUTION_TIME, True)
+        self.assertTrue(channel1.get_flag(HIGH_EXECUTION_TIME))
+        self.assertFalse(channel2.get_flag(HIGH_EXECUTION_TIME))
 
     @staticmethod
-    def __get_channel(vals):
-        channel = Mock()
-        channel.get_event.return_value = vals
+    def create_channel(name, measure_val):
+        channel = Channel(name, [], -1)
+        channel.add_measure("KEY", (1, measure_val))
 
         return channel
-
-    @staticmethod
-    def __get_events(avgs):
-        events = []
-        for avg in avgs:
-            event = Mock()
-            event.get_avg.return_value = avg
-            events.append(event)
-
-        return events

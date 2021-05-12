@@ -8,7 +8,7 @@ class DropRatioMeasurement(BaseChannelMeasurement):
 
     def _measure(self, channel):
         """ calculate the value of
-            drop_ratio = number(dropped events) /number(read events)
+        drop_ratio = number(dropped events) /number(read events)
 
         Args:
              channel: the channel which we want to calculate the measurement for
