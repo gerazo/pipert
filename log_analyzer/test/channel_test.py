@@ -4,7 +4,7 @@ from unittest.mock import patch
 from src.channel import Channel
 from src.event import Event
 
-POINTS_N_EXTRACT_X_AXIS = "src.channel.reduce_points_n_extract_x_axis"
+POINTS_N_EXTRACT_X_AXIS = "src.channel.reduce_points_n_extract_y_axis"
 
 
 class TestChannel(unittest.TestCase):
