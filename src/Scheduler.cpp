@@ -33,6 +33,11 @@ void Scheduler::Stop() {
   impl_->Stop();
 }
 
+void Scheduler::SetStateInvalid() {
+  assert(impl_);
+  impl_->SetStateInvalid();
+}
+
 bool Scheduler::IsRunning() {
   assert(impl_);
   return impl_->IsRunning();
@@ -45,6 +50,11 @@ int Scheduler::GetWorkerNumber() {
 
 Profiler& Scheduler::GetProfiler() {
   return profiler_;
+}
+
+void Scheduler::AddReceiver(ReceiverBase* receiver) {
+  assert(impl_);
+  impl_->AddReceiver(receiver);
 }
 
 ChannelImpl* Scheduler::CreateChannelImpl(

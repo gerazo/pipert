@@ -1,6 +1,8 @@
 #ifndef _PROFILER_H_
 #define _PROFILER_H_
 
+#include "pipert/UDPConnection.h"
+
 #include <cstdint>
 #include <cstdio>
 
@@ -8,7 +10,6 @@ namespace pipert {
 
 class ProfilerImpl;
 class Scheduler;
-class UDPConnection;
 
 /// Controlling object of all profiling and monitoring functionality.
 ///
