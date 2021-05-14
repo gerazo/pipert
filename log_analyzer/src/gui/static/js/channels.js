@@ -1,5 +1,9 @@
 import { get_channel_color } from './utils.js';
 
+/*
+* Create the channels' boxes with the checkers
+* */
+
 export function create_channels(channels) {
     const container = document.getElementsByClassName("channels-container")[0];
     container.innerHTML = "";

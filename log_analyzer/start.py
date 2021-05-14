@@ -1,7 +1,7 @@
 import threading
 
 from src.analyzer_server import AnalyzerServer
-from src.application import run
+from src.gui.application import run
 from src.config_reader import ConfigReader
 
 if __name__ == "__main__":

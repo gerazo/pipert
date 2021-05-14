@@ -1,14 +1,18 @@
 import { get_channel_color } from './utils.js';
 
+/*
+* Creating a map of the channels in the pipeline using the vis.js library
+* */
+
 export function create_map(dict) {
-    var nodes = create_nodes(dict.unique_channels);
-    var edges = create_edges(dict.channels_map);
-    var container = document.getElementById("channels-map");
-    var data = {
+    const nodes = create_nodes(dict.unique_channels);
+    const edges = create_edges(dict.channels_map);
+    const container = document.getElementById("channels-map");
+    const data = {
         nodes: nodes,
         edges: edges
     };
-    var options = {};
+    const options = {};
     new vis.Network(container, data, options);
 }
 

@@ -3,6 +3,9 @@ import { create_map } from './channels_map.js'
 import { add_dataset, create_line_live_chart, update } from './charts.js';
 import {get_channel_names, get_field} from './utils.js'
 
+/*
+* Creating the index page's content
+* */
 
 let socket = io.connect('http://' + document.domain + ':' + location.port);
 let names = [];
@@ -16,8 +19,8 @@ socket.on('channels_map', function(dict){
     create_map(dict);
 });
 socket.on('measures_update', function(dict){
-    var execution_rates = get_field(dict, "Execution Time");
-    var drop_rates = get_field(dict, "Drop Rate");
+    const execution_rates = get_field(dict, "Execution Time");
+    const drop_rates = get_field(dict, "Drop Rate");
     if (!( names.length == get_channel_names(dict).length)) {
         names = get_channel_names(dict);
         for (const channel_name of names) {

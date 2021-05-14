@@ -1,6 +1,10 @@
 import { add_dataset, create_line_live_chart, update } from './charts.js';
 import {get_channel_names, get_field} from './utils.js'
 
+/*
+* Creating and updating the measurements' page content
+* */
+
 let socket = io.connect('http://' + document.domain + ':' + location.port);
 
 let channel_measure_charts = []
@@ -19,9 +23,9 @@ for (const measure of pipeline_measurements){
 let label_begin_channels = 1;
 socket.on('measures_update', function(dict){
     channels_measurements.forEach((measure, i) => {
-        var rates = get_field(dict, measure[1]);
-        var chart = channel_measure_charts[i];
-        var channels_name = get_channel_names(dict);
+        const rates = get_field(dict, measure[1]);
+        const chart = channel_measure_charts[i];
+        const channels_name = get_channel_names(dict);
         if (!( chart.data.datasets.length == channels_name.length)) {
             for (const channel_name of channels_name) {
                 add_dataset(chart, channel_name);

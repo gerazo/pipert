@@ -3,23 +3,21 @@ from src.constants import EXECTION_TIME
 
 
 class ExecutionTimeMeasurement(BaseChannelMeasurement):
-    def _measure(self):
-        for channel in self._channel_manager.get_channels():
-            exec_time = self.__calculate_exectutinme_time(channel)
-            channel.add_measure(self._measurement_key, 
-                                [self._packet_cycle, exec_time])
-
-    """ calculate the value of 
-        execution_time_average = sum( execution_time_events_values) / number(execution_time_events)
-    if there is no execution time events returns execution_time_average=-1
-    
-    Args:
-         channel: the channel which we want to calculate the measurement for
-         
-    Returns:
-         execution_time_average
+    """Calculate the execution time of a channel and assign to it as a measurement
     """
-    def __calculate_exectutinme_time(self, channel):
+
+    def _measure(self, channel):
+        """ calculate the value of
+        execution_time_average = sum( execution_time_events_values) / number(execution_time_events)
+
+        Args:
+             channel: the channel which we want to calculate the measurement for
+
+        Returns:
+             An integer or real number represents the execution time,
+             if there is no execution time events returns execution_time_average = -1
+        """
+
         execution_events = channel.get_event(EXECTION_TIME)
         nr_execution_events = len(execution_events)
 

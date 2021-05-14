@@ -1,6 +1,5 @@
-from flask import Flask, render_template, request, jsonify, session
-from flask_socketio import SocketIO, send, emit
-from src.config_reader import ConfigReader
+from flask import Flask, render_template, request, jsonify
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
@@ -11,14 +10,17 @@ socketio = SocketIO(app)
 pipeline_measures_names = []
 channel_measures_names = []
 
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/measurements')
 def measurements():
     return render_template('measurements.html', pipeline_measures=pipeline_measures_names,
                            channel_measures=channel_measures_names)
+
 
 @app.route('/measurements', methods=['POST'])
 def measurement_post():
