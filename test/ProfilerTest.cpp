@@ -3,7 +3,7 @@
 #include "pipert/Profiler.h"
 
 #include <cstdio>
-
+namespace {
 TEST(ProfilerTest, EmptyIsHarmless) {
   pipert::Profiler profiler;
   EXPECT_EQ(profiler.GetAggregationTime(), 0);
@@ -47,3 +47,4 @@ TEST(ProfilerTest, CreateForUDP) {
 }
 
 // TODO Tests using Scheduler
+}
