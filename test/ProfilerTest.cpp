@@ -1,9 +1,9 @@
+#include "gtest/gtest.h"
 #include <arpa/inet.h>
-
 #include <cstdio>
 #include <thread>
 
-#include "gtest/gtest.h"
+
 #include "pipert/Profiler.h"
 #include "pipert/Scheduler.h"
 namespace {
