@@ -171,6 +171,11 @@ TEST(ProfilerTest, TestUDPUsingSchedular) {
        !packet_to_process.IsEmpty(); packet_to_process = pc.Poll()) {
   }
   // test receiving data
-  EXPECT_EQ(Receive(), true);
+  bool recieve_result=false;
+  for(int i=0;i<100;i++) {
+      recieve_result = Receive() || recieve_result;
+  }
+        EXPECT_EQ(recieve_result,true);
 }
+
 }  // namespace
