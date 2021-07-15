@@ -2,7 +2,7 @@
 #include <arpa/inet.h>
 #include <cstdio>
 #include <thread>
-
+#include <chrono>
 
 #include "pipert/Profiler.h"
 #include "pipert/Scheduler.h"
@@ -174,6 +174,7 @@ TEST(ProfilerTest, TestUDPUsingSchedular) {
   bool recieve_result=false;
   for(int i=0;i<100;i++) {
       recieve_result = Receive() || recieve_result;
+      std::this_thread::sleep_for(std::chrono::duration<int, std::ratio<1, 100000>>());
   }
         EXPECT_EQ(recieve_result,true);
 }
