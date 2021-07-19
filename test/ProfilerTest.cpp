@@ -92,7 +92,13 @@ bool Receive() {
     return true;
   } else {
     close(sockfd);
-    return false;
+    std::cout<<buffer[0];
+    std::cout<<"\n";
+    std::cout<<buffer[37];
+    std::cout<<"\n";
+    std::cout<<buffer[94];
+    std::cout<<"\n";
+      return false;
   }
 }
 
