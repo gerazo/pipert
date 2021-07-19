@@ -11,6 +11,7 @@ const std::uint16_t server_port = 8888;
 const int buffer_size = 131;
 std::uint8_t buffer[buffer_size];
 int sockfd;
+bool recievier_up_and_running= false;
 
 TEST(ProfilerTest, EmptyIsHarmless) {
   pipert::Profiler profiler;
@@ -72,6 +73,8 @@ void PrepareToReceive() {
   if (bind(sockfd, (const struct sockaddr *)&servaddr, sizeof(servaddr)) < 0) {
     ASSERT_TRUE(false);  // bind failed
   }
+
+    recievier_up_and_running= true;
 }
 
 bool Receive() {
@@ -162,7 +165,10 @@ TEST(ProfilerTest, TestUDPUsingSchedular) {
 
   while (pc.GetQueuedBufferLength() != channel_capacity)
     std::this_thread::yield();
+  while(!recievier_up_and_running)
+  {
 
+  }
   sch.GetProfiler().GatherNSend();
 
   sch.Stop();
@@ -172,11 +178,8 @@ TEST(ProfilerTest, TestUDPUsingSchedular) {
   }
   // test receiving data
   bool recieve_result=false;
-  for(int i=0;i<100;i++) {
-      recieve_result = Receive() || recieve_result;
-      std::this_thread::sleep_for(std::chrono::duration<int, std::ratio<1, 100000>>());
-  }
-        EXPECT_EQ(recieve_result,true);
+  recieve_result = Receive();
+  EXPECT_EQ(recieve_result,true);
 }
 
 }  // namespace
