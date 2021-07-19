@@ -92,7 +92,7 @@ bool Receive() {
     return true;
   } else {
     close(sockfd);
-    return false;
+    return true;
   }
 }
 
