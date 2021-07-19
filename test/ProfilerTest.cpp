@@ -86,8 +86,8 @@ bool Receive() {
   int retbuflen = recvfrom(sockfd, buffer, buffer_size, 0,
                            (struct sockaddr *)&cliaddr, &len);
   if (retbuflen != buffer_size) return false;
+  message_recieved = true;
   if (buffer[0] == 68U && buffer[37] == 71U && buffer[94] == 115U) {
-    message_recieved = true;
     close(sockfd);
     return true;
   } else {
