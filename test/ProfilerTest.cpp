@@ -10,7 +10,6 @@
 namespace {
 const std::uint16_t server_port = 8888;
 const int buffer_size = 131;
-std::uint8_t buffer[buffer_size];
 int sockfd;
 bool recievier_up_and_running = false;
 bool message_recieved = false;
@@ -80,6 +79,7 @@ void PrepareToReceive() {
 }
 
 bool Receive() {
+    std::uint8_t buffer[buffer_size];
   struct sockaddr_in cliaddr;
   memset(&cliaddr, 0, sizeof(cliaddr));
   socklen_t len = sizeof(cliaddr);
@@ -92,7 +92,7 @@ bool Receive() {
     return true;
   } else {
     close(sockfd);
-    return true;
+    return false;
   }
 }
 
