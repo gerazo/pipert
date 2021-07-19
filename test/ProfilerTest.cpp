@@ -1,9 +1,10 @@
-#include "gtest/gtest.h"
 #include <arpa/inet.h>
+
+#include <chrono>
 #include <cstdio>
 #include <thread>
-#include <chrono>
 
+#include "gtest/gtest.h"
 #include "pipert/Profiler.h"
 #include "pipert/Scheduler.h"
 namespace {
@@ -11,7 +12,8 @@ const std::uint16_t server_port = 8888;
 const int buffer_size = 131;
 std::uint8_t buffer[buffer_size];
 int sockfd;
-bool recievier_up_and_running= false;
+bool recievier_up_and_running = false;
+bool message_recieved = false;
 
 TEST(ProfilerTest, EmptyIsHarmless) {
   pipert::Profiler profiler;
@@ -74,7 +76,7 @@ void PrepareToReceive() {
     ASSERT_TRUE(false);  // bind failed
   }
 
-    recievier_up_and_running= true;
+  recievier_up_and_running = true;
 }
 
 bool Receive() {
@@ -85,6 +87,7 @@ bool Receive() {
                            (struct sockaddr *)&cliaddr, &len);
   if (retbuflen != buffer_size) return false;
   if (buffer[0] == 68U && buffer[37] == 71U && buffer[94] == 115U) {
+    message_recieved = true;
     close(sockfd);
     return true;
   } else {
@@ -165,9 +168,7 @@ TEST(ProfilerTest, TestUDPUsingSchedular) {
 
   while (pc.GetQueuedBufferLength() != channel_capacity)
     std::this_thread::yield();
-  while(!recievier_up_and_running)
-  {
-
+  while (!recievier_up_and_running) {
   }
   sch.GetProfiler().GatherNSend();
 
@@ -177,9 +178,11 @@ TEST(ProfilerTest, TestUDPUsingSchedular) {
        !packet_to_process.IsEmpty(); packet_to_process = pc.Poll()) {
   }
   // test receiving data
-  bool recieve_result=false;
+  bool recieve_result = false;
   recieve_result = Receive();
-  EXPECT_EQ(recieve_result,true);
+  while (!message_recieved) {
+  }
+  EXPECT_EQ(recieve_result, true);
 }
 
 }  // namespace
