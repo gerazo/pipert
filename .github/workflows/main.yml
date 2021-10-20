@@ -40,3 +40,13 @@ jobs:
 
       - name: Release on Clang
         run: CC=clang CXX=clang++ ./devbuild.sh -ci -dir build_clang_release -mode Release
+
+  publish_artifacts:
+    runs-on: ubuntu-20.04
+    needs: build
+    steps:
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: build_clang_release/docs
