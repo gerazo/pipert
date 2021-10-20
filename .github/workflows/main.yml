@@ -42,6 +42,7 @@ jobs:
         run: CC=clang CXX=clang++ ./devbuild.sh -ci -dir build_clang_release -mode Release
 
       - name: Upload documentation
+        if: github.ref == 'refs/heads/master'
         uses: actions/upload-artifact@v2
         with:
           name: docs
@@ -50,6 +51,7 @@ jobs:
   publish_artifacts:
     runs-on: ubuntu-20.04
     needs: build
+    if: github.ref == 'refs/heads/master'
     steps:
       - name: Download documentation
         uses: actions/download-artifact@v2
