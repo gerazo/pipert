@@ -27,7 +27,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Install extra dependencies
-        run: sudo DEBIAN_FRONTEND=noninteractive apt-get -qy update && sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install ninja-build llvm gcovr
+        run: sudo DEBIAN_FRONTEND=noninteractive apt-get -qy update && sudo DEBIAN_FRONTEND=noninteractive apt-get -qy install ninja-build llvm gcovr doxygen
 
       - name: Debug on GCC
         run: CC=gcc CXX=g++ ./devbuild.sh -ci -nodocs -dir build_gcc_debug -mode Debug
@@ -39,4 +39,4 @@ jobs:
         run: CC=clang CXX=clang++ ./devbuild.sh -ci -nodocs -dir build_clang_debug -mode Debug
 
       - name: Release on Clang
-        run: CC=clang CXX=clang++ ./devbuild.sh -ci -nodocs -dir build_clang_release -mode Release
+        run: CC=clang CXX=clang++ ./devbuild.sh -ci -dir build_clang_release -mode Release
