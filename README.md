@@ -34,7 +34,7 @@ The processing functions defined in the user's nodes accept a packet to be proce
 
 At any point after the scheduler was started, it may be stopped, which means it will instruct all worker threads to finish their processing, wait for them to complete their current tasks, and re-enter the setup/preparation phase.
 
-For a more detailed description on how each component in the system works, please check out our documentation, which you can build using Doxygen following the steps outlined below.
+For a more detailed description on how each component in the system works, please check out our [documentation](https://gerazo.github.io/pipert/).
 
 ## Normal Build for Your Project
 
