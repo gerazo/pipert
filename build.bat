@@ -1,0 +1,3 @@
+@echo OFF
+echo Executing end-user build...
+./devbuild.bat -dir build -mode Release
