@@ -5,7 +5,7 @@
 
 namespace pipert {
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// A mutex implementing a real-time spinlock behavior that tries to not lose
 /// its timeslice by avoiding OS calls.
 ///

@@ -8,7 +8,7 @@
 
 namespace pipert {
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Tracks the sender object of the packet by finding out the name of the
 /// currently executing thread.
 /// A couple of names are logged and ordered to find the most frequent sender.

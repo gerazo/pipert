@@ -6,7 +6,7 @@
 
 namespace pipert {
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Converts primitive, built-in types from native host byte ordering to
 /// network (MSB) byte ordering in a platform independent way.
 /// \param val Value to be converted.
@@ -24,32 +24,32 @@ T ConvertHostToNetworkByteOrder(T val) {
   return ret;
 }
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized version of ConvertHostToNetworkByteOrder() for floats.
 template <>
 float ConvertHostToNetworkByteOrder<float>(float val);
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized version of ConvertHostToNetworkByteOrder() for doubles.
 template <>
 double ConvertHostToNetworkByteOrder<double>(double val);
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized, no-op version of ConvertHostToNetworkByteOrder() for bytes.
 template <>
 char ConvertHostToNetworkByteOrder<char>(char val);
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized, no-op version of ConvertHostToNetworkByteOrder() for bytes.
 template <>
 signed char ConvertHostToNetworkByteOrder<signed char>(signed char val);
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized, no-op version of ConvertHostToNetworkByteOrder() for bytes.
 template <>
 unsigned char ConvertHostToNetworkByteOrder<unsigned char>(unsigned char val);
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Converts primitive, built-in types from network (MSB) byte ordering to
 /// native host byte ordering in a platform independent way.
 /// \param val Value to be converted.
@@ -66,27 +66,27 @@ T ConvertNetworkToHostByteOrder(T val) {
   return ret;
 }
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized version of ConvertNetworkToHostByteOrder() for floats.
 template <>
 float ConvertNetworkToHostByteOrder<float>(float val);
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized version of ConvertNetworkToHostByteOrder() for doubles.
 template <>
 double ConvertNetworkToHostByteOrder<double>(double val);
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized, no-op version of ConvertNetworkToHostByteOrder() for bytes.
 template <>
 char ConvertNetworkToHostByteOrder<char>(char val);
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized, no-op version of ConvertNetworkToHostByteOrder() for bytes.
 template <>
 signed char ConvertNetworkToHostByteOrder<signed char>(signed char val);
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Specialized, no-op version of ConvertNetworkToHostByteOrder() for bytes.
 template <>
 unsigned char ConvertNetworkToHostByteOrder<unsigned char>(unsigned char val);

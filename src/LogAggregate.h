@@ -9,7 +9,7 @@
 
 namespace pipert {
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 /// Aggregates log events instead of logging them individually.
 ///
 /// This class is the final target of log events.

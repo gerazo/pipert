@@ -20,7 +20,7 @@ class ChannelImpl;
 class ProfilerImpl;
 class ReceiverBase;
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 ///
 /// This is the implementation of the Scheduler logic.
 /// Every Scheduler must have a SchedulerImpl behind it.

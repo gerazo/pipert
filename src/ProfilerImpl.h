@@ -12,7 +12,7 @@ namespace pipert {
 
 class ProfileData;
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 ///
 /// The internal implementation of the Profiler object which is responsible
 /// for managing all ProfileData objects connected to channels.

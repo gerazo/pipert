@@ -13,7 +13,7 @@ namespace pipert {
 class ProfileData;
 class SchedulerImpl;
 
-/// (_Part of internal implementation._)
+/// (_Part of internal implementation_.)
 ///
 /// This is the implementation of the Channel logic.
 /// This template free code has all necessary data extracted from
